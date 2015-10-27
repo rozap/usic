@@ -1,0 +1,19 @@
+
+
+<div class="pure-g control-units">
+  <div class="pure-u-1-8 control">
+    <% if(state.status === 'playing') { %>
+      <a class="pure-button pure-button-primary play-pause pause-button" href="javascript:void(0)">Pause</a>
+    <% } else if(state.status === 'paused') { %>
+      <a class="pure-button pure-button-primary play-pause play-button" href="javascript:void(0)">Play</a>
+    <% } %>
+  </div>
+  <div class="pure-u-1-4 control">
+    <span>Speed: <%- parseFloat(state.rate).toFixed(2) %></span>
+    <input
+      id="playback-rate"
+      value="<%- state.rate * 100 %>"
+      type="range" min="<%- state.minRate * 100 %>" max="<%- state.maxRate * 100 %>"/>
+  </div>
+
+</div>

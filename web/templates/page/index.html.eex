@@ -1,0 +1,15 @@
+<div class="head pure-g">
+  <div class="pure-u-1-4">
+    <h2>μsic</h2>
+  </div>
+  <div class="pure-u-3-4">
+    <div id="search" class="search">
+      <input value="https://www.youtube.com/watch?v=0dzOCcK1ziM"/>
+      <div id="search-result"></div>
+    </div>
+  </div>
+</div>
+<div id="song">
+
+
+</div>

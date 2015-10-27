@@ -1,0 +1,28 @@
+
+#song {
+  padding: @base-pad;
+
+  #waveform {
+    ::-webkit-scrollbar {
+      display: none;
+    }
+    #element::-webkit-scrollbar {
+      display: none;
+    }
+  }
+}
+
+.control-units {
+  margin-top: @base-pad;
+  .control {
+    .pure-button {
+      margin-top: @base-pad;
+    }
+    padding: @base-pad / 2;
+    border-left: 1px solid @light-gray;
+  }
+
+  .control:first-of-type {
+    border-left: none;
+  }
+}

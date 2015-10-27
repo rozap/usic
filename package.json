@@ -1,0 +1,34 @@
+{
+  "repository": {
+  },
+  "dependencies": {
+    "brunch": "^1.8.5",
+    "babel-brunch": "^5.1.1",
+    "clean-css-brunch": ">= 1.0 < 1.8",
+    "css-brunch": ">= 1.0 < 1.8",
+    "javascript-brunch": ">= 1.0 < 1.8",
+    "uglify-js-brunch": ">= 1.0 < 1.8",
+    "gulp": "latest",
+    "gulp-less": "latest",
+    "gulp-uglify": "^0.3.1",
+    "gulp-minify-css": "latest",
+    "gulp-sourcemaps": "^1.1.1",
+    "vinyl-buffer": "latest",
+    "optimist": "0.3.4",
+    "underscore": "latest",
+    "moment": "latest",
+    "vinyl-source-stream": "latest",
+    "stringify": "latest",
+    "markdown": "latest",
+    "json-markup": "latest",
+    "orchestrator": "latest",
+    "browserify":"latest",
+    "phoenix_js":"latest",
+    "backbone":"latest",
+    "jquery":"latest",
+    "uuid": "latest",
+    "wavesurfer.js": "latest",
+    "soundbank-granular": "latest",
+    "bopper": "latest"
+  }
+}

@@ -1,0 +1,21 @@
+
+#view-regions {
+  width: 100%;
+  overflow-x: auto;
+
+  #region-list {
+    height: @base-pad * 7;
+    list-style-type: none;
+    padding: 0px;
+    margin: @base-pad 0px;
+    position: relative;
+
+
+    .region {
+      position: absolute;
+      display: inline-block;
+      padding: @base-pad;
+      border: 1px solid @gray;
+    }
+  }
+}

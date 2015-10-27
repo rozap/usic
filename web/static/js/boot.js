@@ -14,17 +14,21 @@ var LoadResult = View.extend({
   template: _.template(LoadResultTemplate),
 
   init: function(opts) {
-    this.stateChange(opts.parent, 'reply:search', this._update);
+    this.stateChange(opts._parent, 'reply:search', this._update);
   },
 
   _update: function(state) {
+    if(this._song) this._song.destroy();
     if(state.state === 'success') {
-      this.addSubview('song', Song, {
+      this._songView = new Song({
         result: state
       });
+
+      $('#search-input').blur();
     }
     return state;
-  }
+  },
+
 });
 
 var Loader = View.extend({
@@ -41,7 +45,7 @@ var Loader = View.extend({
   },
 
   _bootstrapViews: function(opts) {
-    this._subviews.loadResult = new LoadResult({parent: this});
+    this.addSubview('result', LoadResult);
   },
 
   _bootstrapChannel: function(opts) {

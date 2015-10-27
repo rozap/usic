@@ -3,6 +3,7 @@ var _ = require('underscore');
 var t = require('./translate').t;
 
 module.exports = bb.View.extend({
+
   initialize: function(opts) {
     this._subviews = {};
     this._state = {};
@@ -15,7 +16,6 @@ module.exports = bb.View.extend({
       var state = cb.apply(this, Array.prototype.slice.call(arguments));
       if (state) {
         this._state = state;
-        console.log('new state', state);
         this.render();
       }
     }.bind(this));
@@ -31,20 +31,55 @@ module.exports = bb.View.extend({
     this.render();
   },
 
+  _getState:function() {
+    var s = {};
+    if(this.renderTo) {
+      this.renderTo.forEach(function(name) {
+        s[name] = this[name];
+      }.bind(this));
+    }
+    return _.extend(s, this.getState());
+  },
+
   getState: function() {
     return this._state;
   },
 
-  render: function() {
+  r:function() {
+    this.render();
+  },
+
+  render: function(parentState) {
+    parentState = parentState || (this._parent && this._parent.getState()) || {};
+    var state = _.extend(parentState, this._getState());
     this.$el.html(this.template({
       t: t,
-      state: this.getState()
+      _: _,
+      state: state
     }));
+
+    if(state.cid) throw new Error("wtf m8")
+
     this._setAttributes(this.getAttributes());
-    this.onRendered();
+
+    //render all the kids, replacing their element with the new one
+    _.each(this._subviews, function(view) {
+      if(!_.isArray(view)) {
+        view.setElement(document.querySelector(this._rebuildSelector(view)));
+        //state tree
+        view.render(_.clone(state));
+      }
+    }.bind(this));
+
+    this.onRendered(state);
     return this;
   },
 
+  _rebuildSelector:function(view) {
+    if(!view.el) return;
+    var classes = view.el.className.split(' ');
+    return view.el.tagName.toLowerCase() + '#' + view.el.id + (view.el.className? ('.' + classes.join('.')): '');
+  },
 
   getAttributes: function() {
     return {};
@@ -58,13 +93,15 @@ module.exports = bb.View.extend({
 
 
   appendView: function(name, cls, opts) {
-    var view = new cls(opts)
+    opts._parent = this;
+    var view = new cls(opts);
     this._subviews[name] = (this._subviews[name] || []);
     (this._subviews[name]).push(view);
     return view;
   },
 
   addSubview: function(name, cls, opts) {
+    opts = opts || {};
     if(this._subviews[name]) this._subviews[name].destroy();
     opts._parent = this;
     var view = new cls(opts);
@@ -76,7 +113,7 @@ module.exports = bb.View.extend({
     return this._subviews[name];
   },
 
-  onRendered: function() {},
+  onRendered: function(state) {},
   destroy: function() {
     _.each(this._subviews, function(sub, name) {
       if (_.isArray(sub)) {
@@ -85,12 +122,6 @@ module.exports = bb.View.extend({
         });
       }
       sub.destroy();
-    });
-  },
-
-  proxy:function(name, from, to) {
-    from.on(name, function() {
-      to.trigger.apply(to, [name].concat(Array.prototype.slice.call(arguments)));
     });
   }
 });

@@ -95,7 +95,7 @@ WaveSurfer.Region = {
 
         this.bindInOut();
         this.render();
-
+        this.wavesurfer.on('zoom', this.updateRender.bind(this));
         this.wavesurfer.fireEvent('region-created', this);
     },
 

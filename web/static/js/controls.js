@@ -5,6 +5,7 @@ var View = require('./view');
 
 var SlicedBufferSource = require('./sliced-buffer');
 var ControlsTemplate = require('./templates/controls.html');
+var keyCodes = require('./keycodes');
 
 var Controls = View.extend({
   el: '#controls',
@@ -16,12 +17,7 @@ var Controls = View.extend({
     'change #playback-rate': 'onChangeRate'
   },
 
-  keyCodes: {
-    32: 'Space'
-  },
-
   init: function(opts) {
-    window.song = this;
     this._audio = opts.audio;
 
     this._audio.wavesurfer.on('seek', this._seekAudio.bind(this));
@@ -33,7 +29,7 @@ var Controls = View.extend({
       pxPerSecond: 50,
       minRate: 0.15,
       maxRate: 2
-    }
+    };
 
     this.render();
   },
@@ -43,7 +39,6 @@ var Controls = View.extend({
   },
 
   _playAudio: function() {
-    console.log("Playing")
     var context = this._audio.wavesurfer.backend.getAudioContext();
     var st = new soundtouch.SoundTouch(this._audio.buffer.sampleRate);
     var source = new SlicedBufferSource(
@@ -73,7 +68,7 @@ var Controls = View.extend({
   },
 
   onKeyUp: function(ev) {
-    var func = this['on' + this.keyCodes[ev.keyCode]];
+    var func = this[keyCodes[ev.keyCode]];
     if (func) func.call(this, ev);
   },
 
@@ -115,7 +110,7 @@ var Controls = View.extend({
     return this._audio.wavesurfer.isPlaying();
   },
 
-  onSpace: function() {
+  onTogglePlay: function() {
     if (this.isPlaying()) {
       this.pause();
     } else {

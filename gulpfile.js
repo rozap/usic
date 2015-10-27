@@ -14,7 +14,7 @@ var paths = {
         app: {
             src: './web/static/js/app.js',
             dest: './priv/static/js/',
-            watch: ['./web/static/js/*.js']
+            watch: ['./web/static/js/*.js', './web/static/js/*/*.js']
         },
         unmanaged: {
             src: './web/static/js/unmanaged/*',

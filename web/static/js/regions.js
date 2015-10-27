@@ -2,127 +2,79 @@ var _ = require('underscore');
 var View = require('./view');
 var $ = require('jquery');
 
+var RegionView = require('./region');
+var ClicksView = require('./clicks');
 var RegionsTemplate = require('./templates/regions.html');
-var RegionTemplate = require('./templates/region.html');
 
-var Region = View.extend({
-  tagName: 'li',
-  template: _.template(RegionTemplate),
-
-  attributes:{
-    'class': 'region'
-  },
-
-  init: function(opts) {
-    this._region = opts.region;
-    this._state.pxPerSec = opts.pxPerSec;
-    this._state.duration = opts.duration;
-    this.listenTo(this._parent, 'zoom', this.onZoom);
-  },
-
-  onZoom:function(pps, duration) {
-    this.updateState({
-      pxPerSec: pps,
-      duration: duration
-    });
-  },
-
-  getAttributes: function() {
-    var width = this._width();
-    return {
-      'style' : this.buildStyle(['width', 'left'])
-    };
-  },
-
-  _width: function() {
-    var seconds = (this._region.end - this._region.start);
-    return parseInt(seconds * this._state.pxPerSec) + 'px';
-  },
-
-  _left:function() {
-    return parseInt(this._region.start * this._state.pxPerSec) + 'px';
-  },
-
-  getId:function() {
-    return this._region.id;
-  },
-
-
-});
-
-
-var Regions = View.extend({
+module.exports = View.extend({
   template: _.template(RegionsTemplate),
   el: '#view-regions',
 
-  events : {
-    'scroll' : 'onScroll'
+  events: {
+    'scroll': 'onScroll'
   },
 
   init: function(opts) {
     this._wavesurfer = opts.wavesurfer;
     this._bindEvents();
     this.render();
+
+    var clicksView = this.addSubview('clicks', ClicksView, {
+      model: opts.model,
+      wavesurfer: this._wavesurfer
+    });
   },
 
   _bindEvents: function() {
-    this._wavesurfer.on('region-update-end', this.onUpdated.bind(this));
-    this._wavesurfer.on('region-removed', this.onRemoved.bind(this));
-    this._wavesurfer.on('region-click', this.onSelected.bind(this));
+    this._wavesurfer.on('region-update-end', this.onCreated.bind(this));
+    this._wavesurfer.on('scroll', this.onScroll.bind(this));
     this.listenTo(this._parent, 'pan', this.panTo);
     this.listenTo(this._parent, 'zoom', this.zoomTo);
-
   },
 
-  onUpdated: function(region) {
-    region.loop = true;
-    this._wavesurfer.skip(region.start - region.end);
-
+  onCreated: function(region) {
     var existing = this._findRegionView(region);
-    if (!existing) {
-
-      this.appendView('regions', Region, {
-        region: region,
-        pxPerSec: this._getPxPerSec(),
-        duration: this._getDuration()
-      });
-    }
-
+    if (existing) return;
+    this.appendView('regions', RegionView, {
+      region: region,
+      defaultName: this._buildDefaultName(),
+      pxPerSec: this._getPxPerSec(),
+      duration: this._getDuration(),
+    });
     this.render();
   },
 
+  _buildDefaultName: function() {
+    var count = (this.getSubview('regions') || []).length;
+    var wrap = Math.floor(count / 26)
+    var index = wrap === 0 ? '' : wrap;
+    return String.fromCharCode(65 + (count % 26) + index);
+  },
+
   //TODO: urgh
-  _getPxPerSec:function() {
+  _getPxPerSec: function() {
     return this._wavesurfer.params.minPxPerSec;
   },
   //TODO: urgh
-  _getDuration:function() {
+  _getDuration: function() {
     return this._wavesurfer.getDuration();
   },
 
-  getState:function() {
+  getState: function() {
     return _.extend({
       width: Math.round(this._getPxPerSec() * this._getDuration()) + 'px',
     }, this._state);
   },
 
-  onRemoved: function() {
-
-  },
-
-  onSelected: function() {
-
-  },
-
-  onScroll:function(e) {
+  onScroll: function(e) {
     this.trigger('scroll', e.target.scrollLeft);
   },
 
-  panTo:function(p) {
+  panTo: function(p) {
     this.$el.scrollLeft(p);
   },
 
-  zoomTo:function(pps, duration) {
+  zoomTo: function(pps, duration) {
     this.trigger('zoom', pps, duration);
     this.render();
   },
@@ -135,7 +87,7 @@ var Regions = View.extend({
     }.bind(this));
   },
 
-  _getListEl:function() {
+  _getListEl: function() {
     return this.$el.find('#region-list');
   },
 
@@ -152,9 +104,4 @@ var Regions = View.extend({
   destroy: function() {
 
   }
-
-
 });
-
-
-module.exports = Regions;

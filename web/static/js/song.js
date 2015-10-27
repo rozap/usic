@@ -3,15 +3,16 @@ var bb = require('backbone');
 var t = require('./translate').t;
 var _ = require('underscore');
 
-
 var Wave = require('./wave');
 var View = require('./view');
-var Controls = require('./controls');
 var SongTemplate = require('./templates/song.html');
+var keyCodes = require('./keycodes');
 
+var SongModel = require('./models/song');
+var ControlsView = require('./controls');
 var WaveView = require('./wave');
 var RegionView = require('./regions');
-
+var ClicksView = require('./clicks');
 
 module.exports = View.extend({
   el: '#song',
@@ -25,12 +26,13 @@ module.exports = View.extend({
 
   events: {
     'mousewheel .interactive': 'onWheelWaveform',
+    'keydown' : 'onKeyDown'
   },
 
 
   init: function(opts) {
-    window.song = this;
     this.updateState(opts.result);
+    this.model = new SongModel();
     this._state = {};
   },
 
@@ -59,13 +61,13 @@ module.exports = View.extend({
     var wavesurfer = waveView.wv();
 
     var regionsView = this.addSubview('regions', RegionView, {
-      wavesurfer: wavesurfer
+      wavesurfer: wavesurfer,
+      model: this.model
     });
     this.listenTo(regionsView, 'scroll', this.panTo);
 
-
     this._audio.wavesurfer = wavesurfer;
-    this._subviews.controls = new Controls({
+    this._subviews.controls = new ControlsView({
       audio: this._audio
     });
   },
@@ -87,9 +89,8 @@ module.exports = View.extend({
       this.panTo(newPan);
       return;
     }
-    return up ? this.panRight() : this.panLeft();
+    return up ? this.panLeft() : this.panRight();
   },
-
 
   panRight: function() {
     var p = Math.min(
@@ -122,6 +123,7 @@ module.exports = View.extend({
     if (pps > this._maxPps) return;
     var duration = this._audio.wavesurfer.getDuration();
     this.trigger('zoom', pps, duration);
+    this._audio.wavesurfer.fireEvent('zoom');
   },
 
   zoomOut: function() {
@@ -129,6 +131,7 @@ module.exports = View.extend({
     if (pps < this._minPps) return;
     var duration = this._audio.wavesurfer.getDuration();
     this.trigger('zoom', pps, duration);
+    this._audio.wavesurfer.fireEvent('zoom');
   },
 
 

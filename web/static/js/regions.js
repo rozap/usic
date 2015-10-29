@@ -15,6 +15,7 @@ module.exports = View.extend({
   },
 
   init: function(opts) {
+    this.model = opts.model;
     this._wavesurfer = opts.wavesurfer;
     this._bindEvents();
     this.render();
@@ -32,21 +33,30 @@ module.exports = View.extend({
     this.listenTo(this._parent, 'zoom', this.zoomTo);
   },
 
+  onDeselect:function(view){
+    (this.getSubview('regions') || []).forEach(function(region) {
+      if(region.cid !== view.cid) region.onDeselect();
+    });
+  },
+
   onCreated: function(region) {
     var existing = this._findRegionView(region);
     if (existing) return;
-    this.appendView('regions', RegionView, {
+    var view = this.appendView('regions', RegionView, {
       region: region,
+      song: this.model,
       defaultName: this._buildDefaultName(),
       pxPerSec: this._getPxPerSec(),
       duration: this._getDuration(),
     });
+    this.listenTo(view, 'selected', this.onDeselect);
+    view.onSelect();
     this.render();
   },
 
   _buildDefaultName: function() {
     var count = (this.getSubview('regions') || []).length;
-    var wrap = Math.floor(count / 26)
+    var wrap = Math.floor(count / 26);
     var index = wrap === 0 ? '' : wrap;
     return String.fromCharCode(65 + (count % 26) + index);
   },
@@ -83,7 +93,10 @@ module.exports = View.extend({
   onRendered: function() {
     var $list = this._getListEl();
     this._regionViews().forEach(function(view) {
+      console.log('render', view.model.get('name'));
+      view.undelegateEvents();
       $list.append(view.render().el);
+      view.delegateEvents();
     }.bind(this));
   },
 

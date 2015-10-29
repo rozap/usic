@@ -22,7 +22,7 @@ module.exports = View.extend({
       progressColor: 'rgba(0, 0, 0, 0)',
       hideScrollbar: false,
       scrollParent: true,
-      minPxPerSec: 10
+      minPxPerSec: 10,
     });
     wavesurfer.enableDragSelection({});
 

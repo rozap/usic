@@ -14,7 +14,7 @@ var paths = {
         app: {
             src: './web/static/js/app.js',
             dest: './priv/static/js/',
-            watch: ['./web/static/js/*.js', './web/static/js/*/*.js']
+            watch: ['./web/static/js/*.js', './web/static/js/*/*.js', './web/static/js/*/*.html']
         },
         unmanaged: {
             src: './web/static/js/unmanaged/*',
@@ -26,7 +26,12 @@ var paths = {
         src: './web/less/style.less',
         dest: './priv/static/css/',
         watch: ['./web/less/*.less'],
+    },
+    fonts: {
+        src: './web/static/fonts/*',
+        dest: './priv/static/fonts/',
     }
+
 };
 
 var create = function(src, name, dst) {
@@ -61,6 +66,12 @@ gulp.task('less', function() {
         .pipe(gulp.dest(paths.less.dest));
 });
 
+gulp.task('fonts', function() {
+    console.log("Adding fonts...");
+    gulp.src(paths.fonts.src)
+        .pipe(gulp.dest(paths.fonts.dest))
+});
+
 
 gulp.task('watch', function() {
 
@@ -69,5 +80,5 @@ gulp.task('watch', function() {
 });
 
 
-gulp.task('default', ['app', 'less', 'watch']);
-gulp.task('deploy', ['app', 'less']);
+gulp.task('default', ['app', 'less', 'watch', 'fonts']);
+gulp.task('deploy', ['app', 'less', 'fonts']);

@@ -5,16 +5,17 @@ var View = require('./view');
 
 var SlicedBufferSource = require('./sliced-buffer');
 var ControlsTemplate = require('./templates/controls.html');
-var keyCodes = require('./keycodes');
 
 var Controls = View.extend({
   el: '#controls',
   template: _.template(ControlsTemplate),
 
   events: {
-    'click .play-pause': 'onSpace',
+    'click .play-pause': 'onTogglePlay',
     'mousewheel #playback-rate': 'onWheelRate',
-    'change #playback-rate': 'onChangeRate'
+    'change #playback-rate': 'onChangeRate',
+    'click .skip-backward': 'onSkipBackward',
+    'click .skip-forward': 'onSkipForward'
   },
 
   init: function(opts) {
@@ -23,6 +24,10 @@ var Controls = View.extend({
     this._audio.wavesurfer.on('seek', this._seekAudio.bind(this));
     this._audio.wavesurfer.on('play', this._playAudio.bind(this));
     this._audio.wavesurfer.on('pause', this._pauseAudio.bind(this));
+
+    this.listenTo(this.dispatcher, 'input:onTogglePlay',   this.onTogglePlay);
+    this.listenTo(this.dispatcher, 'input:onSkipBackward', this.onSkipBackward);
+    this.listenTo(this.dispatcher, 'input:onSkipForward',  this.onSkipForward);
 
     this._state = {
       rate: 1,
@@ -67,23 +72,6 @@ var Controls = View.extend({
     });
   },
 
-  onKeyUp: function(ev) {
-    var func = this[keyCodes[ev.keyCode]];
-    if (func) func.call(this, ev);
-  },
-
-  onWheelRate: function(ev) {
-    var r = this._state.rate,
-        min = this._state.minRate,
-        max = this._state.maxRate,
-        delta = 0.01;
-
-    var rate = ev.originalEvent.wheelDelta > 0 ?
-      Math.min(max, r + delta) : Math.max(min, r - delta);
-
-    this._changeRate(rate);
-  },
-
   play: function() {
     if (this.isPlaying()) this.pause();
     this._audio.wavesurfer.setPlaybackRate(this._state.rate);
@@ -110,6 +98,18 @@ var Controls = View.extend({
     return this._audio.wavesurfer.isPlaying();
   },
 
+  onWheelRate: function(ev) {
+    var r = this._state.rate,
+        min = this._state.minRate,
+        max = this._state.maxRate,
+        delta = 0.01;
+
+    var rate = ev.originalEvent.wheelDelta > 0 ?
+      Math.min(max, r + delta) : Math.max(min, r - delta);
+
+    this._changeRate(rate);
+  },
+
   onTogglePlay: function() {
     if (this.isPlaying()) {
       this.pause();
@@ -119,9 +119,13 @@ var Controls = View.extend({
     this.render();
   },
 
-  onRendered: function() {
-    $('body').unbind('keyup').bind('keyup', this.onKeyUp.bind(this));
+  onSkipForward:function() {
+    this._audio.wavesurfer.skipForward();
   },
+
+  onSkipBackward:function() {
+    this._audio.wavesurfer.skipBackward();
+  }
 });
 
 module.exports = Controls;

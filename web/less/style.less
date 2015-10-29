@@ -10,16 +10,51 @@
 
 @dark-gray: #121212;
 @gray: lighten(@dark-gray, 50%);
-@light-gray: lighten(@gray, 40%);
+@light-gray: lighten(@gray, 30%);
 
 @import "slider";
 @import "song";
 @import "regions";
 @import "clicks";
+@import "ionicons";
 
 * {
   box-sizing: border-box;
 }
+
+a {
+  color: @dark-gray;
+  text-decoration: none;
+  &:hover {
+    color: @gray;
+  };
+}
+
+.button-success,
+.button-error,
+.button-warning,
+.button-secondary {
+    color: white;
+    border-radius: 4px;
+    text-shadow: 0 1px 1px rgba(0, 0, 0, 0.2);
+}
+
+.button-success {
+    background: @blue;
+}
+
+.button-error {
+    background: @red;
+}
+
+.button-warning {
+    background: @orange;
+}
+
+.button-secondary {
+    background: @tan;
+}
+
 
 .body {
   padding: @base-pad;

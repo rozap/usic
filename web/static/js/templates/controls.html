@@ -1,12 +1,32 @@
 
 
 <div class="pure-g control-units">
+  <div class="pure-u-1-12 control">
+    <a class="pure-button button-success control-button skip-backward"
+      href="javascript:void(0)">
+      <i class="ion-skip-backward"/>
+    </a>
+  </div>
   <div class="pure-u-1-8 control">
     <% if(state.status === 'playing') { %>
-      <a class="pure-button pure-button-primary play-pause pause-button" href="javascript:void(0)">Pause</a>
+      <a class="pure-button button-success play-pause control-button"
+        href="javascript:void(0)">
+        Pause
+        <i class="ion-pause"/>
+      </a>
     <% } else if(state.status === 'paused') { %>
-      <a class="pure-button pure-button-primary play-pause play-button" href="javascript:void(0)">Play</a>
+      <a class="pure-button button-success play-pause control-button"
+        href="javascript:void(0)">
+        Play
+        <i class="ion-play"/>
+      </a>
     <% } %>
+  </div>
+  <div class="pure-u-1-12 control">
+    <a class="pure-button button-success control-button skip-forward"
+      href="javascript:void(0)">
+      <i class="ion-skip-forward"/>
+    </a>
   </div>
   <div class="pure-u-1-4 control">
     <span>Speed: <%- parseFloat(state.rate).toFixed(2) %></span>

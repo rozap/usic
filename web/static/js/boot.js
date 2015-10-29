@@ -6,8 +6,10 @@ var uuid = require('uuid');
 
 var View = require('./view');
 var Song = require('./song');
+var KeyBindings = require('./keybindings');
 var LoadResultTemplate = require('./templates/loader.html');
 
+var dispatcher = _.clone(bb.Events);
 
 var LoadResult = View.extend({
   el: '#search-result',
@@ -18,10 +20,11 @@ var LoadResult = View.extend({
   },
 
   _update: function(state) {
-    if(this._song) this._song.destroy();
     if(state.state === 'success') {
+      if(this._songView) this._songView.destroy();
       this._songView = new Song({
-        result: state
+        result: state,
+        dispatcher: this.dispatcher
       });
 
       $('#search-input').blur();
@@ -80,8 +83,11 @@ var socket = new phx.Socket("/socket", {
   }
 });
 socket.onOpen(function() {
+  new KeyBindings(dispatcher);
+
   var loader = new Loader({
-    socket: socket
+    socket: socket,
+    dispatcher: dispatcher
   });
 });
 socket.connect();

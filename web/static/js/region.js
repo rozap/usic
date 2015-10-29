@@ -8,18 +8,77 @@ module.exports = View.extend({
   tagName: 'li',
   template: _.template(RegionTemplate),
 
-  attributes: {
-    'class': 'region'
+  events: {
+    'click': 'onSelect',
+    'click .remove-region': 'onRemove',
+    'click .edit-region': 'onEdit',
+    'click .toggle-region-loop': 'onToggleLoop',
+    'keyup textarea': 'onEditKey'
   },
 
   renderTo: ['model'],
 
   init: function(opts) {
-    this.model = new RegionModel(opts.region, opts.defaultName);
+    this.model = new RegionModel(opts.region, opts.defaultName, opts.song);
+
     this._state.pxPerSec = opts.pxPerSec;
     this._state.duration = opts.duration;
+    this._state.editing = false;
+
+    this.listenTo(this.dispatcher, 'input:onEnableSnapping',
+      this.model.enableSnapping.bind(this.model)
+    );
+    this.listenTo(this.dispatcher, 'input:onDisableSnapping',
+      this.model.disableSnapping.bind(this.model)
+    );
+    this.listenTo(this.dispatcher, 'input:onNudgeLeft', this.onNudgeLeft);
+    this.listenTo(this.dispatcher, 'input:onNudgeRight', this.onNudgeRight);
+
     this.listenTo(this._parent, 'zoom', this.onZoom);
     this.listenTo(this.model, 'change', this.r);
+    this.listenTo(this.model, 'destroy', this.destroy);
+  },
+
+  onSelect: function() {
+    if(this.isSelected()) return;
+    this.trigger('selected', this);
+    this.updateState({
+      isSelected: true
+    });
+    return this;
+  },
+
+  onDeselect: function() {
+    if(!this.isSelected()) return;
+    this.trigger('deselected', this);
+    this.updateState({
+      isSelected: false
+    });
+    return this;
+  },
+
+  isSelected: function() {
+    return this._state.isSelected;
+  },
+
+  onEdit: function() {
+    this.updateState({
+      editing: true
+    });
+  },
+
+  onEditKey: function(e) {
+    if (e.keyCode === 13 && !e.shiftKey) {
+      this.model.set('name', this.el.querySelector('textarea').value);
+      this.updateState({
+        editing: false
+      });
+    }
+    e.preventDefault();
+  },
+
+  onRemove: function() {
+    this.model.destroy();
   },
 
   onZoom: function(pps, duration) {
@@ -29,9 +88,27 @@ module.exports = View.extend({
     });
   },
 
+  onToggleLoop: function() {
+    this.model.set('loop', !this.model.get('loop'));
+  },
+
+  onNudgeRight: function() {
+    if (!this.isSelected()) return;
+    this.model.shift(this._getNudgeDelta());
+  },
+
+  onNudgeLeft: function() {
+    if (!this.isSelected()) return;
+    this.model.shift(-1 * this._getNudgeDelta());
+  },
+
+  _getNudgeDelta: function() {
+    return 1 / (this._state.pxPerSec / 2);
+  },
+
   getAttributes: function() {
-    var width = this._width();
     return {
+      'class': 'region' + (this._state.isSelected? ' selected' : ''),
       'style': this.buildStyle(['width', 'left'])
     };
   },
@@ -47,5 +124,17 @@ module.exports = View.extend({
 
   getId: function() {
     return this.model.get('id');
+  },
+
+  onRendered:function() {
+    if(this._state.editing) this._focusText();
+  },
+
+  _focusText:function( ){
+    this.$el.find('textarea').focus();
+  },
+
+  detach: function() {
+    this.remove();
   }
 });

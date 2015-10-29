@@ -100,7 +100,7 @@ WaveSurfer.Region = {
     },
 
     /* Update region params. */
-    update: function (params) {
+    update: function (params, supress) {
         if (null != params.start) {
             this.start = Number(params.start);
         }
@@ -133,7 +133,7 @@ WaveSurfer.Region = {
         }
 
         this.updateRender();
-        this.fireEvent('update');
+        if(!supress) this.fireEvent('update');
         this.wavesurfer.fireEvent('region-updated', this);
     },
 

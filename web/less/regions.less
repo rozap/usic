@@ -15,7 +15,41 @@
       position: absolute;
       display: inline-block;
       padding: @base-pad;
-      border: 1px solid @gray;
+      border: 1px solid @light-gray;
+
+      &.selected {
+        border-color: @gray;
+      }
+
+      .region-contents {
+        margin-right: @base-pad * 2;
+
+        textarea {
+          width: 100%;
+          border: 1px solid @light-gray;
+          resize: none;
+        }
+      }
+      .region-name {
+        display: block;
+        width: 100%;
+      }
+      .region-controls {
+        position: absolute;
+        right: 0px;
+        top: 0px;
+        bottom: 0px;
+        padding: @base-pad / 4;
+        width: @base-pad * 2;
+        border-left: 1px solid @light-gray;
+
+        a {
+          padding: @base-pad / 4;
+        }
+        a.disabled {
+          color: @light-gray;
+        }
+      }
     }
   }
 }

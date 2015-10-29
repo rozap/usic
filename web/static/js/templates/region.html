@@ -1,1 +1,20 @@
-<%- state.model.get('name') %>
+<li class="<%- state.isSelected? 'selected': '' %>">
+  <div class="region-contents">
+  <% if(state.editing) { %>
+    <textarea><%- state.model.get('name') %></textarea>
+  <% } else { %>
+    <a href="javascript:void(0)"
+      class="edit-region region-name">
+      <%- state.model.get('name') %>
+    </a>
+  <% } %>
+  </div>
+
+  <div class="region-controls">
+    <a href="javascript:void(0)"
+      class="remove-region ion-ios-close"></a>
+    <a href="javascript:void(0)"
+      class="toggle-region-loop ion-ios-loop-strong
+      <%- state.model.get('loop')? '' : 'disabled' %>"></a>
+  </div>
+</li>

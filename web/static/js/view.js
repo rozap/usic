@@ -5,9 +5,11 @@ var t = require('./translate').t;
 module.exports = bb.View.extend({
 
   initialize: function(opts) {
+    this.dispatcher = opts.dispatcher;
     this._subviews = {};
     this._state = {};
     this._parent = opts._parent;
+    if(!this.dispatcher) throw new Error('wtf m9')
     this.init(opts);
   },
 
@@ -94,9 +96,12 @@ module.exports = bb.View.extend({
 
   appendView: function(name, cls, opts) {
     opts._parent = this;
+    opts.dispatcher = this.dispatcher;
     var view = new cls(opts);
     this._subviews[name] = (this._subviews[name] || []);
+    this.listenTo(view, 'destroy', _.partial(this._removeAppended, name));
     (this._subviews[name]).push(view);
+
     return view;
   },
 
@@ -104,9 +109,22 @@ module.exports = bb.View.extend({
     opts = opts || {};
     if(this._subviews[name]) this._subviews[name].destroy();
     opts._parent = this;
+    opts.dispatcher = this.dispatcher;
     var view = new cls(opts);
     this._subviews[name] = view;
+    this.listenTo(view, 'destroy', _.partial(this._removeAdded, name));
     return view;
+  },
+
+  _removeAppended:function(name, view) {
+    console.log("remove", name, view);
+    this._subviews[name] = _.without(this._subviews[name], view);
+    this.render();
+  },
+
+  _removeAdded:function(name) {
+    delete this._subviews[name];
+    this.render();
   },
 
   getSubview: function(name) {
@@ -114,7 +132,7 @@ module.exports = bb.View.extend({
   },
 
   onRendered: function(state) {},
-  destroy: function() {
+  _destroy: function() {
     _.each(this._subviews, function(sub, name) {
       if (_.isArray(sub)) {
         return sub.forEach(function(view) {
@@ -123,5 +141,19 @@ module.exports = bb.View.extend({
       }
       sub.destroy();
     });
+    this.detach();
+    console.log("Trigger destroy")
+    this.trigger('destroy', this);
+  },
+
+  detach:function() {
+    this.stopListening();
+    this.undelegateEvents();
+    this.$el.html('');
+  },
+
+  destroy:function() {
+    this._destroy();
+
   }
 });

@@ -6,7 +6,7 @@
 /priv
 # Generate on crash by the VM
 erl_crash.dump
-
+*.pyc
 # Static artifacts
 /node_modules
 

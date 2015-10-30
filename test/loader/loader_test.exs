@@ -6,7 +6,7 @@ defmodule UsicTest.Loader do
 
   setup_all do
     clear_media()
-
+    Usic.DryExecutor.start_link
     :ok
   end
 
@@ -23,9 +23,7 @@ defmodule UsicTest.Loader do
   test "can download the song to the static dir" do
     res = Usic.Loader.get_song(UUID.uuid4, @youtube_song)
 
-    output_loc = Usic.Endpoint.config(:static)
-    |> Path.join("media")
-    |> Path.join("5DNVSHm5zr4.m4a")
+    output_loc = Path.join("/media", "5DNVSHm5zr4.m4a")
     assert res == {:ok, output_loc}
   end
 

@@ -54,7 +54,6 @@ module.exports = Model.extend({
 
   _updateUnderlying: function(bounds) {
     this._underlying.update(bounds, true);
-    console.log("UPDATE UNDER")
     this._underlying.loop = this.get('loop');
   },
 

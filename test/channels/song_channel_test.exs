@@ -10,9 +10,9 @@ defmodule Usic.SongChannelTest do
 
   setup_all do
     clear_media
+    Usic.DryExecutor.start_link
     :ok
   end
-
 
   defp make_socket() do
     {:ok, _, socket} = socket("something", %{})
@@ -20,7 +20,6 @@ defmodule Usic.SongChannelTest do
 
     socket
   end
-
 
   test "can give back errors" do
     socket = make_socket
@@ -34,7 +33,6 @@ defmodule Usic.SongChannelTest do
     assert_reply ref, :ok, %{event: "search", state: "loading", message: "getting_song"}
   end
 
-  @tag timeout: 10_000
   test "can give back song when done" do
     socket = make_socket
 
@@ -48,7 +46,6 @@ defmodule Usic.SongChannelTest do
     }}, 10_000
   end
 
-  @tag timeout: 10_000
   test "can send back errors on invalid yotubelike links" do
     socket = make_socket
 

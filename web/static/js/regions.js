@@ -93,7 +93,6 @@ module.exports = View.extend({
   onRendered: function() {
     var $list = this._getListEl();
     this._regionViews().forEach(function(view) {
-      console.log('render', view.model.get('name'));
       view.undelegateEvents();
       $list.append(view.render().el);
       view.delegateEvents();

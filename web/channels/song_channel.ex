@@ -12,7 +12,6 @@ defmodule Usic.SongChannel do
   end
 
   def handle_in(@search, %{"term" => location}, socket) do
-    IO.puts "SEARCH FOR #{location}"
     case Loader.get_song_id(location) do
       {:ok, _id} ->
         Usic.SongServer.get(location)

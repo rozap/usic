@@ -15,6 +15,8 @@ defmodule Usic.TestHelpers do
   end
 end
 
+Code.load_file("dry_executor.exs", "./test/helpers")
+
 ExUnit.start
 
 Mix.Task.run "ecto.create", ["--quiet"]

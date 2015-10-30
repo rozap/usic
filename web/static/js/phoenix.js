@@ -412,7 +412,6 @@ var Channel = module.exports.Channel = (function () {
     },
     trigger: {
       value: function trigger(triggerEvent, payload, ref) {
-        console.log("GOT MESSAGE", triggerEvent, payload, ref)
         this.onMessage(triggerEvent, payload, ref);
         this.bindings.filter(function (bind) {
           return bind.event === triggerEvent;

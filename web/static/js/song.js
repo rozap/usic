@@ -29,7 +29,6 @@ module.exports = View.extend({
     'keydown' : 'onKeyDown'
   },
 
-
   init: function(opts) {
     this.updateState(opts.result);
     this.model = new SongModel();
@@ -120,7 +119,6 @@ module.exports = View.extend({
 
   zoomIn: function() {
     var pps = this.pxPerSec() + this._zoomDelta;
-    console.log(pps);
     if (pps > this._maxPps) return;
     var duration = this._audio.wavesurfer.getDuration();
     this.trigger('zoom', pps, duration);
@@ -141,7 +139,6 @@ module.exports = View.extend({
   },
 
   destroy: function() {
-    console.log("destroy")
     this._audio.context.close();
     this._audio.wavesurfer.destroy();
     this._destroy();

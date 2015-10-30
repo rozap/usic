@@ -1,5 +1,6 @@
 defmodule Usic.Loader do
   require Logger
+  alias Usic.Executor
 
   @format "m4a"
 
@@ -58,17 +59,14 @@ defmodule Usic.Loader do
     |> Path.join(song_id <> ".%(ext)s")
   end
 
+  defp get_executor() do
+    Application.get_env(:usic, :executor)
+  end
+
   defp download_song(song_id, url) do
     output_loc = gen_template(song_id)
-    {log_out, result} = System.cmd("youtube-dl", [
-      "--extract-audio",
-      "--audio-format", "best",
-      "--audio-quality", "0",
-      url,
-      "-o",
-      output_loc
-    ])
 
+    {log_out, result} = get_executor().get(url, output_loc)
 
     lines = String.split(log_out, "\n")
     |> Enum.map(fn line -> "[youtube-dl] [#{song_id}] #{line}" end)
@@ -88,8 +86,7 @@ defmodule Usic.Loader do
 
 
   def get_song(sketch_id, url) do
-    get_song_id(url)
-    |> fetch(url)
+    get_song_id(url) |> fetch(url)
   end
 
 end

@@ -80,5 +80,5 @@ gulp.task('watch', function() {
 });
 
 
-gulp.task('default', ['app', 'less', 'watch', 'fonts']);
-gulp.task('deploy', ['app', 'less', 'fonts']);
+gulp.task('watch', ['app', 'less', 'watch', 'fonts']);
+gulp.task('default', ['app', 'less', 'fonts']);

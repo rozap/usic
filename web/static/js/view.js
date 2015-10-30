@@ -117,7 +117,6 @@ module.exports = bb.View.extend({
   },
 
   _removeAppended:function(name, view) {
-    console.log("remove", name, view);
     this._subviews[name] = _.without(this._subviews[name], view);
     this.render();
   },
@@ -142,7 +141,6 @@ module.exports = bb.View.extend({
       sub.destroy();
     });
     this.detach();
-    console.log("Trigger destroy")
     this.trigger('destroy', this);
   },
 

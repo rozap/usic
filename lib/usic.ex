@@ -12,7 +12,9 @@ defmodule Usic do
       supervisor(Usic.Endpoint, []),
       # Start the Ecto repository
       worker(Usic.Repo, []),
-      worker(Usic.SongServer, [])
+      worker(Usic.SongServer, []),
+      worker(Usic.Executor, [])
+
       # Here you could define other workers and supervisors as children
       # worker(Usic.Worker, [arg1, arg2, arg3]),
     ]

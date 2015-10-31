@@ -26,7 +26,7 @@ module.exports = View.extend({
 
   events: {
     'mousewheel .interactive': 'onWheelWaveform',
-    'keydown' : 'onKeyDown'
+    'keydown': 'onKeyDown'
   },
 
   init: function(opts) {
@@ -36,6 +36,9 @@ module.exports = View.extend({
   },
 
   _loadSong: function() {
+    console.log(this.getState())
+    if (!this.getState().location) return;
+
     var req = new XMLHttpRequest();
     req.open('GET', this.getState().location);
     req.responseType = 'arraybuffer';
@@ -113,7 +116,7 @@ module.exports = View.extend({
     return this;
   },
 
-  pxPerSec:function() {
+  pxPerSec: function() {
     return this._audio.wavesurfer.params.minPxPerSec;
   },
 

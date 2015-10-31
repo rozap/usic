@@ -110,7 +110,8 @@ var Controls = View.extend({
     this._changeRate(rate);
   },
 
-  onTogglePlay: function() {
+  onTogglePlay: function(e) {
+    if(e.isDefaultPrevented()) return;
     if (this.isPlaying()) {
       this.pause();
     } else {

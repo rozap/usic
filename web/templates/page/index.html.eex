@@ -4,7 +4,7 @@
   </div>
   <div class="pure-u-3-4">
     <div id="search" class="search">
-      <input id="search-input" value="https://www.youtube.com/watch?v=0dzOCcK1ziM"/>
+      <input id="search-input"/>
       <div id="search-result"></div>
     </div>
   </div>

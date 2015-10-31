@@ -4,10 +4,7 @@ defmodule Usic.Loader do
 
   @format "m4a"
 
-  defp media_dir do
-    Usic.Endpoint.config(:static)
-    |> Path.join("media")
-  end
+  defp media_dir, do: Application.get_env(:usic, :media_dir)
 
   def get_song_id(location) do
     case URI.parse(location) do
@@ -26,30 +23,22 @@ defmodule Usic.Loader do
     end
   end
 
+  defp to_media_location(log_lines) do
 
-  defp load_local(song_id) do
-    abs_path = Path.join(media_dir, "#{song_id}.#{@format}")
-    if File.exists?(abs_path) do
-      Logger.info("Already have #{song_id}, returning local copy")
-      {:ok, to_media_location(abs_path)}
-    else
-      {:error, :not_found}
+    final_write = log_lines
+    |> Enum.reverse
+    |> Enum.find_value(fn line ->
+      Regex.run(~r/Destination: (.*)/, line)
+    end)
+
+    case final_write do
+      [_, abs_path] -> {:ok, Path.join("/media", Path.basename(abs_path))}
+      _ -> {:error, "Unable to locate audio track"}
     end
-  end
-
-  defp to_media_location(absolute_path) do
-    filename = String.replace(absolute_path, ".%(ext)s", ".m4a")
-    |> Path.basename
-
-    Path.join("/media", filename)
   end
 
   defp fetch({:ok, song_id}, location) do
-    case load_local(song_id) do
-      {:error, :not_found} ->
-        download_song(song_id, location)
-      local -> local
-    end
+    download_song(song_id, location)
   end
   defp fetch(err, _), do: err
 
@@ -74,7 +63,9 @@ defmodule Usic.Loader do
     case result do
       0 ->
         Enum.each(lines, &(Logger.info &1))
-        {:ok, to_media_location(output_loc)}
+        Logger.info("[youtube-dl] Download complete")
+        IO.inspect to_media_location(lines)
+        to_media_location(lines)
       _ ->
         failure = "youtube-dl failed with #{result}"
         Logger.error(failure)

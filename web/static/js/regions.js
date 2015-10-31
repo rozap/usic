@@ -39,6 +39,16 @@ module.exports = View.extend({
     });
   },
 
+  onCloned:function(region) {
+    var bounds = region.getBounds();
+    var region = this._wavesurfer.addRegion({
+      start: bounds.end,
+      end: bounds.end + (bounds.end - bounds.start)
+    });
+    //hack because update-end event isn't fired
+    this.onCreated(region);
+  },
+
   onCreated: function(region) {
     var existing = this._findRegionView(region);
     if (existing) return;
@@ -50,6 +60,7 @@ module.exports = View.extend({
       duration: this._getDuration(),
     });
     this.listenTo(view, 'selected', this.onDeselect);
+    this.listenTo(view, 'cloned', this.onCloned);
     view.onSelect();
     this.render();
   },

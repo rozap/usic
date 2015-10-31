@@ -13,6 +13,7 @@ module.exports = View.extend({
     'click .remove-region': 'onRemove',
     'click .edit-region': 'onEdit',
     'click .toggle-region-loop': 'onToggleLoop',
+    'click .clone-region-right': 'onCloneRight',
     'keyup textarea': 'onEditKey'
   },
 
@@ -40,7 +41,7 @@ module.exports = View.extend({
   },
 
   onSelect: function() {
-    if(this.isSelected()) return;
+    if (this.isSelected()) return;
     this.trigger('selected', this);
     this.updateState({
       isSelected: true
@@ -49,7 +50,7 @@ module.exports = View.extend({
   },
 
   onDeselect: function() {
-    if(!this.isSelected()) return;
+    if (!this.isSelected()) return;
     this.trigger('deselected', this);
     this.updateState({
       isSelected: false
@@ -102,13 +103,17 @@ module.exports = View.extend({
     this.model.shift(-1 * this._getNudgeDelta());
   },
 
+  onCloneRight:function() {
+    this.trigger('cloned', this);
+  },
+
   _getNudgeDelta: function() {
     return 1 / (this._state.pxPerSec / 2);
   },
 
   getAttributes: function() {
     return {
-      'class': 'region' + (this._state.isSelected? ' selected' : ''),
+      'class': 'region' + (this._state.isSelected ? ' selected' : ''),
       'style': this.buildStyle(['width', 'left'])
     };
   },
@@ -126,11 +131,18 @@ module.exports = View.extend({
     return this.model.get('id');
   },
 
-  onRendered:function() {
-    if(this._state.editing) this._focusText();
+  getBounds: function() {
+    return {
+      start: this.model.get('start'),
+      end: this.model.get('end')
+    };
   },
 
-  _focusText:function( ){
+  onRendered: function() {
+    if (this._state.editing) this._focusText();
+  },
+
+  _focusText: function() {
     this.$el.find('textarea').focus();
   },
 

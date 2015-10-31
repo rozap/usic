@@ -8,8 +8,12 @@ defmodule Usic.Endpoint do
   # You should set gzip to true if you are running phoenix.digest
   # when deploying your static files in production.
   plug Plug.Static,
-    at: "/", from: :usic, gzip: false,
-    only: ~w(media css fonts images js favicon.ico robots.txt)
+    at: "/", from: :usic, gzip: true,
+    only: ~w(css fonts images js favicon.ico robots.txt)
+
+  plug Plug.Static,
+    at: "/media", from: Application.get_env(:usic, :media_dir), gzip: false
+
 
   # Code reloading can be explicitly enabled under the
   # :code_reloader configuration of your endpoint.

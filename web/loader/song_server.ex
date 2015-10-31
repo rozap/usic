@@ -1,6 +1,5 @@
 defmodule Usic.SongServer do
   use GenServer
-
   ##
   # Will deal with throttling of song requests so shit
   # doesn't hit the fan

@@ -3,7 +3,7 @@ module.exports = {
     name: 'space',
     character: ' ',
     code: 32,
-    type: 'keydown',
+    type: 'keyup',
     t: 'play_pause'
   },
   'onBeatCreated': {

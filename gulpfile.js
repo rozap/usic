@@ -73,12 +73,12 @@ gulp.task('fonts', function() {
 });
 
 
-gulp.task('watch', function() {
+gulp.task('rebuild', function() {
 
     gulp.watch(paths.js.app.watch, ['app']);
     gulp.watch(paths.less.watch, ['less']);
 });
 
 
-gulp.task('watch', ['app', 'less', 'watch', 'fonts']);
-gulp.task('default', ['app', 'less', 'fonts']);
+gulp.task('watch', ['app', 'less', 'fonts', 'rebuild']);
+gulp.task('deploy', ['app', 'less', 'fonts']);

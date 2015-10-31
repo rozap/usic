@@ -12,7 +12,7 @@ defmodule Usic.DryExecutor do
     response = if String.length(id) < 6 do
       {"invalid id", 1}
     else
-      {"ok done", 0}
+      {"Destination: #{id}.m4a", 0}
     end
     {:reply, response, state}
   end

@@ -2,9 +2,22 @@ defmodule Usic.Loader do
   require Logger
   alias Usic.Executor
 
-  @format "m4a"
 
   defp media_dir, do: Application.get_env(:usic, :media_dir)
+
+  ##
+  # clean this up
+  def unload(uid) do
+    media_dir
+    |> File.ls!
+    |> Enum.filter(fn f -> String.contains?(f, uid) end)
+    |> Enum.each(fn f ->
+      track = Path.join(media_dir, f)
+      Logger.info("Cleaned up #{track}")
+      File.rm!(track)
+    end)
+    :ok
+  end
 
   def get_song_id(location) do
     case URI.parse(location) do
@@ -37,12 +50,6 @@ defmodule Usic.Loader do
     end
   end
 
-  defp fetch({:ok, song_id}, location) do
-    download_song(song_id, location)
-  end
-  defp fetch(err, _), do: err
-
-
   defp gen_template(song_id) do
     media_dir
     |> Path.join(song_id <> ".%(ext)s")
@@ -52,19 +59,18 @@ defmodule Usic.Loader do
     Application.get_env(:usic, :executor)
   end
 
-  defp download_song(song_id, url) do
-    output_loc = gen_template(song_id)
+  defp download_song({:ok, _}, session_id, url) do
+    output_loc = gen_template(session_id)
 
     {log_out, result} = get_executor().get(url, output_loc)
 
     lines = String.split(log_out, "\n")
-    |> Enum.map(fn line -> "[youtube-dl] [#{song_id}] #{line}" end)
+    |> Enum.map(fn line -> "[youtube-dl] [#{session_id}] #{line}" end)
 
     case result do
       0 ->
         Enum.each(lines, &(Logger.info &1))
         Logger.info("[youtube-dl] Download complete")
-        IO.inspect to_media_location(lines)
         to_media_location(lines)
       _ ->
         failure = "youtube-dl failed with #{result}"
@@ -74,10 +80,11 @@ defmodule Usic.Loader do
     end
 
   end
+  defp download_song(err, _, _), do: err
 
 
-  def get_song(sketch_id, url) do
-    get_song_id(url) |> fetch(url)
+  def get_song(session_id, url) do
+    get_song_id(url) |> download_song(session_id, url)
   end
 
 end

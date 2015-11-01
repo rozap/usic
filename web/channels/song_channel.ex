@@ -4,9 +4,9 @@ defmodule Usic.SongChannel do
   alias Usic.Loader
 
   @search "search"
+  @topic_prefix "song:"
 
-
-  def join("song:" <> uid, message, socket) do
+  def join(@topic_prefix <> uid, message, socket) do
     IO.puts "Joined #{inspect uid}"
     {:ok, socket}
   end
@@ -14,7 +14,8 @@ defmodule Usic.SongChannel do
   def handle_in(@search, %{"term" => location}, socket) do
     case Loader.get_song_id(location) do
       {:ok, _id} ->
-        Usic.SongServer.get(location)
+        @topic_prefix <> uid = socket.topic
+        Usic.SongServer.get(location, uid)
         {:reply, {:ok, %{event: @search, state: "loading", message: "getting_song"}}, socket}
       {:error, _} ->
         {:reply, {:ok, %{event: @search, state: "error", message: "invalid_youtube"}}, socket}
@@ -24,6 +25,11 @@ defmodule Usic.SongChannel do
   def handle_in(message, payload, socket) do
     IO.puts "Invalid #{message} #{inspect payload}"
     {:noreply, socket}
+  end
+
+  def terminate(reason, socket) do
+    @topic_prefix <> uid = socket.topic
+    Loader.unload(uid)
   end
 
 

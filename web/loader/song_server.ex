@@ -13,10 +13,9 @@ defmodule Usic.SongServer do
     {:ok, %{}}
   end
 
-  def handle_cast({:get, location, channel}, state) do
+  def handle_cast({:get, location, uid, channel}, state) do
 
     Task.start_link(fn ->
-      uid = UUID.uuid4
       result = Usic.Loader.get_song(uid, location)
       send channel, {:get_song, result}
     end)
@@ -25,7 +24,7 @@ defmodule Usic.SongServer do
   end
 
 
-  def get(location) do
-    GenServer.cast(__MODULE__, {:get, location, self})
+  def get(location, uid) do
+    GenServer.cast(__MODULE__, {:get, location, uid, self})
   end
 end

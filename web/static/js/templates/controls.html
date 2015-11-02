@@ -21,11 +21,19 @@
         <i class="ion-play"/>
       </a>
     <% } %>
+
   </div>
   <div class="pure-u-1-12 control">
     <a class="pure-button button-success control-button skip-forward"
       href="javascript:void(0)">
       <i class="ion-skip-forward"/>
+    </a>
+  </div>
+  <div class="pure-u-1-12 control">
+    <a class="pure-button button-success control-button auto-center
+      <%- state.autoCenter? '': 'disabled' %>"
+      href="javascript:void(0)">
+      <i class="ion-pinpoint"/>
     </a>
   </div>
   <div class="pure-u-1-4 control">

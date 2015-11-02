@@ -17,6 +17,9 @@
 @import "regions";
 @import "clicks";
 @import "ionicons";
+@import "spinner";
+@import "meta";
+@import "error";
 
 * {
   box-sizing: border-box;
@@ -28,6 +31,9 @@ a {
   &:hover {
     color: @gray;
   };
+}
+.pure-button.disabled {
+  opacity: .75;
 }
 .button-success,
 .button-error,
@@ -58,6 +64,8 @@ a {
 .body {
   padding: @base-pad;
   margin: @base-pad;
+  font-family: monospace;
+
 }
 
 h1, h2, h3, h4, h5, h6 {
@@ -66,7 +74,17 @@ h1, h2, h3, h4, h5, h6 {
   font-family: monospace;
 }
 
-h6 {
+html, a {
+  font-family: monospace;
+  -ms-text-size-adjust: 100%;
+  -webkit-text-size-adjust: 100%;
+}
+
+.text-muted {
+  color: @gray;
+}
+
+h5, h6 {
   padding: @base-pad/4;
 }
 
@@ -108,3 +126,34 @@ h6 {
   border-left-color: @blue;
 }
 
+ul {
+  padding: 0px;
+  li {
+    list-style-type: none;
+  }
+}
+
+#auth {
+  padding: @base-pad * 2 0px;
+  text-align: center;
+  form {
+    margin-left: ~'calc(50% - ' @base-pad * 12 ~')';
+    max-width: @base-pad * 24;
+    input {
+      width: 100%;
+      margin: @base-pad 0px;
+    }
+  }
+}
+
+div.result {
+  width: 100%;
+  padding: @base-pad;
+
+  &.success {
+    border-bottom: 1px solid @blue;
+  }
+  &.error {
+    border-bottom: 1px solid @red;
+  }
+}

@@ -12,7 +12,7 @@ defmodule UsicTest.Loader do
 
   test "will give an error for invalid links" do
     res = Usic.Loader.get_song_id("echo \"bad stuff\"")
-    assert res = {:error, "invalid_link"}
+    assert res == {:error, "invalid_link"}
   end
 
   test "can get the song id from a youtube video" do

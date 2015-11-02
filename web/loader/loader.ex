@@ -1,7 +1,5 @@
 defmodule Usic.Loader do
   require Logger
-  alias Usic.Executor
-
 
   defp media_dir, do: Application.get_env(:usic, :media_dir)
 

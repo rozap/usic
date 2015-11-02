@@ -49,7 +49,7 @@ def build_release():
     return archive_name, join(release_dir, archive_name)
 
 
-def update():
+def ship():
     archive_name, archive = build_release()
     put(archive, "/tmp")
 
@@ -62,10 +62,26 @@ def update():
         ))
     put("deploy/upstart.conf", "/etc/init/usic.conf", use_sudo = True)
 
+def upgrade(version):
+    # ~~ we are living in the future ~~
+    # ~~ the future is 1980 ~~
+    print(yellow("Upgrading to {version}".format(version = version)))
+    with cd(base_dir):
+        sudo("bin/usic upgrade {version}".format(version = version))
+
 
 @task
-def deploy():
+def rollback(version):
+    print(yellow("Downgrade to {version}".format(version = version)))
+    with cd(base_dir):
+        sudo("bin/usic downgrade {version}".format(version = version))
+
+
+@task
+def deploy(version):
+    print version
     check_deploy()
     print(green("starting deploy"))
     ensure_packages()
-    update()
+    ship()
+    upgrade(version)

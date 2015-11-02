@@ -6,8 +6,7 @@ defmodule Usic.SongChannel do
   @search "search"
   @topic_prefix "song:"
 
-  def join(@topic_prefix <> uid, message, socket) do
-    IO.puts "Joined #{inspect uid}"
+  def join(@topic_prefix <> _uid, _message, socket) do
     {:ok, socket}
   end
 
@@ -27,7 +26,7 @@ defmodule Usic.SongChannel do
     {:noreply, socket}
   end
 
-  def terminate(reason, socket) do
+  def terminate(_reason, socket) do
     @topic_prefix <> uid = socket.topic
     Loader.unload(uid)
   end

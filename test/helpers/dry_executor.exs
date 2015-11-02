@@ -3,11 +3,11 @@ defmodule Usic.DryExecutor do
     GenServer.start_link(__MODULE__, [], [name: __MODULE__])
   end
 
-  def init(args) do
+  def init(_args) do
     {:ok, %{}}
   end
 
-  def handle_call({:get, url, output_loc}, _from, state) do
+  def handle_call({:get, url, _}, _from, state) do
     [_, id] = String.split(url, "=")
     response = if String.length(id) < 6 do
       {"invalid id", 1}

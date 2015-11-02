@@ -35,14 +35,11 @@ defmodule Usic.SongChannelTest do
 
   test "can give back song when done" do
     socket = make_socket
-
-    expected_location =  Path.join(media_loc, "lVKBRF4gu54.m4a")
-
     push(socket, "search", %{"term" => @youtube_song})
     assert_push "search", %{status: :ok, response: %{
       state: "success",
       message: "video_retrieved",
-      location: expected_location
+      location: "/media/lVKBRF4gu54.m4a"
     }}, 10_000
   end
 

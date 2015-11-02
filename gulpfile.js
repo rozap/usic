@@ -62,7 +62,7 @@ gulp.task('less', function() {
         .pipe(less({
             paths: ['style.less']
         }))
-        .pipe(minifyCSS())
+        // .pipe(minifyCSS())
         .pipe(gulp.dest(paths.less.dest));
 });
 

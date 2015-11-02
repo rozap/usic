@@ -3,6 +3,7 @@ defmodule Usic.UserSocket do
 
   ## Channels
   channel "song:*", Usic.SongChannel
+  channel "session*", Usic.PersistenceChannel
 
   ## Transports
   transport :websocket, Phoenix.Transports.WebSocket

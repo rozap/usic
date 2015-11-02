@@ -15,7 +15,8 @@ var Controls = View.extend({
     'mousewheel #playback-rate': 'onWheelRate',
     'change #playback-rate': 'onChangeRate',
     'click .skip-backward': 'onSkipBackward',
-    'click .skip-forward': 'onSkipForward'
+    'click .skip-forward': 'onSkipForward',
+    'click .auto-center': 'onAutoCenter'
   },
 
   init: function(opts) {
@@ -126,6 +127,14 @@ var Controls = View.extend({
 
   onSkipBackward:function() {
     this._audio.wavesurfer.skipBackward();
+  },
+
+  onAutoCenter:function() {
+    this.updateState({
+      autoCenter: !this.getState().autoCenter
+    });
+    console.log(this.getState().autoCenter)
+    this._audio.wavesurfer.params.follow = this.getState().autoCenter;
   }
 });
 

@@ -3,7 +3,7 @@ defmodule Usic.Mixfile do
 
   def project do
     [app: :usic,
-     version: "0.0.7",
+     version: "0.0.9",
      elixir: "~> 1.0",
      elixirc_paths: elixirc_paths(Mix.env),
      compilers: [:phoenix] ++ Mix.compilers,
@@ -20,7 +20,7 @@ defmodule Usic.Mixfile do
     [mod: {Usic, []},
      applications: [:phoenix, :phoenix_html, :cowboy, :logger,
                     :phoenix_ecto, :postgrex,
-                    :logger_file_backend, :uuid]]
+                    :logger_file_backend, :uuid, :comeonin]]
   end
 
   # Specifies which paths to compile per environment.
@@ -40,7 +40,8 @@ defmodule Usic.Mixfile do
       {:cowboy, "~> 1.0"},
       {:uuid, "~> 1.0.1"},
       {:exrm, "~> 0.19.9"},
-      {:logger_file_backend, "0.0.5"}
+      {:logger_file_backend, "0.0.5"},
+      {:comeonin, "~> 1.3"}
    ]
   end
 

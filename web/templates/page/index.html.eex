@@ -1,15 +1,18 @@
 <div class="head pure-g">
-  <div class="pure-u-1-4">
-    <h2>μsic</h2>
+  <div class="pure-u-1-5">
+    <h2><a href="#">μsic</a></h2>
   </div>
-  <div class="pure-u-3-4">
+  <div class="pure-u-3-5">
     <div id="search" class="search">
-      <input id="search-input"/>
+      <input id="search-input" value="https://www.youtube.com/watch?v=WTNT3YT6EqE" placeholder="Enter a YouTube URL"/>
       <div id="search-result"></div>
     </div>
   </div>
+  <div class="pure-u-1-5" id="meta">
+    <div class="spinner"></div>
+  </div>
 </div>
-<div id="song">
 
-
-</div>
+<div id="error"></div>
+<div id="auth"></div>
+<div id="song"></div>

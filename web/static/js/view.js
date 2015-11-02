@@ -9,7 +9,7 @@ module.exports = bb.View.extend({
     this._subviews = {};
     this._state = {};
     this._parent = opts._parent;
-    if(!this.dispatcher) throw new Error('wtf m9')
+    if(!this.dispatcher) throw new Error('wtf m9');
     this.init(opts);
   },
 
@@ -60,7 +60,7 @@ module.exports = bb.View.extend({
       state: state
     }));
 
-    if(state.cid) throw new Error("wtf m8")
+    if(state.cid) throw new Error("wtf m8");
 
     this._setAttributes(this.getAttributes());
 
@@ -152,6 +152,19 @@ module.exports = bb.View.extend({
 
   destroy:function() {
     this._destroy();
+  },
 
+  serializeForm:function(name) {
+    name = name || 'form';
+    var inputs = this.el
+    .querySelector(name)
+    .querySelectorAll('input');
+
+    return _.object(
+    _.range(0, inputs.length)
+    .map(function(i) {
+      var element = inputs[i];
+      return [element.name, element.value];
+    }));
   }
 });

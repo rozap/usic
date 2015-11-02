@@ -16,11 +16,6 @@ Copyright (c) Nicolas Gallagher and Jonathan Neal
  *    user zoom.
  */
 
-html {
-  font-family: sans-serif; /* 1 */
-  -ms-text-size-adjust: 100%; /* 2 */
-  -webkit-text-size-adjust: 100%; /* 2 */
-}
 
 /**
  * Remove default margin.
@@ -504,7 +499,7 @@ th {
     /* IE10 uses display: flexbox */
     display: -ms-flexbox;
     -ms-flex-flow: row wrap;
-    
+
     /* Prevents distributing space between rows */
     -ms-align-content: flex-start;
 	-webkit-align-content: flex-start;
@@ -838,7 +833,7 @@ this the same font stack that Normalize.css sets for the `body`.
 .pure-button-selected,
 a.pure-button-primary,
 a.pure-button-selected {
-    background-color: rgb(0, 120, 231);
+    background-color: @blue;
     color: #fff;
 }
 

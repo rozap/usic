@@ -40,6 +40,7 @@ module.exports = bb.View.extend({
         s[name] = this[name];
       }.bind(this));
     }
+    s.model = this.model;
     return _.extend(s, this.getState());
   },
 

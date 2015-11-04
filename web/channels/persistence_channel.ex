@@ -10,7 +10,8 @@ defmodule Usic.PersistenceChannel do
 
   @creatable %{
     "user" => Usic.User,
-    "song" => Usic.Song
+    "song" => Usic.Song,
+    "session" => Usic.Session
   }
 
   def join(_term, _message, socket) do

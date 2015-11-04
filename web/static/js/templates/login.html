@@ -3,24 +3,41 @@
         <legend>Login</legend>
 
         <% if(state.error) { %>
-           <div class="error">
+           <div class="result error">
             <h5><%- t('login_failed') %></h5>
             <% _.each(state.error, function(reason, key) { %>
                 <h5>
-                    <%- key %>: <span class="text-muted"><%- reason %></span>
+                    <%- key %>: <span class="text-muted"><%- t(reason) %></span>
                 </h5>
             <% }) %>
             </div>
         <% } %>
 
-        <input id="email" name="email" type="email" placeholder="Email">
-        <input id="password" name="password" type="password" placeholder="Password">
+        <% if(state.success) { %>
+            <div class="result success">
+                <%- t('login_success') %>
+            </div>
+        <% } else { %>
 
-        <a href="javascript:void(0)" class="pure-button pure-button-primary register">
-          Register
-        </a>
-        <a href="#" class="pure-button">
-          Nevermind
-        </a>
+            <input
+                id="email"
+                name="email"
+                type="email"
+                value="<%- state.model.get('email') %>"
+                placeholder="Email">
+
+            <input
+                id="password"
+                name="password"
+                type="password"
+                placeholder="Password">
+
+            <a href="javascript:void(0)" class="pure-button pure-button-primary login">
+              <%- t('login') %>
+            </a>
+            <a href="#" class="pure-button">
+              <%- t('nvm') %>
+            </a>
+        <% } %>
     </fieldset>
 </form>

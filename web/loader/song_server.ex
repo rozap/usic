@@ -4,6 +4,9 @@ defmodule Usic.SongServer do
   # Will deal with throttling of song requests so shit
   # doesn't hit the fan
   #
+  # Need to delete if it's already there
+  #
+
 
   def start_link() do
     GenServer.start_link(__MODULE__, [], [name: __MODULE__])

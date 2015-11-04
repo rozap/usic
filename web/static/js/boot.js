@@ -25,7 +25,8 @@ var opts = {
 
 function getSessionToken() {
   try {
-    var sesh = JSON.parse(localStorage['usic'])
+    //TODO: fix this duplication with the model
+    var sesh = JSON.parse(localStorage['usic']);
     return "session:" + sesh.token;
   } catch(e) {
     return "session";
@@ -36,7 +37,7 @@ var router = new Router(opts);
 new KeyBindings(dispatcher);
 
 socket.onOpen(function() {
-  dispatcher.trigger('error:dismiss')
+  dispatcher.trigger('error:dismiss');
 
   var api = socket.channel(getSessionToken(), {});
   opts.api = api;
@@ -57,5 +58,5 @@ socket.onOpen(function() {
 });
 socket.onError(function() {
   dispatcher.trigger('error:new', 'socket_error', {fatal : false});
-})
+});
 socket.connect();

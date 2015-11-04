@@ -4,7 +4,7 @@ defmodule Usic.User do
   @whitelist [:id, :email, :inserted_at, :updated_at]
 
   schema "user" do
-    field :email, :string
+    field :email, :string, primary_key: true
     field :password, :string
     timestamps
   end

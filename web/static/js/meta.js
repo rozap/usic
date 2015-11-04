@@ -8,10 +8,15 @@ module.exports = View.extend({
   template: _.template(MetaTemplate),
 
   init: function(opts) {
+    this.listenTo(this.dispatcher, 'create:session:success', this.onAuth);
     this.render();
   },
 
-  _update: function(state) {
-  },
+  onAuth:function(user) {
+    this.updateState({
+      user:user
+    })
+  }
+
 
 });

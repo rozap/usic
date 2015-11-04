@@ -8,24 +8,33 @@ module.exports = View.extend({
   template: _.template(ErrorTemplate),
 
   events : {
-    'click .dismiss-error': 'onErrorDismiss'
+    'click .minimize-error': 'onMinimizeError'
   },
 
   init: function(opts) {
     this.listenTo(opts.dispatcher, 'error:new', this.onError);
-    this.listenTo(opts.dispatcher, 'error:dismiss', this.onErrorDismiss);
+    this.listenTo(opts.dispatcher, 'error:dismiss', this.onDismissError);
   },
 
   onError: function(message, opts) {
+    //only show the first one, preventing cascading weirdness
+    if(this.getState().hasError) return;
     this.setState(_.extend({}, opts, {
       hasError: true,
-      message: message
+      message: message,
+      dismissed: false
     }));
   },
 
-  onErrorDismiss: function() {
+  onDismissError:function() {
     this.setState({
       hasError: false
+    });
+  },
+
+  onMinimizeError: function() {
+    this.updateState({
+      dismissed: true
     });
   }
 });

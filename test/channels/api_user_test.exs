@@ -33,7 +33,6 @@ defmodule Usic.ApiUserTest do
     })
     receive do
       %{payload: p} ->
-        IO.inspect p
         assert p == %{password: "should be at least 6 characters"}
     end
   end
@@ -44,7 +43,7 @@ defmodule Usic.ApiUserTest do
       "email": "foo@bar.com", "password": "blahblah"
     })
     receive do
-      %{payload: p} -> :ok
+      %{payload: _} -> :ok
     end
 
     push(socket, "create:user", %{

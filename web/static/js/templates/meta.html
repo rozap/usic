@@ -2,12 +2,21 @@
   <li>
     <a href="#transcriptions/0"><%- t('transcriptions') %></a>
   </li>
-  <li>
-    <a href="#register"><%- t('register') %></a>
-  </li>
-  <li>
-    <a href="#login"><%- t('login') %></a>
-  </li>
+  <% if(state.user) { %>
+    <li>
+      <a href="#profile">
+        <%- t('profile') %>
+        [<%- state.user.get('email') %>]
+      </a>
+    </li>
+  <% } else { %>
+    <li>
+      <a href="#register"><%- t('register') %></a>
+    </li>
+    <li>
+      <a href="#login"><%- t('login') %></a>
+    </li>
+  <% } %>
   <li>
     <a href="#about"><%- t('about') %></a>
   </li>

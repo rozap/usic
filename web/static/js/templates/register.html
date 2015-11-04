@@ -3,12 +3,12 @@
         <legend>Register</legend>
 
         <% if(state.error) { %>
-           <div class="error">
+           <div class="result error">
             <h5><%- t('account_create_failed') %></h5>
 
             <% _.each(state.error, function(reason, key) { %>
                 <h5>
-                    <%- key %>: <span class="text-muted"><%- reason %></span>
+                    <%- key %>: <span class="text-muted"><%- t(reason) %></span>
                 </h5>
             <% }) %>
 

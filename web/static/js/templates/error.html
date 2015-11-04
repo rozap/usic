@@ -1,12 +1,18 @@
 <% if(state.hasError) { %>
-  <h4>
-    <i class="ion-alert-circled"/>
-    <%- t(state.message) %>
+  <% if(state.dismissed) { %>
+    <h6 title="<%- t(state.message) %>">
+      <i class="ion-alert-circled"/>
+    </h6>
+  <% } else { %>
+    <h4>
+      <i class="ion-alert-circled"/>
+      <%- t(state.message) %>
 
-    <% if(!state.fatal) { %>
-      <a href="javascript:void(0)" class="text-muted dismiss-error">
-        <%- t('dismiss_error') %>
-      </a>
-    <% } %>
-  </h4>
+      <% if(!state.fatal) { %>
+        <a href="javascript:void(0)" class="text-muted minimize-error">
+          <%- t('minimize_error') %>
+        </a>
+      <% } %>
+    </h4>
+  <% } %>
 <% } %>

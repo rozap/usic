@@ -1,4 +1,10 @@
 module.exports = {
+  'onConfirm': {
+    name: 'enter',
+    code: 13,
+    type: 'keyup',
+    t: 'confirm'
+  },
   'onTogglePlay': {
     name: 'space',
     character: ' ',

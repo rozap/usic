@@ -24,21 +24,22 @@ module.exports = bb.Router.extend({
 
   index: function() {
     console.log("route", "index");
+    this.reset();
   },
 
   reset: function() {
-    if (this._authview) this._authview.destroy();
+    if (this._authView) this._authView.destroy();
   },
 
   login: function() {
     this.reset();
-    new Login(this._opts);
+    this._authView = new Login(this._opts);
     console.log("route", "login");
   },
 
   register: function() {
     this.reset();
-    new Register(this._opts);
+    this._authView = new Register(this._opts);
     console.log("route", "register");
   },
 

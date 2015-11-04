@@ -14,6 +14,7 @@ defmodule Usic.SongChannel do
     case Loader.get_song_id(location) do
       {:ok, _id} ->
         @topic_prefix <> uid = socket.topic
+        Loader.unload(uid)
         Usic.SongServer.get(location, uid)
         {:reply, {:ok, %{event: @search, state: "loading", message: "getting_song"}}, socket}
       {:error, _} ->

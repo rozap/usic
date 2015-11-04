@@ -5,8 +5,5 @@ var _ = require('underscore');
 module.exports = bb.Model.extend({
   defaults: {
     'clicks': [],
-  },
-  initialize: function() {
-
   }
 });

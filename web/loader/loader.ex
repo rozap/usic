@@ -60,24 +60,26 @@ defmodule Usic.Loader do
   defp download_song({:ok, _}, session_id, url) do
     output_loc = gen_template(session_id)
 
-    {log_out, result} = get_executor().get(url, output_loc)
+    case get_executor().get(url, output_loc) do
+      {:error, reason} -> {:error, reason}
+      {log_out, result} ->
+        lines = String.split(log_out, "\n")
+        |> Enum.map(fn line -> "[youtube-dl] [#{session_id}] #{line}" end)
 
-    lines = String.split(log_out, "\n")
-    |> Enum.map(fn line -> "[youtube-dl] [#{session_id}] #{line}" end)
-
-    case result do
-      0 ->
-        Enum.each(lines, &(Logger.info &1))
-        Logger.info("[youtube-dl] Download complete")
-        to_media_location(lines)
-      _ ->
-        failure = "youtube-dl failed with #{result}"
-        Logger.error(failure)
-        Enum.each(lines, &(Logger.error &1))
-        {:error, failure}
+        case result do
+          0 ->
+            Enum.each(lines, &(Logger.info &1))
+            Logger.info("[youtube-dl] Download complete")
+            to_media_location(lines)
+          _ ->
+            failure = "youtube-dl failed with #{result}"
+            Logger.error(failure)
+            Enum.each(lines, &(Logger.error &1))
+            {:error, failure}
+        end
     end
-
   end
+
   defp download_song(err, _, _), do: err
 
 

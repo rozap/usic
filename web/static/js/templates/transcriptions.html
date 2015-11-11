@@ -1,0 +1,19 @@
+<h2 class="text-muted"><%- t('transcriptions') %></h2>
+
+<ul class="transcriptions">
+<% state.model.forEach(function(song) { %>
+  <li class="transcription">
+    <h3>
+      <a href="#song/<%- song.get('id') %>"><%- song.get('name') %></a>
+    </h3>
+    <span class="text-muted">
+      <%- t('last_updated') %>: <%- moment(song.get('updated_at')).fromNow() %>
+    </span>
+  </li>
+<% }); %>
+</ul>
+
+<ul>
+  <li><%- t('back') %></li>
+  <li><%- t('next') %></li>
+</ul>

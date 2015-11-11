@@ -2,6 +2,7 @@ var bb = require('backbone');
 
 var Register = require('./register');
 var Login = require('./login');
+var Transcriptions = require('./transcriptions');
 
 module.exports = bb.Router.extend({
   routes: {
@@ -49,5 +50,6 @@ module.exports = bb.Router.extend({
 
   transcriptions: function(page) {
     console.log("route", "transcriptions");
+    this._mainView = new Transcriptions(this._opts);
   }
 });

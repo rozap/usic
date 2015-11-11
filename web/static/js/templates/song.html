@@ -1,10 +1,11 @@
-<% if(state.state === 'success') { %>
+<% if(state.state === 'error') { %>
+  <h4>Failed to load that audio buffer! <%- JSON.stringify(state) %></h4>
+<% } else { %>
   <div class="interactive">
     <div id="view-wave"></div>
     <div id="view-regions"></div>
   </div>
 
   <div id="controls"></div>
-<% } else if(state.state === 'error') { %>
-  <h4>Failed to load that audio buffer! <%- JSON.stringify(state) %></h4>
+
 <% } %>

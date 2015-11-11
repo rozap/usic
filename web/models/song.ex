@@ -11,7 +11,6 @@ defmodule Usic.Song do
     timestamps
   end
 
-
   def changeset(song, params \\ :empty, user: user) do
     params = case user do
       nil -> Dict.put(params, "user", nil)
@@ -19,17 +18,10 @@ defmodule Usic.Song do
     end
     song |> cast(params, ~w(name url))
   end
-
-  ##
-  # this is stupid but it's simple
-  def readable(instance) do
-    Usic.Model.Util.sanitize(instance, @whitelist)
-  end
-
 end
 
 defimpl Poison.Encoder, for: Usic.Song do
-  @attributes ~W(id name url inserted_at updated_at)
+  @attributes ~w(id name url inserted_at updated_at)a
 
   def encode(song, _options) do
     song

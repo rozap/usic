@@ -37,10 +37,12 @@ defmodule Usic.Resource do
   def list(model, params, socket) do
     user = Map.get(socket.assigns, :user, nil)
 
-    offset = 0
-    limit = 20
+    %{"offset" => offset, "limit" => limit} = params
 
-    models = Usic.Repo.all(from m in model, select: m)
+    models = Usic.Repo.all(from m in model,
+      limit: ^limit,
+      offset: ^offset,
+      select: m)
 
     resp = Dict.put(%{}, "items", models)
     {{:ok, resp}, socket}

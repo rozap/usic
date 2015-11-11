@@ -8,7 +8,7 @@ var View = require('./view');
 var SongTemplate = require('./templates/song.html');
 var keyCodes = require('./keycodes');
 
-var SongModel = require('./models/song');
+var Song = require('./models/song');
 var ControlsView = require('./controls');
 var WaveView = require('./wave');
 var RegionView = require('./regions');
@@ -30,16 +30,25 @@ module.exports = View.extend({
   },
 
   init: function(opts) {
-    this.updateState(opts.result);
-    this.model = new SongModel({}, opts);
-    this._state = {};
+    window.wtf = this;
+
+    this.model = new Song({
+      url : opts.result.location,
+      name: 'a song'
+    }, opts);
+    this.setState({});
+    console.log(SongTemplate)
+  },
+
+  onRendered: function() {
+    this._loadSong();
   },
 
   _loadSong: function() {
-    console.log(this.getState())
-    if (!this.getState().location) return;
+    var loc = this.model.get('url');
+    if (!loc) return;
     var req = new XMLHttpRequest();
-    req.open('GET', this.getState().location);
+    req.open('GET', loc);
     req.responseType = 'arraybuffer';
     req.onload = _.partial(this._onSongLoaded, req).bind(this);
     req.send();
@@ -54,11 +63,8 @@ module.exports = View.extend({
   },
 
   _onBufferLoaded: function(buf) {
-    debugger
-    this.model.set({
-      url: this.getState().location,
-      name: 'foo'
-    }).save();
+    console.log("state is", this.getState());
+    this.model.save();
 
     this._audio.buffer = buf;
 
@@ -76,11 +82,10 @@ module.exports = View.extend({
     this._audio.wavesurfer = wavesurfer;
     this.addSubview('controls', ControlsView, {
       audio: this._audio
-    })
+    });
   },
 
   _onBufferError: function(err) {
-    console.warn("Failed to load", err);
     this.setState({
       state: 'error',
       error: err
@@ -139,11 +144,6 @@ module.exports = View.extend({
     var duration = this._audio.wavesurfer.getDuration();
     this.trigger('zoom', pps, duration);
     this._audio.wavesurfer.fireEvent('zoom');
-  },
-
-
-  onRendered: function() {
-    this._loadSong();
   },
 
   destroy: function() {

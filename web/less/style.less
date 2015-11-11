@@ -20,6 +20,7 @@
 @import "spinner";
 @import "meta";
 @import "error";
+@import "transcriptions";
 
 * {
   box-sizing: border-box;
@@ -70,7 +71,7 @@ a {
 
 h1, h2, h3, h4, h5, h6 {
   color: @dark-gray;
-  padding: @base-pad * 1.5;
+  padding: @base-pad 0px;
   font-family: monospace;
 }
 
@@ -89,8 +90,10 @@ h5, h6 {
 }
 
 .head {
+  /*padding: 0px @base-pad;*/
   border-bottom: 1px solid @light-gray;
   h2 {
+    padding: @base-pad * 1.5 @base-pad;
     border-right: 1px solid @light-gray;
   }
   .search {
@@ -134,7 +137,7 @@ ul {
 }
 
 #auth {
-  padding: @base-pad * 2 0px;
+  margin: @base-pad * 2 0px;
   text-align: center;
   form {
     margin-left: ~'calc(50% - ' @base-pad * 12 ~')';
@@ -156,4 +159,7 @@ div.result {
   &.error {
     border-bottom: 1px solid @red;
   }
+}
+.main {
+  margin: @base-pad;
 }

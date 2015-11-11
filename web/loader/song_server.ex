@@ -1,12 +1,10 @@
 defmodule Usic.SongServer do
   use GenServer
+  require Logger
   ##
   # Will deal with throttling of song requests so shit
   # doesn't hit the fan
   #
-  # Need to delete if it's already there
-  #
-
 
   def start_link() do
     GenServer.start_link(__MODULE__, [], [name: __MODULE__])
@@ -17,7 +15,7 @@ defmodule Usic.SongServer do
   end
 
   def handle_cast({:get, location, uid, channel}, state) do
-
+    Logger.info("Starting task for song fetch #{location} #{uid}")
     Task.start_link(fn ->
       result = Usic.Loader.get_song(uid, location)
       send channel, {:get_song, result}

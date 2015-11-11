@@ -4,7 +4,4 @@ var _ = require('underscore');
 
 module.exports = Model.extend({
   name: 'song'
-  // defaults: {
-  //   'clicks': [],
-  // }
 });

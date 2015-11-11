@@ -28,7 +28,6 @@
     "jquery":"latest",
     "uuid": "latest",
     "wavesurfer.js": "latest",
-    "soundbank-granular": "latest",
-    "bopper": "latest"
+    "moment": "latest"
   }
 }

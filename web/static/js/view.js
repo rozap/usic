@@ -1,6 +1,7 @@
 var bb = require('backbone');
 var _ = require('underscore');
 var t = require('./translate').t;
+var moment = require('moment');
 
 module.exports = bb.View.extend({
 
@@ -60,6 +61,7 @@ module.exports = bb.View.extend({
     this.$el.html(this.template({
       t: t,
       _: _,
+      moment: moment,
       state: state
     }));
 

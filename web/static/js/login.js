@@ -29,14 +29,12 @@ module.exports = View.extend({
   onSuccess:function() {
     this.model.persistLocally();
 
-    console.log('update ls', localStorage['usic']);
     this.setState({
       success:true
     });
   },
 
   onError:function(error) {
-    console.log('erro', error);
     this.setState({
       error: error
     });

@@ -1,9 +1,10 @@
-var bb = require('backbone');
+var Model = require('./model');
 var _ = require('underscore');
 
 
-module.exports = bb.Model.extend({
-  defaults: {
-    'clicks': [],
-  }
+module.exports = Model.extend({
+  name: 'song'
+  // defaults: {
+  //   'clicks': [],
+  // }
 });

@@ -12,9 +12,9 @@ module.exports = View.extend({
     this.render();
   },
 
-  onAuth:function(user) {
+  onAuth:function(session) {
     this.updateState({
-      user:user
+      session: session
     })
   }
 

@@ -31,14 +31,13 @@ module.exports = View.extend({
 
   init: function(opts) {
     this.updateState(opts.result);
-    this.model = new SongModel();
+    this.model = new SongModel({}, opts);
     this._state = {};
   },
 
   _loadSong: function() {
     console.log(this.getState())
     if (!this.getState().location) return;
-
     var req = new XMLHttpRequest();
     req.open('GET', this.getState().location);
     req.responseType = 'arraybuffer';
@@ -55,6 +54,12 @@ module.exports = View.extend({
   },
 
   _onBufferLoaded: function(buf) {
+    debugger
+    this.model.set({
+      url: this.getState().location,
+      name: 'foo'
+    }).save();
+
     this._audio.buffer = buf;
 
     var waveView = this.addSubview('wave', WaveView, {

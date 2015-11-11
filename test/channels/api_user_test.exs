@@ -4,12 +4,13 @@ defmodule Usic.ApiUserTest do
   alias Usic.User
   @endpoint Usic.Endpoint
 
+  setup do
+    Ecto.Adapters.SQL.restart_test_transaction(Usic.Repo)
+  end
+
   defp make_socket() do
     {:ok, _, socket} = socket("something", %{})
-    |> subscribe_and_join(
-      Usic.PersistenceChannel, "hi", %{}
-    )
-
+    |> subscribe_and_join(Usic.PersistenceChannel, "hi", %{})
     socket
   end
 

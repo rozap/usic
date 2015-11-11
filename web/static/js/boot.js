@@ -40,6 +40,7 @@ socket.onOpen(function() {
   dispatcher.trigger('error:dismiss');
 
   var api = socket.channel(getSessionToken(), {});
+  window.a = api;
   opts.api = api;
 
   new ErrorView(opts);

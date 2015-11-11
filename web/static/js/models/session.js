@@ -6,17 +6,21 @@
    persistLocally: function() {
      localStorage['usic'] = JSON.stringify({
        token: this.get('token'),
-       email: this.get('email')
+       user: this.get('user')
      });
    },
 
-   loadFromDisk:function() {
-    try {
-      var sesh = JSON.parse(localStorage['usic']);
-      this.set(sesh);
-    } catch(e) {
-      //no session
-    }
-    return this;
+   loadFromDisk: function() {
+     try {
+       var sesh = JSON.parse(localStorage['usic']);
+       this.set(sesh);
+     } catch (e) {
+       //no session
+     }
+     return this;
+   },
+
+   _onSync: function() {
+     this.unset('password');
    }
  });

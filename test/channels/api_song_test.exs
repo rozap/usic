@@ -4,19 +4,20 @@ defmodule Usic.ApiSongTest do
   alias Usic.Song
   @endpoint Usic.Endpoint
 
+  setup do
+    Ecto.Adapters.SQL.restart_test_transaction(Usic.Repo)
+  end
+
   defp make_socket() do
     {:ok, _, socket} = socket("something", %{})
-    |> subscribe_and_join(
-      Usic.PersistenceChannel, "hi", %{}
-    )
-
+    |> subscribe_and_join(Usic.PersistenceChannel, "hi", %{})
     socket
   end
 
   test "can create an anonymous song" do
     socket = make_socket
     push(socket, "create:song", %{
-      "url": "foo", "name": "something"
+      "url" => "foo", "name" => "something"
     })
     receive do
       %{payload: p} ->
@@ -25,6 +26,31 @@ defmodule Usic.ApiSongTest do
         assert song.url == "foo"
     end
   end
+
+ test "can get a list of songs" do
+    socket = make_socket
+    Enum.each(1..40, fn i ->
+      push(socket, "create:song", %{
+        "url" => "foo", "name" => "something #{i}"
+      })
+      receive do
+        %{payload: p} ->
+          assert p.name == "something #{i}"
+      end
+    end)
+
+    push(socket, "list:song", %{})
+
+    receive do
+      %{payload: p} ->
+        assert length(p["items"]) == 40
+    end
+
+
+
+  end
+
+
 
   # test "can create an non-anon song" do
   #   socket = make_socket

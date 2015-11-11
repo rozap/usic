@@ -5,8 +5,10 @@ var t = require('./translate').t;
 module.exports = bb.View.extend({
 
   initialize: function(opts) {
+    this.api = opts.api;
     this.dispatcher = opts.dispatcher;
     this._subviews = {};
+    this._opts = opts;
     this._state = {};
     this._parent = opts._parent;
     if(!this.dispatcher) throw new Error('wtf m9');

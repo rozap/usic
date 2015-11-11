@@ -18,7 +18,7 @@ module.exports = View.extend({
   },
 
   _bootstrapViews: function(opts) {
-    this.addSubview('result', LoadResult);
+    this.addSubview('result', LoadResult, this._opts);
   },
 
   _bootstrapChannel: function(opts) {

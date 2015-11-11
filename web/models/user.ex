@@ -1,11 +1,10 @@
 defmodule Usic.User do
   use Ecto.Model
 
-  @whitelist [:id, :email, :inserted_at, :updated_at]
-
   schema "user" do
-    field :email, :string, primary_key: true
+    field :email, :string
     field :password, :string
+    has_many :sessions, Usic.Session, foreign_key: :user
     timestamps
   end
 
@@ -22,10 +21,16 @@ defmodule Usic.User do
     Comeonin.Pbkdf2.hashpwsalt(password)
   end
 
-  ##
-  # this is stupid but it's simple
-  def readable(instance) do
-    Usic.Model.Util.sanitize(instance, @whitelist)
-  end
+end
 
+
+defimpl Poison.Encoder, for: Usic.User do
+  @attributes ~W(id email inserted_at updated_at)
+
+  def encode(song, _options) do
+    IO.puts "ENCODE USER"
+    song
+    |> Map.take(@attributes)
+    |> Poison.encode!
+  end
 end

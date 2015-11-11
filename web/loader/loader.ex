@@ -66,6 +66,7 @@ defmodule Usic.Loader do
         lines = String.split(log_out, "\n")
         |> Enum.map(fn line -> "[youtube-dl] [#{session_id}] #{line}" end)
 
+
         case result do
           0 ->
             Enum.each(lines, &(Logger.info &1))

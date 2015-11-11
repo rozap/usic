@@ -10,6 +10,7 @@ defmodule Usic.SongChannelTest do
 
   setup_all do
     clear_media
+    Ecto.Adapters.SQL.restart_test_transaction(Usic.Repo)
     Usic.DryExecutor.start_link
     :ok
   end

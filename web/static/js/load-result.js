@@ -12,11 +12,13 @@ module.exports = View.extend({
   },
 
   _update: function(state) {
+    console.log(state)
     if(state.state === 'success') {
       if(this._songView) this._songView.destroy();
       this._songView = new Song({
         result: state,
-        dispatcher: this.dispatcher
+        dispatcher: this.dispatcher,
+        api: this.api
       });
 
       document.querySelector('#search-input').blur();

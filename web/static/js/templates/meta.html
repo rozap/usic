@@ -2,11 +2,11 @@
   <li>
     <a href="#transcriptions/0"><%- t('transcriptions') %></a>
   </li>
-  <% if(state.user) { %>
+  <% if(state.session) { %>
     <li>
       <a href="#profile">
         <%- t('profile') %>
-        [<%- state.user.get('email') %>]
+        [<%- state.session.get('user') %>]
       </a>
     </li>
   <% } else { %>

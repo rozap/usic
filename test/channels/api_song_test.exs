@@ -43,7 +43,7 @@ defmodule Usic.ApiSongTest do
 
     receive do
       %{payload: p} ->
-        assert length(p["items"]) == 40
+        assert length(p["items"]) == 16
     end
 
 

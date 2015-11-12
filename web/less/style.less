@@ -163,3 +163,26 @@ div.result {
 .main {
   margin: @base-pad;
 }
+ul.pager {
+  margin-top: @base-pad * 2;
+  li {
+    display: inline-block;
+
+    a {
+      padding: @base-pad;
+      border-left: 1px solid @light-gray;
+    }
+
+    &:first-of-type {
+      a {
+        padding-left: 0px;
+        border-left: none;
+      }
+    };
+    i {
+      position: relative;
+      top: 2px;
+      padding: @base-pad;
+    }
+  }
+}

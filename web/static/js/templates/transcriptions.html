@@ -13,7 +13,15 @@
 <% }); %>
 </ul>
 
-<ul>
-  <li><%- t('back') %></li>
-  <li><%- t('next') %></li>
+<ul class="pager">
+  <li>
+    <a href="javascript:void(0);" class="back">
+      <i class="ion-ios-arrow-left"/><%- t('back') %>
+    </a>
+  </li>
+  <li>
+    <a href="javascript:void(0);" class="next">
+      <%- t('next') %><i class="ion-ios-arrow-right"/>
+    </a>
+  </li>
 </ul>

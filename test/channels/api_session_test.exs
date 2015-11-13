@@ -9,7 +9,7 @@ defmodule Usic.ApiSessionTest do
 
   defp make_socket() do
     {:ok, _, socket} = socket("something", %{})
-    |> subscribe_and_join(Usic.PersistenceChannel, "hi", %{})
+    |> subscribe_and_join(Usic.PersistenceChannel, "anon", %{})
     socket
   end
 
@@ -29,14 +29,6 @@ defmodule Usic.ApiSessionTest do
     receive do
       %{payload: p} ->
         assert p.token != nil
-    end
-
-    push(socket, "read:user", %{
-      "email" => "sessiontest@bar.com"
-    })
-    receive do
-      %{payload: p} ->
-        IO.inspect p
     end
   end
 
@@ -63,6 +55,40 @@ defmodule Usic.ApiSessionTest do
     receive do
       %{payload: p} -> assert p == %{email: "unknown_user"}
     end
+  end
+
+  test "can get user info using session token" do
+    socket = make_socket
+
+    push(socket, "create:user", %{
+      "email" => "sessiontest@bar.com", "password"=> "blahblah"
+    })
+    receive do
+      %{payload: p} -> assert p.email == "sessiontest@bar.com"
+    end
+
+    push(socket, "create:session", %{
+      "email" => "sessiontest@bar.com", "password"=> "blahblah"
+    })
+    token = receive do
+      %{payload: p} -> p.token
+    end
+
+    {:ok, _, socket} = socket("an_id", %{})
+    |> subscribe_and_join(Usic.PersistenceChannel, token, %{})
+
+    push(socket, "read:session", %{})
+
+    receive do
+      %{payload: p} ->
+        js = p
+        |> Poison.encode!
+        |> Poison.decode!
+
+        assert js["user"]["email"] == "sessiontest@bar.com"
+        assert js["user"]["password"] == nil
+    end
+
 
   end
 end

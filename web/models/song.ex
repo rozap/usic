@@ -11,17 +11,17 @@ defmodule Usic.Song do
     timestamps
   end
 
-  def changeset(song, params \\ :empty, user: user) do
-    params = case user do
-      nil -> Dict.put(params, "user", nil)
-      _ -> Dict.put(params, "user", user.email)
+  def changeset(song, params \\ :empty, session: session) do
+    params = case session do
+      nil -> Dict.put(params, "user_id", nil)
+      _ -> Dict.put(params, "user_id", session.user.id)
     end
-    song |> cast(params, ~w(name url))
+    cast(song, params, ~w(name url), ~w(user_id))
   end
 end
 
 defimpl Poison.Encoder, for: Usic.Song do
-  @attributes ~w(id name url inserted_at updated_at)a
+  @attributes ~w(id name url inserted_at updated_at user_id)a
 
   def encode(song, _options) do
     song

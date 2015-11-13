@@ -17,10 +17,10 @@ defmodule Usic.Resource do
 
 
   def create(model, params, socket) do
-    Logger.info("Create #{inspect model} :: #{inspect params}")
+    session = Map.get(socket.assigns, :session, nil)
+    cset = model.changeset(struct(model), params, session: session)
 
-    user = Map.get(socket.assigns, :user, nil)
-    cset = model.changeset(struct(model), params, user: user)
+    Logger.info("Create #{inspect model} :: #{inspect params}")
 
     if cset.valid? do
       case Usic.Repo.insert(cset) do
@@ -90,7 +90,6 @@ defmodule Usic.Resource do
   def read(model, params, socket) do
     user = Map.get(socket.assigns, :user, nil)
     [id_name] = model.__schema__(:primary_key)
-    IO.puts "Gettings #{inspect model} #{id_name}"
     case Map.get(params, Atom.to_string(id_name)) do
       nil ->
         {{:error, %{"id" => :not_found}}, socket}

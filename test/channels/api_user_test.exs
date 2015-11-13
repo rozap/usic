@@ -10,7 +10,7 @@ defmodule Usic.ApiUserTest do
 
   defp make_socket() do
     {:ok, _, socket} = socket("something", %{})
-    |> subscribe_and_join(Usic.PersistenceChannel, "hi", %{})
+    |> subscribe_and_join(Usic.PersistenceChannel, "anon", %{})
     socket
   end
 

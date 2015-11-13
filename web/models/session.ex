@@ -35,7 +35,7 @@ end
 
 
 defimpl Poison.Encoder, for: Usic.Session do
-  @attributes ~W(token)
+  @attributes ~w(token user inserted_at updated_at)a
 
   def encode(song, _options) do
     song

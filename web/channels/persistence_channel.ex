@@ -2,6 +2,8 @@ defmodule Usic.PersistenceChannel do
   use Phoenix.Channel
   import Ecto.Query
   require Logger
+  alias Usic.Session
+  alias Usic.Repo
 
   @create "create"
   @update "update"
@@ -20,7 +22,7 @@ defmodule Usic.PersistenceChannel do
   }
 
   @readable %{
-    "user" => {Usic.User, Usic.Resource}
+    "session" => {Usic.Session, Usic.Resource.Session}
   }
 
   @operations [
@@ -29,9 +31,29 @@ defmodule Usic.PersistenceChannel do
     {@read, quote do: @readable}
   ]
 
-  def join(_term, _message, socket) do
+
+  def join("anon", message, socket) do
+    Logger.info("Anon session has started")
     {:ok, socket}
   end
+
+  def join(session_token, message, socket) do
+    case Repo.one(from s in Session,
+      where: s.token == ^session_token, select: s, preload: [:user]) do
+      nil -> {:error, %{error: :invalid_token}}
+      session ->
+        Logger.info("#{session.user.email} has started an existing session")
+        {:ok, assign(socket, :session, session)}
+    end
+  end
+
+
+
+  def join(invalid, _, socket) do
+    Logger.info("Invalid session join #{invalid}")
+    {:error, %{error: :invalid_handshake}}
+  end
+
 
   defp r({{:error, reason}, socket}) do
     {:reply, {:error, reason}, socket}
@@ -45,6 +67,7 @@ defmodule Usic.PersistenceChannel do
     def handle_in(unquote(verb) <> ":" <> name, payload, socket) do
       case Dict.get(unquote(noun), name) do
         nil ->
+          Logger.error("Invalid resource #{unquote(verb) <> ":" <> name} #{inspect unquote(noun)}")
           r({{:error, %{message: "invalid_resource"}}, socket})
         {model, res} ->
           r(apply(res, String.to_atom(unquote(verb)), [model, payload, socket]))

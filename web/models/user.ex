@@ -25,10 +25,9 @@ end
 
 
 defimpl Poison.Encoder, for: Usic.User do
-  @attributes ~W(id email inserted_at updated_at)
+  @attributes ~W(id email inserted_at updated_at)a
 
   def encode(song, _options) do
-    IO.puts "ENCODE USER"
     song
     |> Map.take(@attributes)
     |> Poison.encode!

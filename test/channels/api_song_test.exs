@@ -10,7 +10,7 @@ defmodule Usic.ApiSongTest do
 
   defp make_socket() do
     {:ok, _, socket} = socket("something", %{})
-    |> subscribe_and_join(Usic.PersistenceChannel, "hi", %{})
+    |> subscribe_and_join(Usic.PersistenceChannel, "anon", %{})
     socket
   end
 
@@ -19,8 +19,10 @@ defmodule Usic.ApiSongTest do
     push(socket, "create:user", %{
       "email" => "sessiontest@bar.com", "password"=> "blahblah"
     })
-    receive do
-      %{payload: p} -> assert p.email == "sessiontest@bar.com"
+    user = receive do
+      %{payload: p} ->
+        assert p.email == "sessiontest@bar.com"
+        p
     end
 
     push(socket, "create:session", %{
@@ -40,7 +42,7 @@ defmodule Usic.ApiSongTest do
       end
     end)
 
-    socket
+    {socket, user}
   end
 
   test "can create an anonymous song" do
@@ -108,7 +110,7 @@ defmodule Usic.ApiSongTest do
 
 
   test "can select by name for" do
-    socket = make_authed_songs
+    {socket, _} = make_authed_songs
 
     push(socket, "list:song", %{
       "where" => %{
@@ -123,13 +125,13 @@ defmodule Usic.ApiSongTest do
   end
 
   test "logged in user should have songs made by them" do
-    socket = make_authed_songs
+    {socket, user} = make_authed_songs
 
     push(socket, "list:song", %{})
 
     receive do
       %{payload: %{"items" => [item | _]}} ->
-        IO.inspect item
+        assert item.user_id == user.id
     end
   end
 

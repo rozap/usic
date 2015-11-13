@@ -8,7 +8,7 @@ defmodule Usic.Resource.Session do
 
   def create(model, params, socket) do
     case Usic.Resource.create(model, params, socket) do
-      {{:error, reason}, _} = r -> r
+      {{:error, reason}, socket} = r -> r
       {{:ok, session}, socket} ->
 
         session = Repo.one(from s in Session,

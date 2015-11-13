@@ -34,18 +34,69 @@ defmodule Usic.Resource do
     end
   end
 
+
+  def filter(query, {name, value}) do
+    fname = String.to_atom(name)
+    query |> where([m], field(m, ^fname) == ^value)
+  end
+
+  def apply_filters(query, %{"where" => wheres}) do
+    Enum.reduce(wheres, query, fn clause, q ->
+      filter(q, clause)
+    end)
+  end
+
+  def apply_filters(query, _), do: query
+
+
+  defp run_list(model, params) do
+    try do
+      offset = Dict.get(params, "offset", 0)
+      limit = Dict.get(params, "limit", 16)
+
+      query = from(m in model)
+      |> limit([m], ^limit)
+      |> offset([m], ^offset)
+      |> apply_filters(params)
+
+      {:ok, Usic.Repo.all(query |> select([m], m))}
+    rescue
+      e in [Ecto.QueryError] ->
+        {:error, %{query: e.message}}
+    end
+  end
+
   def list(model, params, socket) do
     user = Map.get(socket.assigns, :user, nil)
 
-    offset = Dict.get(params, "offset", 0)
-    limit = Dict.get(params, "limit", 16)
+    case run_list(model, params) do
+      {:ok, models} ->
+        c = Usic.Repo.one(from m in model, select: count(m.id))
+        resp = %{}
+        |> Dict.put("items", models)
+        |> Dict.put("count", c)
+        {{:ok, resp}, socket}
 
-    models = Usic.Repo.all(from m in model,
-      limit: ^limit,
-      offset: ^offset,
-      select: m)
+      err -> {err, socket}
+    end
 
-    resp = Dict.put(%{}, "items", models)
-    {{:ok, resp}, socket}
+  end
+
+  ##
+  # Read and List should be able to send a where query
+  # Read will just ensure this returns one thing
+  #
+
+  def read(model, params, socket) do
+    user = Map.get(socket.assigns, :user, nil)
+    [id_name] = model.__schema__(:primary_key)
+    IO.puts "Gettings #{inspect model} #{id_name}"
+    case Map.get(params, Atom.to_string(id_name)) do
+      nil ->
+        {{:error, %{"id" => :not_found}}, socket}
+      id ->
+        model = Usic.repo.one(from m in model, where: m.id == ^id, select: m)
+        {{:ok, model}, socket}
+    end
   end
 end

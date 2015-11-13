@@ -24,11 +24,19 @@ defmodule Usic.ApiSessionTest do
     end
 
     push(socket, "create:session", %{
-      "user_id" => "sessiontest@bar.com", "password"=> "blahblah"
+      "email" => "sessiontest@bar.com", "password"=> "blahblah"
     })
     receive do
       %{payload: p} ->
         assert p.token != nil
+    end
+
+    push(socket, "read:user", %{
+      "email" => "sessiontest@bar.com"
+    })
+    receive do
+      %{payload: p} ->
+        IO.inspect p
     end
   end
 
@@ -43,17 +51,17 @@ defmodule Usic.ApiSessionTest do
     end
 
     push(socket, "create:session", %{
-      "user_id"=> "sessiontest2@bar.com", "password"=> "foobar"
+      "email"=> "sessiontest2@bar.com", "password"=> "foobar"
     })
     receive do
       %{payload: p} -> assert p == %{password: "invalid_password"}
     end
 
     push(socket, "create:session", %{
-      "user_id"=> "wtfwhy@bar.com", "password"=> "blahblah"
+      "email"=> "wtfwhy@bar.com", "password"=> "blahblah"
     })
     receive do
-      %{payload: p} -> assert p == %{user_id: "unknown_user"}
+      %{payload: p} -> assert p == %{email: "unknown_user"}
     end
 
   end

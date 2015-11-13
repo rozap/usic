@@ -7,7 +7,7 @@ defmodule Usic.Song do
   schema "song" do
     field :name, :string
     field :url, :string
-    belongs_to :user, User, references: :email, type: :string, foreign_key: :user, define_field: false
+    belongs_to :user, User
     timestamps
   end
 

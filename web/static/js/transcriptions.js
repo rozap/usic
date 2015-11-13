@@ -10,6 +10,11 @@ module.exports = View.extend({
   el: '#transcriptions',
   template: _.template(TranscriptionsTemplate),
 
+  events : {
+    'click .next' : 'onNext',
+    'click .previous' : 'onPrevious'
+  },
+
   init: function(opts) {
     window.thing = this;
     this.model = new Songs([], opts);
@@ -18,5 +23,12 @@ module.exports = View.extend({
     this.render();
   },
 
+  onNext:function() {
+    this.model.next();
+  },
+
+  onPrevious:function() {
+    this.model.previous();
+  }
 
 });

@@ -4,7 +4,7 @@ defmodule Usic.User do
   schema "user" do
     field :email, :string
     field :password, :string
-    has_many :sessions, Usic.Session, foreign_key: :user
+    has_many :sessions, Usic.Session
     timestamps
   end
 

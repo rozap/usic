@@ -3,11 +3,11 @@ defmodule Usic.PersistenceChannel do
   import Ecto.Query
   require Logger
 
-  @create "create:"
-  @update "update:"
-  @delete "delete:"
-  @read   "read:"
-  @list   "list:"
+  @create "create"
+  @update "update"
+  @delete "delete"
+  @read   "read"
+  @list   "list"
 
   @creatable %{
     "user" => {Usic.User, Usic.Resource},
@@ -18,6 +18,16 @@ defmodule Usic.PersistenceChannel do
   @listable %{
     "song" => {Usic.Song, Usic.Resource}
   }
+
+  @readable %{
+    "user" => {Usic.User, Usic.Resource}
+  }
+
+  @operations [
+    {@create, quote do: @creatable},
+    {@list, quote do: @listable},
+    {@read, quote do: @readable}
+  ]
 
   def join(_term, _message, socket) do
     {:ok, socket}
@@ -31,23 +41,16 @@ defmodule Usic.PersistenceChannel do
     {:reply, {:ok, resp}, socket}
   end
 
-  def handle_in(@create <> name, payload, socket) do
-    case Dict.get(@creatable, name) do
-      nil ->
-        r({{:error, %{message: "invalid_model"}}, socket})
-      {model, res} ->
-        r(res.create(model, payload, socket))
+  Enum.each(@operations, fn {verb, noun} ->
+    def handle_in(unquote(verb) <> ":" <> name, payload, socket) do
+      case Dict.get(unquote(noun), name) do
+        nil ->
+          r({{:error, %{message: "invalid_resource"}}, socket})
+        {model, res} ->
+          r(apply(res, String.to_atom(unquote(verb)), [model, payload, socket]))
+      end
     end
-  end
-
-  def handle_in(@list <> name, payload, socket) do
-    case Dict.get(@listable, name) do
-      nil ->
-        r({{:error, %{message: "invalid_model"}}, socket})
-      {model, res} ->
-        r(res.list(model, payload, socket))
-    end
-  end
+  end)
 
   def terminate(_reason, _socket) do
     :ok

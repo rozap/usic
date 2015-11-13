@@ -6,21 +6,23 @@ defmodule Usic.Session do
 
   schema "session" do
     field :token, :string
-    belongs_to :user, User, references: :email, type: :string
+    belongs_to :user, User
     timestamps
   end
 
 
   def changeset(session, params \\ :empty, opts \\ []) do
     params = Dict.put(params, "token", UUID.uuid4)
-    email = Dict.get(params, "user_id", "")
-    cset = cast(session, params, ~w(token user_id))
+    email = Dict.get(params, "email", "")
+    cset = cast(session, params, ~w(token))
 
     query = from u in User, where: u.email == ^email
     case {Usic.Repo.one(query), params["password"]} do
-      {nil, _} -> add_error(cset, :user_id, "unknown_user")
+      {nil, _} -> add_error(cset, :email, "unknown_user")
       {_, nil} -> add_error(cset, :password, "empty_password")
       {user, pass} ->
+        params = Dict.put(params, "user_id", user.id)
+        cset = cast(cset, params, ~w(token user_id))
         pw_match = Comeonin.Pbkdf2.checkpw(pass, user.password)
         if pw_match do
           cset
@@ -36,7 +38,6 @@ defimpl Poison.Encoder, for: Usic.Session do
   @attributes ~W(token)
 
   def encode(song, _options) do
-    IO.puts "ENCODE Session"
     song
     |> Map.take(@attributes)
     |> Poison.encode!

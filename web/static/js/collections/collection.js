@@ -9,6 +9,9 @@ module.exports = bb.Collection.extend(_.extend({
 
     this._api = opts.api;
     this._dispatcher = opts.dispatcher;
+    this._meta = {
+      count: Infinity
+    };
     this._state = {
       offset: 0,
       limit: this._pageSize
@@ -24,13 +27,18 @@ module.exports = bb.Collection.extend(_.extend({
     this.trigger('state', this._state);
   },
 
-  _onStateChange:function() {
+  _onStateChange: function() {
     this.fetch();
   },
 
-  payloadFor:function(method) {
-    console.log("fetch collection", this._state)
+  payloadFor: function(method) {
+    console.log("fetch collection", this._state);
     return this._state;
+  },
+
+  parse: function(payload) {
+    this._meta.count = payload.count;
+    return payload.items;
   },
 
   _prepareModel: function(attrs, options) {
@@ -48,13 +56,25 @@ module.exports = bb.Collection.extend(_.extend({
     return false;
   },
 
+  hasNext:function() {
+    var page = Math.floor((this._state.offset + this._pageSize) / this._pageSize);
+    var maxPage = Math.ceil(this._meta.count / this._pageSize);
+    console.log("PAGE", page, maxPage)
+    return page < maxPage;
+  },
+
+  hasPrevious:function() {
+    return this._state.offset > 0;
+  },
 
   next: function() {
+    if(!this.hasNext()) return this;
     this.updateState('offset', this._state.offset + this._pageSize);
   },
 
   previous: function() {
-    this.updateState('offset', Math.min(0, this._state.offset - this._pageSize));
+    if(!this.hasPrevious()) return this;
+    this.updateState('offset', this._state.offset - this._pageSize);
   }
 
 }, socketSync));

@@ -3,6 +3,7 @@ var bb = require('backbone');
 var Register = require('./register');
 var Login = require('./login');
 var Transcriptions = require('./transcriptions');
+var Me = require('./me');
 
 module.exports = bb.Router.extend({
   routes: {
@@ -10,6 +11,7 @@ module.exports = bb.Router.extend({
     'login': 'login',
     'register': 'register',
     'song/:uid': 'song',
+    'me': 'me',
     'transcriptions/:page': 'transcriptions'
   },
 
@@ -29,23 +31,28 @@ module.exports = bb.Router.extend({
   },
 
   reset: function() {
-    if (this._authView) this._authView.destroy();
+    if (this._main) this._main.destroy();
   },
 
   login: function() {
     this.reset();
-    this._authView = new Login(this._opts);
+    this._main = new Login(this._opts);
     console.log("route", "login");
   },
 
   register: function() {
     this.reset();
-    this._authView = new Register(this._opts);
+    this._main = new Register(this._opts);
     console.log("route", "register");
   },
 
   song: function(uid) {
     console.log("route", "song");
+  },
+
+  me: function() {
+    this.reset();
+    this._main = new Me(this._opts);
   },
 
   transcriptions: function(page) {

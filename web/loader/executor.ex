@@ -28,7 +28,7 @@ defmodule Usic.Executor do
 
   def get(url, output_loc) do
     try do
-      GenServer.call(__MODULE__, {:get, url, output_loc}, 1_000)
+      GenServer.call(__MODULE__, {:get, url, output_loc}, 15_000)
     catch
       :exit, _ ->
         Logger.warn("[youtube-dl] timeout from python process")

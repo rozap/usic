@@ -12,8 +12,8 @@ module.exports = View.extend({
   },
 
   _update: function(state) {
-    console.log(state)
     if(state.state === 'success') {
+      console.log("making song", state)
       if(this._songView) this._songView.destroy();
       this._songView = new Song({
         result: state,

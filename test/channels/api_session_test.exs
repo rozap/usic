@@ -9,7 +9,7 @@ defmodule Usic.ApiSessionTest do
 
   defp make_socket() do
     {:ok, _, socket} = socket("something", %{})
-    |> subscribe_and_join(Usic.PersistenceChannel, "anon", %{})
+    |> subscribe_and_join(Usic.PersistenceChannel, "session", %{})
     socket
   end
 
@@ -75,7 +75,7 @@ defmodule Usic.ApiSessionTest do
     end
 
     {:ok, _, socket} = socket("an_id", %{})
-    |> subscribe_and_join(Usic.PersistenceChannel, token, %{})
+    |> subscribe_and_join(Usic.PersistenceChannel, "session:#{token}", %{})
 
     push(socket, "read:session", %{})
 

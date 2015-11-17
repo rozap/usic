@@ -9,10 +9,13 @@ module.exports = View.extend({
 
   init: function(opts) {
     this.listenTo(this.dispatcher, 'create:session:success', this.onAuth);
+    this.listenTo(this.dispatcher, 'read:session:success', this.onAuth);
+
     this.render();
   },
 
   onAuth:function(session) {
+    console.log("ON AUTH", session)
     this.updateState({
       session: session
     })

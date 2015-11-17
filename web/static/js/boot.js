@@ -9,6 +9,8 @@ var LoaderView = require('./loader');
 var MetaView = require('./meta');
 var ErrorView = require('./error');
 var Router = require('./router');
+var Session = require('./models/session');
+
 
 var dispatcher = _.clone(bb.Events);
 
@@ -26,11 +28,16 @@ var opts = {
 function getSessionToken() {
   try {
     //TODO: fix this duplication with the model
-    var sesh = JSON.parse(localStorage['usic']);
-    return "session:" + sesh.token;
+    var token = JSON.parse(localStorage.usic).token;
+    if(!token) return 'session';
+    return "session:" + token;
   } catch(e) {
     return "session";
   }
+}
+
+function hasSession(token) {
+  return token !== "session";
 }
 
 var router = new Router(opts);
@@ -39,7 +46,9 @@ new KeyBindings(dispatcher);
 socket.onOpen(function() {
   dispatcher.trigger('error:dismiss');
 
-  var api = socket.channel(getSessionToken(), {});
+  console.log("Joining..");
+  var token = getSessionToken();
+  var api = socket.channel(token, {});
   window.a = api;
   opts.api = api;
 
@@ -50,6 +59,12 @@ socket.onOpen(function() {
     .receive('ok', function(resp) {
       new MetaView(opts);
       router.start();
+
+      if(hasSession(token)) {
+        var session = new Session({}, opts);
+        session.fetch();
+      }
+
     })
     .receive('error', function(reson) {
       dispatcher.trigger('error:new', 'api_channel_error', {fatal : false});

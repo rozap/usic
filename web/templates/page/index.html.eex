@@ -16,6 +16,5 @@
 <div id="error"></div>
 
 <div id="auth"></div>
-<div class="main" id="song"></div>
-<div class="main" id="transcriptions"></div>
-<div class="main" id="me"></div>
+
+<div id="main"></div>

@@ -7,7 +7,7 @@ var Songs = require('./collections/songs');
 var TranscriptionsTemplate = require('./templates/transcriptions.html');
 
 module.exports = View.extend({
-  el: '#transcriptions',
+  el: '#main',
   template: _.template(TranscriptionsTemplate),
 
   events : {
@@ -16,10 +16,9 @@ module.exports = View.extend({
   },
 
   init: function(opts) {
-    window.thing = this;
     this.model = new Songs([], opts);
     this.listenTo(this.model, 'change sync', this.r);
-    this.model.fetch()
+    this.model.fetch();
     this.render();
   },
 

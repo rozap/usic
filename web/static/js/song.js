@@ -15,7 +15,7 @@ var RegionView = require('./regions');
 var ClicksView = require('./clicks');
 
 module.exports = View.extend({
-  el: '#song',
+  el: '#main',
   template: _.template(SongTemplate),
   _audio: {},
   _zoomDelta: 2,
@@ -30,14 +30,11 @@ module.exports = View.extend({
   },
 
   init: function(opts) {
-    window.wtf = this;
-
     this.model = new Song({
       url : opts.result.location,
       name: 'a song'
     }, opts);
     this.setState({});
-    console.log(SongTemplate)
   },
 
   onRendered: function() {
@@ -63,7 +60,6 @@ module.exports = View.extend({
   },
 
   _onBufferLoaded: function(buf) {
-    console.log("state is", this.getState());
     this.model.save();
 
     this._audio.buffer = buf;

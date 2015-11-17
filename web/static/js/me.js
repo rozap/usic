@@ -2,19 +2,22 @@ var _ = require('underscore');
 var t = require('./translate').t;
 var View = require('./view');
 
-var Me = require('./models/user');
-
-var TranscriptionsTemplate = require('./templates/me.html');
+var Session = require('./models/session');
+var Transcriptions = require('./transcriptions');
+var MeTemplate = require('./templates/me.html');
 
 module.exports = View.extend({
-  el: '#me',
-  template: _.template(TranscriptionsTemplate),
+  el: '#main',
+  template: _.template(MeTemplate),
 
   init: function(opts) {
-    this.model = new Me({}, opts);
-    this.listenTo(this.model, 'change sync', this.r);
+    this.model = new Session({}, opts);
+    this.listenTo(this.model, 'sync change', this.r);
     this.model.fetch();
-    this.render();
-  }
 
+    this.render();
+
+    opts.el = '#my-transcriptions'
+    this.addSubview('transcriptions', Transcriptions, opts);
+  }
 });

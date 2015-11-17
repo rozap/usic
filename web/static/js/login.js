@@ -19,7 +19,6 @@ module.exports = View.extend({
     this.listenTo(this.model, 'error', this.onError);
     this.listenTo(this.dispatcher, 'input:onConfirm', this.onLogin);
     this.render();
-
   },
 
   onLogin: function() {

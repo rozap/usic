@@ -1,3 +1,24 @@
+defmodule Usic.Song.State do
+  defstruct [
+    clicks:          [],
+  ]
+
+  defmodule Type do
+    @behaviour Ecto.Type
+    alias Usic.Song.State
+
+    def type, do: :json
+
+    def cast(%State{} = state), do: {:ok, state}
+    def cast(%{} = state),         do: {:ok, struct(State, state)}
+    def cast(_other),                 do: :error
+
+    def load(value), do: Poison.decode(value, as: Usic.Song.State)
+
+    def dump(value), do: Poison.encode(value)
+  end
+end
+
 defmodule Usic.Song do
   use Ecto.Model
   alias Usic.User
@@ -7,6 +28,9 @@ defmodule Usic.Song do
   schema "song" do
     field :name, :string
     field :url, :string
+    field :uid, :string
+    field :location, :string
+    field :state, Usic.Song.State.Type
     belongs_to :user, User
     timestamps
   end
@@ -18,10 +42,14 @@ defmodule Usic.Song do
     end
     cast(song, params, ~w(name url), ~w(user_id))
   end
+
+
+
+
 end
 
 defimpl Poison.Encoder, for: Usic.Song do
-  @attributes ~w(id name url inserted_at updated_at user_id)a
+  @attributes ~w(id name url inserted_at updated_at user_id state)a
 
   def encode(song, _options) do
     song

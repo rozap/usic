@@ -3,8 +3,12 @@ var _ = require('underscore');
 var t = require('./translate').t;
 var moment = require('moment');
 
-module.exports = bb.View.extend({
 
+var fragments = {
+  'spinner': _.template(require('./templates/spinner.html'))
+};
+
+module.exports = bb.View.extend({
   initialize: function(opts) {
     this.api = opts.api;
     this.dispatcher = opts.dispatcher;
@@ -12,7 +16,7 @@ module.exports = bb.View.extend({
     this._opts = opts;
     this._state = {};
     this._parent = opts._parent;
-    if(!this.dispatcher) throw new Error('wtf m9');
+    if (!this.dispatcher) throw new Error('wtf m9');
     this.init(opts);
   },
 
@@ -36,9 +40,9 @@ module.exports = bb.View.extend({
     this.render();
   },
 
-  _getState:function() {
+  _getState: function() {
     var s = {};
-    if(this.renderTo) {
+    if (this.renderTo) {
       this.renderTo.forEach(function(name) {
         s[name] = this[name];
       }.bind(this));
@@ -51,27 +55,36 @@ module.exports = bb.View.extend({
     return this._state;
   },
 
-  r:function() {
+  r: function() {
     this.render();
+  },
+
+  fragment: function(name) {
+    return fragments[name](this._context({}));
+  },
+
+  _context: function(state) {
+    return {
+      t: t,
+      _: _,
+      moment: moment,
+      state: state,
+      fragment: this.fragment.bind(this)
+    };
   },
 
   render: function(parentState) {
     parentState = parentState || (this._parent && this._parent.getState()) || {};
-    var state = _.extend(parentState, this._getState());
-    this.$el.html(this.template({
-      t: t,
-      _: _,
-      moment: moment,
-      state: state
-    }));
+    var state = _.extend({}, parentState, this._getState());
+    this.$el.html(this.template(this._context(state)));
 
-    if(state.cid) throw new Error("wtf m8");
+    if (state.cid) throw new Error("wtf m8");
 
     this._setAttributes(this.getAttributes());
 
     //render all the kids, replacing their element with the new one
     _.each(this._subviews, function(view) {
-      if(!_.isArray(view)) {
+      if (!_.isArray(view)) {
         view.setElement(document.querySelector(this._rebuildSelector(view)));
         //state tree
         view.render(_.clone(state));
@@ -82,10 +95,10 @@ module.exports = bb.View.extend({
     return this;
   },
 
-  _rebuildSelector:function(view) {
-    if(!view.el) return;
+  _rebuildSelector: function(view) {
+    if (!view.el) return;
     var classes = view.el.className.split(' ');
-    return view.el.tagName.toLowerCase() + '#' + view.el.id + (view.el.className? ('.' + classes.join('.')): '');
+    return view.el.tagName.toLowerCase() + '#' + view.el.id + (view.el.className ? ('.' + classes.join('.')) : '');
   },
 
   getAttributes: function() {
@@ -112,7 +125,7 @@ module.exports = bb.View.extend({
 
   addSubview: function(name, cls, opts) {
     opts = opts || {};
-    if(this._subviews[name]) this._subviews[name].destroy();
+    if (this._subviews[name]) this._subviews[name].destroy();
     opts._parent = this;
     opts.dispatcher = this.dispatcher;
     var view = new cls(opts);
@@ -121,12 +134,12 @@ module.exports = bb.View.extend({
     return view;
   },
 
-  _removeAppended:function(name, view) {
+  _removeAppended: function(name, view) {
     this._subviews[name] = _.without(this._subviews[name], view);
     this.render();
   },
 
-  _removeAdded:function(name) {
+  _removeAdded: function(name) {
     delete this._subviews[name];
     this.render();
   },
@@ -149,27 +162,27 @@ module.exports = bb.View.extend({
     this.trigger('destroy', this);
   },
 
-  detach:function() {
+  detach: function() {
     this.stopListening();
     this.undelegateEvents();
     this.$el.html('');
   },
 
-  destroy:function() {
+  destroy: function() {
     this._destroy();
   },
 
-  serializeForm:function(name) {
+  serializeForm: function(name) {
     name = name || 'form';
     var inputs = this.el
-    .querySelector(name)
-    .querySelectorAll('input');
+      .querySelector(name)
+      .querySelectorAll('input');
 
     return _.object(
-    _.range(0, inputs.length)
-    .map(function(i) {
-      var element = inputs[i];
-      return [element.name, element.value];
-    }));
+      _.range(0, inputs.length)
+      .map(function(i) {
+        var element = inputs[i];
+        return [element.name, element.value];
+      }));
   }
 });

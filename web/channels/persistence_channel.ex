@@ -13,7 +13,7 @@ defmodule Usic.PersistenceChannel do
 
   @creatable %{
     "user" => {Usic.User, Usic.Resource},
-    "song" => {Usic.Song, Usic.Resource},
+    "song" => {Usic.Song, Usic.Resource.Song},
     "session" => {Usic.Session, Usic.Resource.Session}
   }
 
@@ -32,12 +32,12 @@ defmodule Usic.PersistenceChannel do
   ]
 
 
-  def join("anon", message, socket) do
+  def join("session", message, socket) do
     Logger.info("Anon session has started")
     {:ok, socket}
   end
 
-  def join(session_token, message, socket) do
+  def join("session:" <> session_token, message, socket) do
     case Repo.one(from s in Session,
       where: s.token == ^session_token, select: s, preload: [:user]) do
       nil -> {:error, %{error: :invalid_token}}
@@ -50,7 +50,7 @@ defmodule Usic.PersistenceChannel do
 
 
   def join(invalid, _, socket) do
-    Logger.info("Invalid session join #{invalid}")
+    Logger.warn("Invalid session join #{invalid}")
     {:error, %{error: :invalid_handshake}}
   end
 
@@ -74,6 +74,12 @@ defmodule Usic.PersistenceChannel do
       end
     end
   end)
+
+
+  def handle_info(info, socket) do
+    IO.puts "HANDLE INFO #{inspect info}"
+    {:noreply, socket}
+  end
 
   def terminate(_reason, _socket) do
     :ok

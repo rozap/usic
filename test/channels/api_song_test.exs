@@ -10,7 +10,7 @@ defmodule Usic.ApiSongTest do
 
   defp make_socket() do
     {:ok, _, socket} = socket("something", %{})
-    |> subscribe_and_join(Usic.PersistenceChannel, "anon", %{})
+    |> subscribe_and_join(Usic.PersistenceChannel, "session", %{})
     socket
   end
 
@@ -34,11 +34,11 @@ defmodule Usic.ApiSongTest do
 
     Enum.each(1..8, fn i ->
       push(socket, "create:song", %{
-        "url" => "foo", "name" => "something #{i}"
+        "url" => "foo"
       })
       receive do
         %{payload: p} ->
-          assert p.name == "something #{i}"
+          assert p.url == "foo"
       end
     end)
 
@@ -48,12 +48,11 @@ defmodule Usic.ApiSongTest do
   test "can create an anonymous song" do
     socket = make_socket
     push(socket, "create:song", %{
-      "url" => "foo", "name" => "something"
+      "url" => "foo"
     })
     receive do
       %{payload: p} ->
         song = Usic.Repo.get!(Song, p.id)
-        assert song.name == "something"
         assert song.url == "foo"
     end
   end

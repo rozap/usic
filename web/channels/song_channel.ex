@@ -11,7 +11,7 @@ defmodule Usic.SongChannel do
   end
 
   def handle_in(@search, %{"term" => location}, socket) do
-    case Loader.get_song_id(location) do
+    case Loader.get_song_id(url) do
       {:ok, _id} ->
         @topic_prefix <> uid = socket.topic
         Loader.unload(uid)

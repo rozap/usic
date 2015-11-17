@@ -1,3 +1,4 @@
+var _ = require('underscore');
 var bb = require('backbone');
 
 var Register = require('./register');
@@ -16,7 +17,11 @@ module.exports = bb.Router.extend({
   },
 
   initialize: function(opts) {
-    this._opts = opts;
+    this._options = opts;
+  },
+
+  _opts:function( ){
+    return _.extend({}, this._options);
   },
 
   start: function() {
@@ -36,14 +41,13 @@ module.exports = bb.Router.extend({
 
   login: function() {
     this.reset();
-    this._main = new Login(this._opts);
+    this._main = new Login(this._opts());
     console.log("route", "login");
   },
 
   register: function() {
     this.reset();
-    this._main = new Register(this._opts);
-    console.log("route", "register");
+    this._main = new Register(this._opts());
   },
 
   song: function(uid) {
@@ -51,12 +55,14 @@ module.exports = bb.Router.extend({
   },
 
   me: function() {
+    console.log("route me");
     this.reset();
-    this._main = new Me(this._opts);
+    this._main = new Me(this._opts());
   },
 
   transcriptions: function(page) {
     console.log("route", "transcriptions");
-    this._mainView = new Transcriptions(this._opts);
+    this.reset();
+    this._main = new Transcriptions(this._opts());
   }
 });

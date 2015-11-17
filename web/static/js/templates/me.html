@@ -1,1 +1,24 @@
-i'm me
+<h2 class="text-muted"><%- t('me') %></h2>
+
+<% if(state.model.get('user')) { %>
+  <h4>
+    <span class="text-muted"><%- t('email') %></span>
+    <%- state.model.get('user').email %>
+  </h4>
+
+  <h4>
+    <span class="text-muted"><%- t('joined') %></span>
+    <%- moment(state.model.get('user').inserted_at).fromNow() %>
+  </h4>
+  <h4>
+    <span class="text-muted"><%- t('logged_in') %></span>
+    <%- moment(state.model.get('.inserted_at')).fromNow() %>
+  </h4>
+<% } else { %>
+  <%= fragment('spinner') %>
+<% } %>
+
+
+<%- JSON.stringify(state) %>
+
+<div id="my-transcriptions"></div>

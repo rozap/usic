@@ -6,7 +6,7 @@
     <li>
       <a href="#me">
         <%- t('me') %>
-        [<%- state.session.get('user_id') %>]
+        [<%- state.session.get('user').email %>]
       </a>
     </li>
   <% } else { %>

@@ -21,9 +21,11 @@ end
 
 defmodule Usic.Song do
   use Ecto.Model
+  use Ecto.Model.Callbacks
   alias Usic.User
 
-  @whitelist [:id, :name, :url]
+  after_insert Usic.Model.Dispatcher, :after_insert
+  after_update Usic.Model.Dispatcher, :after_update
 
   schema "song" do
     field :name, :string
@@ -40,7 +42,10 @@ defmodule Usic.Song do
       nil -> Dict.put(params, "user_id", nil)
       _ -> Dict.put(params, "user_id", session.user.id)
     end
-    cast(song, params, ~w(name url), ~w(user_id))
+    cast(song, params, ~w(url), ~w(name user_id location state))
+    |> validate_change(:url, fn
+        :url, url -> []
+      end)
   end
 
 

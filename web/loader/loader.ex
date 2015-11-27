@@ -48,7 +48,8 @@ defmodule Usic.Loader do
     end
   end
 
-  defp gen_template(song_id) do
+  defp gen_template() do
+    song_id = UUID.uuid4()
     media_dir
     |> Path.join(song_id <> ".%(ext)s")
   end
@@ -57,14 +58,14 @@ defmodule Usic.Loader do
     Application.get_env(:usic, :executor)
   end
 
-  defp download_song({:ok, _}, session_id, url) do
-    output_loc = gen_template(session_id)
+  defp download_song({:ok, _}, song) do
+    output_loc = gen_template()
 
-    case get_executor().get(url, output_loc) do
+    case get_executor().get(song.url, output_loc) do
       {:error, reason} -> {:error, reason}
       {log_out, result} ->
         lines = String.split(log_out, "\n")
-        |> Enum.map(fn line -> "[youtube-dl] [#{session_id}] #{line}" end)
+        |> Enum.map(fn line -> "[youtube-dl] [#{song.id}] #{line}" end)
 
         case result do
           0 ->
@@ -80,11 +81,20 @@ defmodule Usic.Loader do
     end
   end
 
-  defp download_song(err, _, _), do: err
+  defp download_song(err, _), do: err
 
 
-  def get_song(session_id, url) do
-    get_song_id(url) |> download_song(session_id, url)
+  defp update_location({:ok, location}, song) do
+    song = %{song | location: location}
+    Usic.Repo.update(song)
+  end
+  defp update_location(err, _), do: err
+
+
+  def get_song(song) do
+    get_song_id(song.url)
+    |> download_song(song)
+    |> update_location(song)
   end
 
 end

@@ -1,49 +1,33 @@
 defmodule Usic.Resource.Song do
   require Logger
   import Phoenix.Socket
+  import Phoenix.Channel
   import Ecto.Query
   import Ecto.Model
   alias Usic.Song
   alias Usic.User
   alias Usic.Repo
+  alias Usic.Loader
+  alias Usic.Model.Dispatcher
 
   @songtopic "create:song:success"
 
-  defp fetch_song(url, uid) do
-    case Loader.get_song_id(url) do
-      {:ok, id} ->
 
-        Usic.SongServer.get(location, uid)
-
-        push socket, "create:song:success", %{
-          status: :ok,
-          response: %{
-
-          }
-        }
-      {:error, _} ->
-        {:error, %{"url" => "invalid_url"}}
-    end
-
+  def begin_download({:ok, {song, socket}}) do
+    Dispatcher.bind(song, socket)
+    Task.start_link(Loader, :get_song, [song])
   end
+
+  def begin_download({:error, _} = r), do: r
 
 
   def create(model, params, socket) do
-    uid = UUID.uuid4()
+    result = model
+    |> Usic.Resource.create(params, socket)
 
-    song = Usic.Resource.create(model, params, socket)
+    begin_download(result)
 
-    case params["url"] do
-      nil -> {{:error, %{"url" => "url_required"}, socket}
-      url ->
-        push socket, @songtopic, %{
-          status: :ok,
-          response: song
-        }
-        fetch_song(url, uid)
-    end
-
-    {{:ok, song}, socket}
+    result
   end
 
 

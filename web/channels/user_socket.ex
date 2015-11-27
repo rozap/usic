@@ -2,7 +2,6 @@ defmodule Usic.UserSocket do
   use Phoenix.Socket
 
   ## Channels
-  channel "song:*", Usic.SongChannel
   channel "session*", Usic.PersistenceChannel
 
   ## Transports

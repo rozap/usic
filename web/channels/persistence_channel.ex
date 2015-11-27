@@ -55,11 +55,11 @@ defmodule Usic.PersistenceChannel do
   end
 
 
-  defp r({{:error, reason}, socket}) do
+  defp r({:error, {reason, socket}}) do
     {:reply, {:error, reason}, socket}
   end
 
-  defp r({{:ok, resp}, socket}) do
+  defp r({:ok, {resp, socket}}) do
     {:reply, {:ok, resp}, socket}
   end
 
@@ -68,7 +68,7 @@ defmodule Usic.PersistenceChannel do
       case Dict.get(unquote(noun), name) do
         nil ->
           Logger.error("Invalid resource #{unquote(verb) <> ":" <> name} #{inspect unquote(noun)}")
-          r({{:error, %{message: "invalid_resource"}}, socket})
+          r({:error, {%{message: "invalid_resource"}, socket}})
         {model, res} ->
           r(apply(res, String.to_atom(unquote(verb)), [model, payload, socket]))
       end

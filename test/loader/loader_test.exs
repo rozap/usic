@@ -19,12 +19,4 @@ defmodule UsicTest.Loader do
     res = Usic.Loader.get_song_id(@youtube_song)
     assert res == {:ok, "5DNVSHm5zr4"}
   end
-
-  test "can download the song to the static dir" do
-    res = Usic.Loader.get_song(UUID.uuid4, @youtube_song)
-
-    output_loc = Path.join("/media", "5DNVSHm5zr4.m4a")
-    assert res == {:ok, output_loc}
-  end
-
 end

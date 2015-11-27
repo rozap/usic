@@ -25,12 +25,12 @@ defmodule Usic.Resource do
     if cset.valid? do
       case Usic.Repo.insert(cset) do
         {:error, attempt} ->
-          {{:error, format_cset_errors(attempt.errors)}, socket}
+          {:error, {format_cset_errors(attempt.errors), socket}}
         {:ok, inserted} ->
-          {{:ok, inserted}, socket}
+          {:ok, {inserted, socket}}
       end
     else
-      {{:error, format_cset_errors(cset.errors)}, socket}
+      {:error, {format_cset_errors(cset.errors), socket}}
     end
   end
 
@@ -75,9 +75,9 @@ defmodule Usic.Resource do
         resp = %{}
         |> Dict.put("items", models)
         |> Dict.put("count", c)
-        {{:ok, resp}, socket}
+        {:ok, {resp, socket}}
 
-      err -> {err, socket}
+      {:error, reason} -> {:error, {reason, socket}}
     end
 
   end
@@ -92,10 +92,10 @@ defmodule Usic.Resource do
     [id_name] = model.__schema__(:primary_key)
     case Map.get(params, Atom.to_string(id_name)) do
       nil ->
-        {{:error, %{"id" => :not_found}}, socket}
+        {:error, {%{"id" => :not_found}, socket}}
       id ->
         model = Usic.repo.one(from m in model, where: m.id == ^id, select: m)
-        {{:ok, model}, socket}
+        {:ok, {model, socket}}
     end
   end
 end

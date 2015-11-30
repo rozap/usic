@@ -14,8 +14,9 @@ module.exports = View.extend({
   init: function(opts) {
     this._wavesurfer = opts.wavesurfer;
     this.model = opts.model;
-    this.listenTo(this.model, 'change:clicks', this.r);
+    this.listenTo(this.model, 'change', this.r);
     this.render();
+    window.clicks = this;
     this.listenTo(this.dispatcher, 'input:onBeatCreated', this.onBeatCreated);
   },
 
@@ -26,7 +27,8 @@ module.exports = View.extend({
   },
 
   onBeatCreated: function() {
-    var clicks = this.model.get('clicks');
-    this.model.set('clicks', clicks.concat([this._wavesurfer.getCurrentTime()]));
+    var state = _.clone(this.model.get('state'));
+    state.clicks = state.clicks.concat([this._wavesurfer.getCurrentTime()]);
+    this.model.set('state', state).trigger('change');
   }
 });

@@ -12,6 +12,7 @@ module.exports = bb.View.extend({
   initialize: function(opts) {
     this.api = opts.api;
     this.dispatcher = opts.dispatcher;
+    this.router = opts.router;
     this._subviews = {};
     this._opts = opts;
     this._state = {};
@@ -149,6 +150,7 @@ module.exports = bb.View.extend({
   },
 
   onRendered: function(state) {},
+
   _destroy: function() {
     _.each(this._subviews, function(sub, name) {
       if (_.isArray(sub)) {

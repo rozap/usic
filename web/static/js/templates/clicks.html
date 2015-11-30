@@ -1,5 +1,5 @@
 <svg width="<%- state.width %>">
-  <% _.each(state.model.get('clicks'), function(click) { %>
+  <% _.each(state.model.get('state').clicks, function(click) { %>
     <line
       x1="<%- state.scale * click %>"
       y1="0"

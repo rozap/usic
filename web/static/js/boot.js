@@ -24,6 +24,8 @@ var opts = {
   socket: socket,
   dispatcher: dispatcher
 };
+var router = new Router(opts);
+opts.router = router;
 
 function getSessionToken() {
   try {
@@ -40,7 +42,6 @@ function hasSession(token) {
   return token !== "session";
 }
 
-var router = new Router(opts);
 new KeyBindings(dispatcher);
 
 socket.onOpen(function() {
@@ -51,6 +52,10 @@ socket.onOpen(function() {
   var api = socket.channel(token, {});
   window.a = api;
   opts.api = api;
+
+  opts.api.onMessage = function(event, payload) {
+    dispatcher.trigger(event, payload);
+  }
 
   new ErrorView(opts);
   new LoaderView(opts);

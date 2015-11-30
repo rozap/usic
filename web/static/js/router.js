@@ -5,6 +5,7 @@ var Register = require('./register');
 var Login = require('./login');
 var Transcriptions = require('./transcriptions');
 var Me = require('./me');
+var Song = require('./song');
 
 module.exports = bb.Router.extend({
   routes: {
@@ -20,8 +21,8 @@ module.exports = bb.Router.extend({
     this._options = opts;
   },
 
-  _opts:function( ){
-    return _.extend({}, this._options);
+  _opts:function(o){
+    return _.extend(o || {}, this._options);
   },
 
   start: function() {
@@ -50,8 +51,12 @@ module.exports = bb.Router.extend({
     this._main = new Register(this._opts());
   },
 
-  song: function(uid) {
-    console.log("route", "song");
+  song: function(id) {
+    this.reset();
+    this._main = new Song(this._opts({
+      id: id
+    }));
+    document.querySelector('#search-input').blur();
   },
 
   me: function() {

@@ -1,6 +1,11 @@
 defmodule Usic.Song.State do
   defstruct [
-    clicks:          [],
+    clicks:      [],
+    load_state:  "load_start",
+    error:       nil,
+    rate:        1,
+    pxPerSecond: 40,
+    autoCenter:  false
   ]
 
   defmodule Type do
@@ -10,12 +15,16 @@ defmodule Usic.Song.State do
     def type, do: :json
 
     def cast(%State{} = state), do: {:ok, state}
-    def cast(%{} = state),         do: {:ok, struct(State, state)}
-    def cast(_other),                 do: :error
+    def cast(%{} = state),      do: {:ok, struct(State, state)}
+    def cast(_other),           do: :error
 
-    def load(value), do: Poison.decode(value, as: Usic.Song.State)
+    def load(value) do
+      Poison.decode(value, as: Usic.Song.State)
+    end
 
-    def dump(value), do: Poison.encode(value)
+    def dump(value) do
+      Poison.encode(value)
+    end
   end
 end
 
@@ -23,16 +32,17 @@ defmodule Usic.Song do
   use Ecto.Model
   use Ecto.Model.Callbacks
   alias Usic.User
+  alias Usic.Song.State
 
   after_insert Usic.Model.Dispatcher, :after_insert
   after_update Usic.Model.Dispatcher, :after_update
 
   schema "song" do
-    field :name, :string
+    field :name, :string, default: "untitled"
     field :url, :string
     field :uid, :string
     field :location, :string
-    field :state, Usic.Song.State.Type
+    field :state, State.Type, default: %State{}
     belongs_to :user, User
     timestamps
   end
@@ -54,7 +64,7 @@ defmodule Usic.Song do
 end
 
 defimpl Poison.Encoder, for: Usic.Song do
-  @attributes ~w(id name url inserted_at updated_at user_id state)a
+  @attributes ~w(id name url inserted_at updated_at user_id state location)a
 
   def encode(song, _options) do
     song

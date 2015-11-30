@@ -81,14 +81,24 @@ defmodule Usic.Loader do
     end
   end
 
-  defp download_song(err, _), do: err
+  defp download_song(err, song), do: put_err(err, song)
 
 
   defp update_location({:ok, location}, song) do
-    song = %{song | location: location}
+    state = %{song.state | load_state: "load_complete"}
+    song = %{song | location: location, state: state}
     Usic.Repo.update(song)
   end
-  defp update_location(err, _), do: err
+
+  defp update_location(err, song), do: put_err(err, song)
+
+
+  defp put_err({:error, reason} = err, song) do
+    state = %{song.state | load_state: "error", error: reason}
+    song = %{song | state: state}
+    Usic.Repo.update(song)
+    err
+  end
 
 
   def get_song(song) do

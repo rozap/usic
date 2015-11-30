@@ -5,10 +5,10 @@ var _ = require('underscore');
 
 var Wave = require('./wave');
 var View = require('./view');
+var Song = require('./models/song');
 var SongTemplate = require('./templates/song.html');
 var keyCodes = require('./keycodes');
 
-var Song = require('./models/song');
 var ControlsView = require('./controls');
 var WaveView = require('./wave');
 var RegionView = require('./regions');
@@ -30,20 +30,15 @@ module.exports = View.extend({
   },
 
   init: function(opts) {
-    this.model = new Song({
-      url : opts.result.location,
-      name: 'a song'
-    }, opts);
-    this.setState({});
-  },
-
-  onRendered: function() {
-    this._loadSong();
+    this.model = new Song({id: opts.id}, this._opts);
+    this.listenToOnce(this.model, 'sync', this._loadSong);
+    this.model.fetch();
   },
 
   _loadSong: function() {
-    var loc = this.model.get('url');
-    if (!loc) return;
+    this.render();
+    this.model.resetHistory();
+    var loc = this.model.get('location');
     var req = new XMLHttpRequest();
     req.open('GET', loc);
     req.responseType = 'arraybuffer';
@@ -54,14 +49,12 @@ module.exports = View.extend({
   _onSongLoaded: function(req) {
     this._audio.context = new(AudioContext || webkitAudioContext)(); //jshint ignore:line
     this._audio.context.decodeAudioData(req.response,
-      this._onBufferLoaded.bind(this),
-      this._onBufferError.bind(this)
+      _.once(this._onBufferLoaded).bind(this),
+      _.once(this._onBufferError).bind(this)
     );
   },
 
   _onBufferLoaded: function(buf) {
-    this.model.save();
-
     this._audio.buffer = buf;
 
     var waveView = this.addSubview('wave', WaveView, {
@@ -77,7 +70,8 @@ module.exports = View.extend({
 
     this._audio.wavesurfer = wavesurfer;
     this.addSubview('controls', ControlsView, {
-      audio: this._audio
+      audio: this._audio,
+      model: this.model
     });
   },
 
@@ -143,7 +137,6 @@ module.exports = View.extend({
   },
 
   destroy: function() {
-    this._audio.context.close();
     this._audio.wavesurfer.destroy();
     this._destroy();
   }

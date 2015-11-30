@@ -10,7 +10,6 @@ module.exports = {
     console.log("API", name, this.payloadFor(method));
     this._api.push(name, this.payloadFor(method))
       .receive("ok", function(payload) {
-        console.log('received ok', payload)
         payload = this.parse(payload);
         this.set(payload)
         this.trigger('sync', this);

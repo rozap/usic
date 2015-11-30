@@ -22,7 +22,8 @@ defmodule Usic.PersistenceChannel do
   }
 
   @readable %{
-    "session" => {Usic.Session, Usic.Resource.Session}
+    "session" => {Usic.Session, Usic.Resource.Session},
+    "song" => {Usic.Song, Usic.Resource}
   }
 
   @operations [

@@ -9,7 +9,8 @@ var ControlsTemplate = require('./templates/controls.html');
 var Controls = View.extend({
   el: '#controls',
   template: _.template(ControlsTemplate),
-
+  minRate: 0.15,
+  maxRate: 2,
   events: {
     'click .play-pause': 'onTogglePlay',
     'mousewheel #playback-rate': 'onWheelRate',
@@ -26,22 +27,19 @@ var Controls = View.extend({
     this._audio.wavesurfer.on('play', this._playAudio.bind(this));
     this._audio.wavesurfer.on('pause', this._pauseAudio.bind(this));
 
-    this.listenTo(this.dispatcher, 'input:onTogglePlay',   this.onTogglePlay);
+    this.listenTo(this.dispatcher, 'input:onTogglePlay', this.onTogglePlay);
     this.listenTo(this.dispatcher, 'input:onSkipBackward', this.onSkipBackward);
-    this.listenTo(this.dispatcher, 'input:onSkipForward',  this.onSkipForward);
+    this.listenTo(this.dispatcher, 'input:onSkipForward', this.onSkipForward);
+    this.listenTo(this.dispatcher, 'input:onUndo', this.onUndo);
+    this.listenTo(this.dispatcher, 'input:onRedo', this.onRedo);
 
-    this._state = {
-      rate: 1,
-      pxPerSecond: 50,
-      minRate: 0.15,
-      maxRate: 2
-    };
+    this.listenTo(this.model, 'change:state', this.r);
 
     this.render();
   },
 
   _seekAudio: function(progress) {
-    if(this.isPlaying()) this.play();
+    if (this.isPlaying()) this.play();
   },
 
   _playAudio: function() {
@@ -55,7 +53,7 @@ var Controls = View.extend({
       source,
       st
     );
-    st.tempo = this._state.rate;
+    st.tempo = this.model.get('state').rate;
 
 
     this._audio.stNode = soundtouch.getWebAudioNode(context, audioFilter);
@@ -63,19 +61,25 @@ var Controls = View.extend({
   },
 
   _pauseAudio: function() {
-    if(this._audio.stNode) this._audio.stNode.disconnect();
+    if (this._audio.stNode) this._audio.stNode.disconnect();
   },
 
 
   getState: function() {
+    console.log("GET STATE", this.model.get('state'));
     return _.extend({}, this._state, {
-      status: this.isPlaying() ? 'playing' : 'paused'
+      status: this.isPlaying() ? 'playing' : 'paused',
+      minRate: this.minRate,
+      maxRate: this.maxRate,
+      rate: this.model.get('state').rate,
+      pxPerSecond: this.model.get('state').pxPerSecond,
+      autoCenter: this.model.get('state').autoCenter
     });
   },
 
   play: function() {
     if (this.isPlaying()) this.pause();
-    this._audio.wavesurfer.setPlaybackRate(this._state.rate);
+    this._audio.wavesurfer.setPlaybackRate(this.model.get('state').rate);
     this._audio.wavesurfer.play();
   },
 
@@ -88,8 +92,8 @@ var Controls = View.extend({
     this._changeRate(rate);
   },
 
-  _changeRate:function(rate) {
-    this.updateState({
+  _changeRate: function(rate) {
+    this.model.updateState({
       rate: rate
     });
     if (this.isPlaying()) this.play();
@@ -100,10 +104,10 @@ var Controls = View.extend({
   },
 
   onWheelRate: function(ev) {
-    var r = this._state.rate,
-        min = this._state.minRate,
-        max = this._state.maxRate,
-        delta = 0.01;
+    var r = this.model.get('state').rate,
+      min = this.minRate,
+      max = this.maxRate,
+      delta = 0.01;
 
     var rate = ev.originalEvent.wheelDelta > 0 ?
       Math.min(max, r + delta) : Math.max(min, r - delta);
@@ -112,7 +116,7 @@ var Controls = View.extend({
   },
 
   onTogglePlay: function(e) {
-    if(e.isDefaultPrevented()) return;
+    if (e.isDefaultPrevented()) return;
     if (this.isPlaying()) {
       this.pause();
     } else {
@@ -121,20 +125,27 @@ var Controls = View.extend({
     this.render();
   },
 
-  onSkipForward:function() {
+  onSkipForward: function() {
     this._audio.wavesurfer.skipForward();
   },
 
-  onSkipBackward:function() {
+  onSkipBackward: function() {
     this._audio.wavesurfer.skipBackward();
   },
 
-  onAutoCenter:function() {
-    this.updateState({
-      autoCenter: !this.getState().autoCenter
+  onAutoCenter: function() {
+    this.model.updateState({
+      autoCenter: !this.model.get('state').autoCenter
     });
-    console.log(this.getState().autoCenter)
-    this._audio.wavesurfer.params.follow = this.getState().autoCenter;
+    this._audio.wavesurfer.params.follow = this.model.get('state').autoCenter;
+  },
+
+  onUndo: function() {
+    this.model.undo();
+  },
+
+  onRedo: function() {
+    this.model.redo();
   }
 });
 

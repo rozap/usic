@@ -57,6 +57,7 @@ defmodule Usic.Resource do
       query = from(m in model)
       |> limit([m], ^limit)
       |> offset([m], ^offset)
+      |> order_by([m], [desc: m.updated_at])
       |> apply_filters(params)
 
       {:ok, Usic.Repo.all(query |> select([m], m))}
@@ -94,7 +95,7 @@ defmodule Usic.Resource do
       nil ->
         {:error, {%{"id" => :not_found}, socket}}
       id ->
-        model = Usic.repo.one(from m in model, where: m.id == ^id, select: m)
+        model = Usic.Repo.one(from m in model, where: m.id == ^id, select: m)
         {:ok, {model, socket}}
     end
   end

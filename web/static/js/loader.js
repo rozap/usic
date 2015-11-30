@@ -3,6 +3,7 @@ var uuid = require('uuid');
 var View = require('./view');
 var LoadResult = require('./load-result');
 
+var Song = require('./models/song');
 
 module.exports = View.extend({
   el: "#search",
@@ -13,31 +14,16 @@ module.exports = View.extend({
 
   init: function(opts) {
     this._state = {term: null};
-    this._bootstrapChannel(opts);
-    this._bootstrapViews(opts);
-  },
-
-  _bootstrapViews: function(opts) {
-    this.addSubview('result', LoadResult, this._opts);
-  },
-
-  _bootstrapChannel: function(opts) {
-    this._channel = opts.socket.channel("song:" + uuid.v4(), {});
-    this._channel.join();
-
-    this._channel.onMessage = function(ref, reply) {
-      var event = (reply && reply.response && reply.response.event) || ref;
-      this.trigger('reply:' + event, reply && reply.response);
-    }.bind(this);
   },
 
   _onSearch: function(e) {
     var term = e.currentTarget.value.replace(/ /g,'');
     if(this._state.term !== term) {
+      this.model = new Song({}, this._opts);
+      this._opts.model = this.model;
+      this.addSubview('result', LoadResult, this._opts);
       this._state.term = term;
-      this._channel.push("search", {
-        term: this._state.term
-      });
+      this.model.set('url', term).save();
     }
   }
 });

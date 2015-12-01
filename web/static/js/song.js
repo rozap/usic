@@ -64,7 +64,9 @@ module.exports = View.extend({
 
     var regionsView = this.addSubview('regions', RegionView, {
       wavesurfer: wavesurfer,
-      model: this.model
+      model: this.model,
+      dispatcher: this.dispatcher,
+      api: this.api
     });
     this.listenTo(regionsView, 'scroll', this.panTo);
 
@@ -137,7 +139,7 @@ module.exports = View.extend({
   },
 
   destroy: function() {
-    this._audio.wavesurfer.destroy();
+    if(this._audio.wavesurfer) this._audio.wavesurfer.destroy();
     this._destroy();
   }
 });

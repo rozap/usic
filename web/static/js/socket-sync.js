@@ -15,11 +15,13 @@ module.exports = {
         this.trigger('sync', this);
         this._onSync();
         this._dispatcher.trigger(name + ':success', this);
+        console.log("sync success", payload)
       }.bind(this))
       .receive("error", function(payload) {
         this.trigger('error', payload);
         this._onError();
         this._dispatcher.trigger(name + ':error', payload, this);
+        console.log("sync error", payload)
       }.bind(this));
     return this;
   },

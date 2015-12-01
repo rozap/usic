@@ -5,9 +5,9 @@ var _ = require('underscore');
 function KeyBindings(dispatcher) {
   this._dispatcher = dispatcher;
   this._bind();
-  dispatcher.on('all', function() {
-    console.log("emit event", Array.prototype.slice.call(arguments));
-  });
+  // dispatcher.on('all', function() {
+  //   console.log("emit event", Array.prototype.slice.call(arguments));
+  // });
 }
 
 KeyBindings.prototype = {

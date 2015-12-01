@@ -41,12 +41,16 @@ module.exports = bb.Collection.extend(_.extend({
     return payload.items;
   },
 
+  modelOpts:function(opts) {
+    return opts;
+  },
+
   _prepareModel: function(attrs, options) {
     if (this._isModel(attrs)) {
       if (!attrs.collection) attrs.collection = this;
       return attrs;
     }
-    options = options ? _.clone(options) : {};
+    options = this.modelOpts(options ? _.clone(options) : {});
     options.collection = this;
     options.api = this._api;
     options.dispatcher = this._dispatcher;
@@ -59,7 +63,6 @@ module.exports = bb.Collection.extend(_.extend({
   hasNext:function() {
     var page = Math.floor((this._state.offset + this._pageSize) / this._pageSize);
     var maxPage = Math.ceil(this._meta.count / this._pageSize);
-    console.log("PAGE", page, maxPage)
     return page < maxPage;
   },
 

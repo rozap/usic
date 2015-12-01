@@ -16,7 +16,6 @@ module.exports = View.extend({
     this.model = opts.model;
     this.listenTo(this.model, 'change', this.r);
     this.render();
-    window.clicks = this;
     this.listenTo(this.dispatcher, 'input:onBeatCreated', this.onBeatCreated);
   },
 
@@ -29,6 +28,9 @@ module.exports = View.extend({
   onBeatCreated: function() {
     var state = _.clone(this.model.get('state'));
     state.clicks = state.clicks.concat([this._wavesurfer.getCurrentTime()]);
-    this.model.set('state', state).trigger('change');
+    this.model
+      .set('state', state)
+      .trigger('change')
+      .save();
   }
 });

@@ -1,17 +1,26 @@
 var _ = require('underscore');
 var Model = require('./model');
 
+var saveEvents = 'change:name change:loop change:start change:end';
+
 module.exports = Model.extend({
-  initialize: function(wvRegion, name, song) {
-    this._song = song;
+  name: 'region',
+  defaults: {
+    loop: true,
+  },
+  initialize: function(attrs, opts) {
+    Model.prototype.initialize.call(this, attrs, opts);
     this._isSnapping = true;
-    this._underlying = wvRegion;
-    this._underlying.on('update', this.underlyingChange.bind(this));
+    this._song = opts.song;
     this.listenTo(this, 'change', this._updateUnderlying);
-    this.set({
-      name: name,
-      loop: true
-    });
+    this.listenTo(this, saveEvents, _.debounce(this._saveChanges, 1000).bind(this));
+  },
+
+  addUnderlying:function(waveRegion) {
+    if(this._underlying) throw new Error('only one underlying region');
+
+    this._underlying = waveRegion;
+    this._underlying.on('update', this.underlyingChange.bind(this));
     this.underlyingChange();
   },
 
@@ -23,6 +32,10 @@ module.exports = Model.extend({
     this._isSnapping = false;
   },
 
+  _saveChanges:function() {
+    this.save();
+  },
+
   _snapTo: function(start, end) {
     if (!this._isSnapping) {
       return {
@@ -32,7 +45,7 @@ module.exports = Model.extend({
     }
 
     var snap = function(position) {
-      return this._song.get('clicks').reduce(function(eps, click) {
+      return this._song.get('state').clicks.reduce(function(eps, click) {
         var clickEps = click - position;
         if (Math.abs(clickEps) < Math.abs(eps)) return clickEps;
         return eps;
@@ -62,8 +75,7 @@ module.exports = Model.extend({
     this._updateUnderlying(bounds);
     this.set({
       start: bounds.start,
-      end: bounds.end,
-      id: this._underlying.id
+      end: bounds.end
     });
   },
 
@@ -79,5 +91,9 @@ module.exports = Model.extend({
   destroy: function() {
     this._underlying.remove();
     Model.__super__.destroy.call(this);
+  },
+
+  underlyingId: function() {
+    return this._underlying.id;
   }
 });

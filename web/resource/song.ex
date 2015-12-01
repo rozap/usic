@@ -1,12 +1,5 @@
 defmodule Usic.Resource.Song do
   require Logger
-  import Phoenix.Socket
-  import Phoenix.Channel
-  import Ecto.Query
-  import Ecto.Model
-  alias Usic.Song
-  alias Usic.User
-  alias Usic.Repo
   alias Usic.Loader
   alias Usic.Model.Dispatcher
 

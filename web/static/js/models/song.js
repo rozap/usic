@@ -10,7 +10,7 @@ module.exports = Model.extend({
 
   updateState:function(ns) {
     var s = _.extend({}, this.get('state'), ns);
-    this.set('state', s);
+    return this.set('state', s);
   },
 
   toJSON:function() {

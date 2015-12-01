@@ -14,8 +14,13 @@ defmodule Usic.Song.State do
 
     def type, do: :json
 
-    def cast(%State{} = state), do: {:ok, state}
-    def cast(%{} = state),      do: {:ok, struct(State, state)}
+    def cast(%State{} = state) do
+      {:ok, state}
+    end
+    def cast(%{} = state)      do
+      IO.puts "DOING CAST STATE"
+      {:ok, struct(State, state)}
+    end
     def cast(_other),           do: :error
 
     def load(value) do
@@ -47,11 +52,13 @@ defmodule Usic.Song do
     timestamps
   end
 
+
   def changeset(song, params \\ :empty, session: session) do
     params = case session do
       nil -> Dict.put(params, "user_id", nil)
       _ -> Dict.put(params, "user_id", session.user.id)
     end
+    IO.puts "CHANGESET FOR #{inspect song} \n\n #{inspect params}"
     cast(song, params, ~w(url), ~w(name user_id location state))
     |> validate_change(:url, fn
         :url, url -> []

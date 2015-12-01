@@ -181,4 +181,26 @@ defmodule Usic.ApiSongTest do
     assert update_dispatch.location == "/media/lVKBRF4gu54.m4a"
   end
 
+  test "can update a song state" do
+    socket = make_socket
+    ref = push(socket, "create:song", %{
+      "url" => @url
+    })
+    song = receive do
+      %Reply{ref: ^ref, payload: p} -> p
+    end
+    state = %{song.state | rate: 0.8}
+    ref = push(socket, "update:song", %{
+      "url" => @url,
+      "id" => song.id,
+      "state" => state
+    })
+
+    receive do
+      %Reply{ref: ^ref, payload: p} ->
+        assert p.state.rate == 0.8
+        assert Usic.Repo.get!(Song, song.id).state.rate == 0.8
+    end
+  end
+
 end

@@ -50,7 +50,6 @@ socket.onOpen(function() {
   console.log("Joining..");
   var token = getSessionToken();
   var api = socket.channel(token, {});
-  window.a = api;
   opts.api = api;
 
   opts.api.onMessage = function(event, payload) {

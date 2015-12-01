@@ -126,13 +126,25 @@ module.exports = bb.View.extend({
 
   addSubview: function(name, cls, opts) {
     opts = opts || {};
-    if (this._subviews[name]) this._subviews[name].destroy();
+    this.removeSubview(name);
     opts._parent = this;
     opts.dispatcher = this.dispatcher;
     var view = new cls(opts);
     this._subviews[name] = view;
     this.listenTo(view, 'destroy', _.partial(this._removeAdded, name));
     return view;
+  },
+
+  removeSubview:function(name) {
+    if(_.isArray(this._subviews[name])) {
+      this._subviews.map(function(sv) {
+        return sv.destroy();
+      });
+      delete this._subviews[name];
+      return this;
+    }
+    if (this._subviews[name]) this._subviews[name].destroy();
+    return this;
   },
 
   _removeAppended: function(name, view) {
@@ -144,6 +156,7 @@ module.exports = bb.View.extend({
     delete this._subviews[name];
     this.render();
   },
+
 
   getSubview: function(name) {
     return this._subviews[name];

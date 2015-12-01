@@ -66,7 +66,6 @@ var Controls = View.extend({
 
 
   getState: function() {
-    console.log("GET STATE", this.model.get('state'));
     return _.extend({}, this._state, {
       status: this.isPlaying() ? 'playing' : 'paused',
       minRate: this.minRate,
@@ -95,7 +94,7 @@ var Controls = View.extend({
   _changeRate: function(rate) {
     this.model.updateState({
       rate: rate
-    });
+    }).save();
     if (this.isPlaying()) this.play();
   },
 

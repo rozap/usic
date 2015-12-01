@@ -1,7 +1,6 @@
 var _ = require('underscore');
 var View = require('./view');
 
-var RegionModel = require('./models/region');
 var RegionTemplate = require('./templates/region.html');
 
 module.exports = View.extend({
@@ -20,8 +19,6 @@ module.exports = View.extend({
   renderTo: ['model'],
 
   init: function(opts) {
-    this.model = new RegionModel(opts.region, opts.defaultName, opts.song);
-
     this._state.pxPerSec = opts.pxPerSec;
     this._state.duration = opts.duration;
     this._state.editing = false;
@@ -127,8 +124,8 @@ module.exports = View.extend({
     return parseInt(this.model.get('start') * this._state.pxPerSec) + 'px';
   },
 
-  getId: function() {
-    return this.model.get('id');
+  waveId: function() {
+    return this.model.underlyingId();
   },
 
   getBounds: function() {

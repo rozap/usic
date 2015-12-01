@@ -88,15 +88,49 @@ defmodule Usic.Resource do
   # Read will just ensure this returns one thing
   #
 
-  def read(model, params, socket) do
-    user = Map.get(socket.assigns, :user, nil)
+  defp one(model, params, socket) do
     [id_name] = model.__schema__(:primary_key)
     case Map.get(params, Atom.to_string(id_name)) do
       nil ->
-        {:error, {%{"id" => :not_found}, socket}}
+        {:error, {%{id: :not_found}, socket}}
       id ->
-        model = Usic.Repo.one(from m in model, where: m.id == ^id, select: m)
-        {:ok, {model, socket}}
+        case Usic.Repo.one(from m in model, where: m.id == ^id, select: m) do
+          nil -> {:error, {%{id: :not_found}, socket}}
+          m -> {:ok, {m, socket}}
+        end
+    end
+  end
+
+
+  def read(model, params, socket) do
+    user = Map.get(socket.assigns, :user, nil)
+    one(model, params, socket)
+  end
+
+  def update(model, params, socket) do
+    IO.puts "update? #{inspect params}"
+    case one(model, params, socket) do
+      {:ok, {instance, _}} ->
+        session = Map.get(socket.assigns, :session, nil)
+        cset = model.changeset(instance, params, session: session)
+        IO.puts "Update with #{inspect cset}"
+        case Usic.Repo.update(cset) do
+          {:ok, result} -> {:ok, {result, socket}}
+          {:error, reason} -> {:error, {%{update: reason}, socket}}
+        end
+      err -> err
+    end
+  end
+
+
+  def delete(model, params, socket) do
+    case one(model, params, socket) do
+      {:ok, {instance, _}} ->
+        case Usic.Repo.delete(instance) do
+          {:ok, result} -> {:ok, {result, socket}}
+          {:error, reason} -> {:error, {%{delete: reason}, socket}}
+        end
+      err -> err
     end
   end
 end

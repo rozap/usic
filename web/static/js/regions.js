@@ -2,6 +2,8 @@ var _ = require('underscore');
 var View = require('./view');
 var $ = require('jquery');
 
+var Regions = require('./collections/regions');
+var RegionModel = require('./models/region');
 var RegionView = require('./region');
 var ClicksView = require('./clicks');
 var RegionsTemplate = require('./templates/regions.html');
@@ -15,54 +17,90 @@ module.exports = View.extend({
   },
 
   init: function(opts) {
-    this.model = opts.model;
     this._wavesurfer = opts.wavesurfer;
     this._bindEvents();
     this.render();
-
-    var clicksView = this.addSubview('clicks', ClicksView, {
-      model: opts.model,
+    this.regions = new Regions([], {
+      song: opts.model,
+      api: opts.api,
+      dispatcher: opts.dispatcher
+    });
+    this.listenToOnce(this.regions, 'sync', this.onRegionsSynced);
+    this.regions.fetch();
+    this.addSubview('clicks', ClicksView, {
+      model: this.model,
       wavesurfer: this._wavesurfer
     });
   },
 
   _bindEvents: function() {
-    this._wavesurfer.on('region-update-end', this.onCreated.bind(this));
+    this._wavesurfer.on('region-update-end', this.onChanged.bind(this));
     this._wavesurfer.on('scroll', this.onScroll.bind(this));
     this.listenTo(this._parent, 'pan', this.panTo);
     this.listenTo(this._parent, 'zoom', this.zoomTo);
   },
 
-  onDeselect:function(view){
+  onDeselect: function(view) {
     (this.getSubview('regions') || []).forEach(function(region) {
-      if(region.cid !== view.cid) region.onDeselect();
+      if (region.cid !== view.cid) region.onDeselect();
     });
   },
 
-  onCloned:function(region) {
+  onCloned: function(region) {
     var bounds = region.getBounds();
-    var region = this._wavesurfer.addRegion({
+    var r = this._wavesurfer.addRegion({
       start: bounds.end,
       end: bounds.end + (bounds.end - bounds.start)
     });
     //hack because update-end event isn't fired
-    this.onCreated(region);
+    this.onChanged(r);
   },
 
-  onCreated: function(region) {
-    var existing = this._findRegionView(region);
+  onRegionsSynced: function() {
+    this.regions.each(function(model) {
+      var waveRegion = this._wavesurfer.addRegion({
+        start: model.get('start'),
+        end: model.get('end'),
+        loop: model.get('loop')
+      });
+      model.addUnderlying(waveRegion);
+
+      this._append(model);
+    }.bind(this));
+    this.render();
+  },
+
+  onChanged: function(waveRegion) {
+    var existing = this._findRegionView(waveRegion);
     if (existing) return;
+
+    var model = new RegionModel({
+      name: this._buildDefaultName(),
+      song_id: this.model.get('id')
+    }, {
+      api: this.api,
+      dispatcher: this.dispatcher,
+      song: this.model
+    });
+    model.addUnderlying(waveRegion);
+
+    this._append(model).onSelect();
+    this.render();
+  },
+
+  _append:function(model) {
     var view = this.appendView('regions', RegionView, {
-      region: region,
+      model: model,
       song: this.model,
-      defaultName: this._buildDefaultName(),
+      api: this.api,
+      dispatcher: this.dispatcher,
       pxPerSec: this._getPxPerSec(),
       duration: this._getDuration(),
     });
+
     this.listenTo(view, 'selected', this.onDeselect);
     this.listenTo(view, 'cloned', this.onCloned);
-    view.onSelect();
-    this.render();
+    return view;
   },
 
   _buildDefaultName: function() {
@@ -100,7 +138,6 @@ module.exports = View.extend({
     this.render();
   },
 
-
   onRendered: function() {
     var $list = this._getListEl();
     this._regionViews().forEach(function(view) {
@@ -114,17 +151,13 @@ module.exports = View.extend({
     return this.$el.find('#region-list');
   },
 
-  _findRegionView: function(region) {
+  _findRegionView: function(waveRegion) {
     return _.find(this.getSubview('regions'), function(regionView) {
-      return regionView.getId() === region.id;
+      return regionView.waveId() === waveRegion.id;
     });
   },
 
   _regionViews: function() {
     return this._subviews.regions || [];
-  },
-
-  destroy: function() {
-
   }
 });

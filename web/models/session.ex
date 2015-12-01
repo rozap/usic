@@ -2,8 +2,6 @@ defmodule Usic.Session do
   use Ecto.Model
   alias Usic.User
 
-  @whitelist [:token]
-
   schema "session" do
     field :token, :string
     belongs_to :user, User

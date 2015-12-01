@@ -14,31 +14,45 @@ defmodule Usic.PersistenceChannel do
   @creatable %{
     "user" => {Usic.User, Usic.Resource},
     "song" => {Usic.Song, Usic.Resource.Song},
-    "session" => {Usic.Session, Usic.Resource.Session}
+    "session" => {Usic.Session, Usic.Resource.Session},
+    "region" => {Usic.Region, Usic.Resource}
   }
 
   @listable %{
-    "song" => {Usic.Song, Usic.Resource}
+    "song" => {Usic.Song, Usic.Resource},
+    "region" => {Usic.Region, Usic.Resource}
   }
 
   @readable %{
     "session" => {Usic.Session, Usic.Resource.Session},
-    "song" => {Usic.Song, Usic.Resource}
+    "song" => {Usic.Song, Usic.Resource},
+    "region" => {Usic.Region, Usic.Resource}
+  }
+
+  @updatable %{
+    "song" => {Usic.Song, Usic.Resource},
+    "region" => {Usic.Region, Usic.Resource}
+  }
+
+  @deletable %{
+    "region" => {Usic.Region, Usic.Resource}
   }
 
   @operations [
     {@create, quote do: @creatable},
     {@list, quote do: @listable},
-    {@read, quote do: @readable}
+    {@read, quote do: @readable},
+    {@update, quote do: @updatable},
+    {@delete, quote do: @deletable}
   ]
 
 
-  def join("session", message, socket) do
+  def join("session", _, socket) do
     Logger.info("Anon session has started")
     {:ok, socket}
   end
 
-  def join("session:" <> session_token, message, socket) do
+  def join("session:" <> session_token, _message, socket) do
     case Repo.one(from s in Session,
       where: s.token == ^session_token, select: s, preload: [:user]) do
       nil -> {:error, %{error: :invalid_token}}
@@ -50,7 +64,7 @@ defmodule Usic.PersistenceChannel do
 
 
 
-  def join(invalid, _, socket) do
+  def join(invalid, _, _) do
     Logger.warn("Invalid session join #{invalid}")
     {:error, %{error: :invalid_handshake}}
   end
@@ -71,6 +85,7 @@ defmodule Usic.PersistenceChannel do
           Logger.error("Invalid resource #{unquote(verb) <> ":" <> name} #{inspect unquote(noun)}")
           r({:error, {%{message: "invalid_resource"}, socket}})
         {model, res} ->
+          IO.puts "dispatch #{unquote(verb)} to #{inspect res}"
           r(apply(res, String.to_atom(unquote(verb)), [model, payload, socket]))
       end
     end
@@ -78,7 +93,6 @@ defmodule Usic.PersistenceChannel do
 
 
   def handle_info(info, socket) do
-    IO.puts "HANDLE INFO #{inspect info}"
     {:noreply, socket}
   end
 

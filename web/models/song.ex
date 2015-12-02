@@ -18,7 +18,12 @@ defmodule Usic.Song.State do
       {:ok, state}
     end
     def cast(%{} = state)      do
-      IO.puts "DOING CAST STATE"
+      state = state
+      |> Enum.map(fn
+        {key, val} when is_atom(key) -> {key, val}
+        {key, val} -> {String.to_atom(key), val}
+      end)
+      |> Enum.into(%{})
       {:ok, struct(State, state)}
     end
     def cast(_other),           do: :error
@@ -58,16 +63,11 @@ defmodule Usic.Song do
       nil -> Dict.put(params, "user_id", nil)
       _ -> Dict.put(params, "user_id", session.user.id)
     end
-    IO.puts "CHANGESET FOR #{inspect song} \n\n #{inspect params}"
     cast(song, params, ~w(url), ~w(name user_id location state))
     |> validate_change(:url, fn
         :url, url -> []
       end)
   end
-
-
-
-
 end
 
 defimpl Poison.Encoder, for: Usic.Song do

@@ -17,7 +17,8 @@ module.exports = View.extend({
 
     this.render();
 
-    opts.el = '#my-transcriptions'
+    opts.title = 'my_transcriptions';
+    opts.el = '#my-transcriptions';
     this.addSubview('transcriptions', Transcriptions, opts);
   }
 });

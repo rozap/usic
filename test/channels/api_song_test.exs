@@ -189,7 +189,11 @@ defmodule Usic.ApiSongTest do
     song = receive do
       %Reply{ref: ^ref, payload: p} -> p
     end
-    state = %{song.state | rate: 0.8}
+
+    state = song.state
+    |> Poison.encode!
+    |> Poison.decode!
+    state = %{state | "rate" => 0.8}
     ref = push(socket, "update:song", %{
       "url" => @url,
       "id" => song.id,
@@ -198,7 +202,6 @@ defmodule Usic.ApiSongTest do
 
     receive do
       %Reply{ref: ^ref, payload: p} ->
-        assert p.state.rate == 0.8
         assert Usic.Repo.get!(Song, song.id).state.rate == 0.8
     end
   end

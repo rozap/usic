@@ -85,7 +85,6 @@ defmodule Usic.PersistenceChannel do
           Logger.error("Invalid resource #{unquote(verb) <> ":" <> name} #{inspect unquote(noun)}")
           r({:error, {%{message: "invalid_resource"}, socket}})
         {model, res} ->
-          IO.puts "dispatch #{unquote(verb)} to #{inspect res}"
           r(apply(res, String.to_atom(unquote(verb)), [model, payload, socket]))
       end
     end

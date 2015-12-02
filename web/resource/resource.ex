@@ -108,12 +108,10 @@ defmodule Usic.Resource do
   end
 
   def update(model, params, socket) do
-    IO.puts "update? #{inspect params}"
     case one(model, params, socket) do
       {:ok, {instance, _}} ->
         session = Map.get(socket.assigns, :session, nil)
         cset = model.changeset(instance, params, session: session)
-        IO.puts "Update with #{inspect cset}"
         case Usic.Repo.update(cset) do
           {:ok, result} -> {:ok, {result, socket}}
           {:error, reason} -> {:error, {%{update: reason}, socket}}

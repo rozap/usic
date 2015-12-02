@@ -1,4 +1,4 @@
-<h2 class="text-muted"><%- t('transcriptions') %></h2>
+<h2 class="text-muted"><%- t(state.title) %></h2>
 
 <ul class="transcriptions">
 <% state.model.forEach(function(song) { %>
@@ -14,19 +14,23 @@
 </ul>
 
 <ul class="pager">
-  <% if(state.model.hasPrevious()) { %>
   <li>
-    <a href="javascript:void(0);" class="previous">
+    <a href="javascript:void(0);"
+    class="<%- state.model.hasPrevious()? 'previous': 'text-muted' %>">
       <i class="ion-ios-arrow-left"/><%- t('back') %>
     </a>
   </li>
-  <% } %>
 
-  <% if(state.model.hasNext()) { %>
   <li>
-    <a href="javascript:void(0);" class="next">
+    <a href="javascript:void(0);"
+    class="<%- state.model.hasNext()? 'next': 'text-muted' %>">
       <%- t('next') %><i class="ion-ios-arrow-right"/>
     </a>
   </li>
-  <% } %>
+
+  <li>
+    <span class="text-muted">
+      <%- state.model.currentPage()+1 %>/<%- state.model.maxPage() %>
+    </span>
+  </li>
 </ul>

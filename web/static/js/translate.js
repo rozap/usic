@@ -14,7 +14,10 @@ var terms = {
   'login_failed' : 'Login failed!',
   'unknown_email': 'that email is not registered',
   'invalid_password': 'that password is wrong',
-  'login_success' : 'You have been logged in'
+  'login_success' : 'You have been logged in',
+  'last_updated': 'last updated',
+  'my_transcriptions': 'my transcriptions',
+  'all_transcriptions': 'all transcriptions'
 };
 
 module.exports = {

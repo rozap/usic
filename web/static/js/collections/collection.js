@@ -61,9 +61,8 @@ module.exports = bb.Collection.extend(_.extend({
   },
 
   hasNext:function() {
-    var page = Math.floor((this._state.offset + this._pageSize) / this._pageSize);
-    var maxPage = Math.ceil(this._meta.count / this._pageSize);
-    return page < maxPage;
+    var page = this.currentPage() + 1;
+    return page < this.maxPage();
   },
 
   hasPrevious:function() {
@@ -78,6 +77,14 @@ module.exports = bb.Collection.extend(_.extend({
   previous: function() {
     if(!this.hasPrevious()) return this;
     this.updateState('offset', this._state.offset - this._pageSize);
+  },
+
+  currentPage:function() {
+    return Math.floor(this._state.offset / this._pageSize);
+  },
+
+  maxPage:function() {
+    return Math.ceil(this._meta.count / this._pageSize);
   }
 
 }, socketSync));

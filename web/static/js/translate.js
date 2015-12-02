@@ -1,10 +1,13 @@
 
 var terms = {
-  'invalid_youtube' : 'Not a valid youtube link',
-  'getting_song': 'Fetching the video...',
-  'video_retrieved': 'Video retrieved, downloading audio and building waveform...',
-  'download_failed': 'Audio extraction failed. Try a different video',
-  'upstream_timeout': 'Upstream site took too long to respond',
+  'load_state_invalid_link': 'Invalid youtube URL',
+  'load_state_loading': 'Loading the video',
+  'load_state_error': 'Error loading the video',
+  'load_state_success': 'Video loaded, building waveform for',
+  'unknown_vid': 'Unknown Video',
+  'upstream_timeout': 'Timed out while loading the video',
+
+
   'success' : 'Huzzah!',
   'api_channel_error': 'Failed to register with persistence layer. Changes will not be saved.',
   'socket_error': 'Encountered an error with the websocket connection. Changes will not be saved.',

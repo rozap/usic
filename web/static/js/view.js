@@ -149,12 +149,10 @@ module.exports = bb.View.extend({
 
   _removeAppended: function(name, view) {
     this._subviews[name] = _.without(this._subviews[name], view);
-    this.render();
   },
 
   _removeAdded: function(name) {
     delete this._subviews[name];
-    this.render();
   },
 
 

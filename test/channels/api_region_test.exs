@@ -11,6 +11,7 @@ defmodule Usic.ApiRegionTest do
 
   setup do
     Usic.DryExecutor.start_link
+    Usic.DryMetaserver.start_link
     Ecto.Adapters.SQL.restart_test_transaction(Usic.Repo)
   end
 

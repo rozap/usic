@@ -33,7 +33,7 @@ def make_dirs():
 def ensure_packages():
     with hide('output'):
         sudo("apt-get update")
-        sudo("apt-get install -y htop python-pip tmux vim libav-tools")
+        sudo("apt-get install -y htop python-pip tmux vim libav-tools erlang-dev")
     sudo("pip install --upgrade youtube_dl")
 
 

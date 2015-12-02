@@ -41,7 +41,8 @@ defmodule Usic.Mixfile do
       {:uuid, "~> 1.0.1"},
       {:exrm, "~> 0.19.9"},
       {:logger_file_backend, "0.0.5"},
-      {:comeonin, "~> 1.3"}
+      {:comeonin, "~> 1.3"},
+      {:httpoison, "~> 0.8.0"}
    ]
   end
 

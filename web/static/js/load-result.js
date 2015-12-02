@@ -8,14 +8,26 @@ module.exports = View.extend({
 
   init: function(opts) {
     this.listenTo(this.model, 'change', this.onChange);
+    this.listenTo(this.model, 'error', this.onError);
+
   },
 
   onChange: function() {
-    if(this.model.get('state').load_state === 'load_complete') {
+    if (this.model.get('state').load_state === 'success') {
       this.stopListening(this.model);
-      this.router.navigate('song/' + this.model.get('id'), {trigger: true})
+      this.router.navigate('song/' + this.model.get('id'), {
+        trigger: true
+      });
     }
+    this.updateState({
+      createError: false
+    });
     return this.r();
   },
 
+  onError: function(payload) {
+    this.updateState({
+      createError: payload.url
+    });
+  }
 });

@@ -1,7 +1,9 @@
 defmodule Usic do
   use Application
   require Usic.Executor
+  require Usic.Metaserver
   require Usic.Model.Dispatcher
+
   # See http://elixir-lang.org/docs/stable/elixir/Application.html
   # for more information on OTP Applications
   def start(_type, _args) do
@@ -13,6 +15,7 @@ defmodule Usic do
       # Start the Ecto repository
       worker(Usic.Repo, []),
       worker(Usic.Executor, []),
+      worker(Usic.Metaserver, []),
       worker(Usic.Model.Dispatcher, [])
 
       # Here you could define other workers and supervisors as children

@@ -16,6 +16,7 @@ defmodule Usic.TestHelpers do
 end
 
 Code.load_file("dry_executor.exs", "./test/helpers")
+Code.load_file("dry_metaserver.exs", "./test/helpers")
 
 ExUnit.start
 

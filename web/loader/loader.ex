@@ -5,17 +5,17 @@ defmodule Usic.Loader do
 
   ##
   # clean this up
-  def unload(uid) do
-    media_dir
-    |> File.ls!
-    |> Enum.filter(fn f -> String.contains?(f, uid) end)
-    |> Enum.each(fn f ->
-      track = Path.join(media_dir, f)
-      Logger.info("Cleaned up #{track}")
-      File.rm!(track)
-    end)
-    :ok
-  end
+  # def unload(uid) do
+  #   media_dir
+  #   |> File.ls!
+  #   |> Enum.filter(fn f -> String.contains?(f, uid) end)
+  #   |> Enum.each(fn f ->
+  #     track = Path.join(media_dir, f)
+  #     Logger.info("Cleaned up #{track}")
+  #     File.rm!(track)
+  #   end)
+  #   :ok
+  # end
 
   def get_song_id(location) do
     case URI.parse(location) do
@@ -58,11 +58,26 @@ defmodule Usic.Loader do
     Application.get_env(:usic, :executor)
   end
 
-  defp download_song({:ok, _}, song) do
+  defp get_metaserver() do
+    Application.get_env(:usic, :metaserver)
+  end
+
+  defp get_metadata(id, song) do
+    case get_metaserver().get(id) do
+      {:ok, metadata} ->
+        name = metadata["title"]
+        song = %{song | name: name}
+        Logger.info("Fetched metadata #{id} name: #{name}")
+        Usic.Repo.update(song)
+      err -> err
+    end
+  end
+
+  defp download_song({:ok, song}) do
     output_loc = gen_template()
 
     case get_executor().get(song.url, output_loc) do
-      {:error, reason} -> {:error, reason}
+      {:error, reason} -> put_err({:error, reason}, song)
       {log_out, result} ->
         lines = String.split(log_out, "\n")
         |> Enum.map(fn line -> "[youtube-dl] [#{song.id}] #{line}" end)
@@ -71,21 +86,21 @@ defmodule Usic.Loader do
           0 ->
             Enum.each(lines, &(Logger.info &1))
             Logger.info("[youtube-dl] Download complete")
-            to_media_location(lines)
+            to_media_location(lines) |> update_location(song)
           _ ->
             failure = "youtube-dl failed with #{result}"
             Logger.error(failure)
             Enum.each(lines, &(Logger.error &1))
-            {:error, failure}
+            put_err({:error, failure}, song)
         end
     end
   end
 
-  defp download_song(err, song), do: put_err(err, song)
+  defp download_song(err), do: err
 
 
   defp update_location({:ok, location}, song) do
-    state = %{song.state | load_state: "load_complete"}
+    state = %{song.state | load_state: "success"}
     song = %{song | location: location, state: state}
     Usic.Repo.update(song)
   end
@@ -102,9 +117,14 @@ defmodule Usic.Loader do
 
 
   def get_song(song) do
-    get_song_id(song.url)
-    |> download_song(song)
-    |> update_location(song)
+    case get_song_id(song.url) do
+      {:ok, id} ->
+        Task.start_link(fn ->
+          get_metadata(id, song)
+          |> download_song
+        end)
+      err -> put_err(err, song)
+    end
   end
 
 end

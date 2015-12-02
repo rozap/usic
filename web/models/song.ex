@@ -1,7 +1,7 @@
 defmodule Usic.Song.State do
   defstruct [
     clicks:      [],
-    load_state:  "load_start",
+    load_state:  "loading",
     error:       nil,
     rate:        1,
     pxPerSecond: 40,
@@ -65,7 +65,11 @@ defmodule Usic.Song do
     end
     cast(song, params, ~w(url), ~w(name user_id location state))
     |> validate_change(:url, fn
-        :url, url -> []
+        :url, url ->
+          case Usic.Loader.get_song_id(url) do
+            {:error, reason} -> [url: reason]
+            _ -> []
+          end
       end)
   end
 end

@@ -8,7 +8,7 @@ defmodule Usic.Resource.Song do
 
   def begin_download({:ok, {song, socket}}) do
     Dispatcher.bind(song, socket)
-    Task.start_link(Loader, :get_song, [song])
+    Loader.get_song(song)
   end
 
   def begin_download({:error, _} = r), do: r

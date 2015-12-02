@@ -10,6 +10,8 @@ defmodule Usic.ApiSongTest do
 
   setup do
     Usic.DryExecutor.start_link
+    Usic.DryMetaserver.start_link
+
     Ecto.Adapters.SQL.restart_test_transaction(Usic.Repo)
   end
 
@@ -66,11 +68,11 @@ defmodule Usic.ApiSongTest do
     socket = make_socket
     Enum.each(1..40, fn i ->
       ref = push(socket, "create:song", %{
-        "url" => @url, "name" => "something #{i}"
+        "url" => @url
       })
       receive do
         %Reply{payload: p, ref: ^ref} ->
-          assert p.name == "something #{i}"
+          assert p.url == @url
       end
     end)
 
@@ -102,28 +104,6 @@ defmodule Usic.ApiSongTest do
     receive do
       %Reply{payload: p, ref: ^ref} ->
         assert length(p["items"]) == 2
-
-        [s3, s4] = p["items"]
-        assert s3.name == "something 3"
-        assert s4.name == "something 4"
-    end
-  end
-
-
-  test "can select by name for" do
-    {socket, _} = make_authed_songs
-
-    ref = push(socket, "list:song", %{
-      "where" => %{
-        "name" => "something 4"
-      }
-    })
-
-    receive do
-      %Reply{ref: ^ref, payload: %{"items" => [item]}} ->
-        assert item.name == "something 4"
-    after
-      200 -> raise "NOPE"
     end
   end
 
@@ -171,14 +151,22 @@ defmodule Usic.ApiSongTest do
       %Reply{ref: ^ref, payload: p} -> assert p.location == nil
     end
 
-    update_dispatch = receive do
+    meta_update = receive do
+      %Message{event: "update:song", payload: p} ->
+        p
+    after
+      40 -> raise "nope!"
+    end
+    assert meta_update.name == "foobar"
+
+    location_update = receive do
       %Message{event: "update:song", payload: p} ->
         p
     after
       40 -> raise "nope!"
     end
 
-    assert update_dispatch.location == "/media/lVKBRF4gu54.m4a"
+    assert location_update.location == "/media/lVKBRF4gu54.m4a"
   end
 
   test "can update a song state" do

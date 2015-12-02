@@ -1,5 +1,15 @@
-<span class="loader state-<%- state.state %>">
-  <% if(state.model.get('state')) { %>
-  <% } %>
-  <%- JSON.stringify(state.model.get('state')) %>
-</span>
+<% if(state.createError) { %>
+  <span class="loader state-error">
+    <%- t('load_state_' + state.createError) %>
+  </span>
+<% } else if(state.model.get('state')) { %>
+  <% var mstate = state.model.get('state') %>
+  <span class="loader state-<%- mstate.load_state %>">
+    <%- t('load_state_' + mstate.load_state) %>
+    <%- state.model.get('name') || t('unknown_vid') %>
+
+    <% if(mstate.load_state === 'error') { %>
+      <%- t(mstate.error) %>
+    <% } %>
+  </span>
+<% } %>

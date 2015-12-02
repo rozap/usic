@@ -12,10 +12,10 @@ module.exports = bb.Collection.extend(_.extend({
     this._meta = {
       count: Infinity
     };
-    this._state = {
+    this._state = _.extend({
       offset: 0,
       limit: this._pageSize
-    };
+    }, opts.collectionState);
 
     if (!this._api) throw new Error("Model needs api channel");
 

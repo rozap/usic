@@ -33,7 +33,7 @@ def make_dirs():
 def ensure_packages():
     with hide('output'):
         sudo("apt-get update")
-        sudo("apt-get install -y htop python-pip tmux vim libav-tools erlang-dev")
+        sudo("apt-get install -y htop python-pip tmux vim libav-tools erlang-dev postgresql-9.3")
     sudo("pip install --upgrade youtube_dl")
 
 
@@ -62,12 +62,30 @@ def ship():
         ))
     put("deploy/upstart.conf", "/etc/init/usic.conf", use_sudo = True)
 
+
+def migrate(version):
+    artifact = 'usic-%s' % version
+    print(cyan("""
+        To migrate, run
+
+            sudo {base_dir}/bin/usic
+
+        And then in the console:
+
+            Ecto.Migrator.run(Usic.Repo, "/var/sites/usic/lib/{artifact}/priv/repo/migrations", :up, all: true)
+    """.format(
+        base_dir = base_dir,
+        artifact = artifact
+    )))
+    return prompt('Are your migrations in order?', default = 'no')
+
 def upgrade(version):
     # ~~ we are living in the future ~~
     # ~~ the future is 1980 ~~
     print(yellow("Upgrading to {version}".format(version = version)))
     with cd(base_dir):
         sudo("bin/usic upgrade {version}".format(version = version))
+
 
 
 @task
@@ -79,9 +97,14 @@ def rollback(version):
 
 @task
 def deploy(version):
-    print version
     check_deploy()
     print(green("starting deploy"))
     ensure_packages()
     ship()
-    upgrade(version)
+
+    res = migrate(version)
+
+    if res == 'yes':
+        upgrade(version)
+    else:
+        print(red("Not upgrading until migrations are done"))

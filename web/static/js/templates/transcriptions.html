@@ -1,36 +1,43 @@
 <h2 class="text-muted"><%- t(state.title) %></h2>
 
-<ul class="transcriptions">
-<% state.model.forEach(function(song) { %>
-  <li class="transcription">
-    <h3>
-      <a href="#song/<%- song.get('id') %>"><%- song.get('name') %></a>
-    </h3>
-    <span class="text-muted">
-      <%- t('last_updated') %>: <%- moment(song.get('updated_at')).fromNow() %>
-    </span>
-  </li>
-<% }); %>
-</ul>
+<% if(state.model.length === 0) { %>
+  <h4><%- t('no_transcriptions') %></h4>
+<% } else { %>
+  <ul class="transcriptions">
+    <% state.model.forEach(function(song) { %>
+      <li class="transcription">
+        <h3>
+          <a href="#song/<%- song.get('id') %>"><%- song.get('name') %></a>
+        </h3>
+        <span class="text-muted">
+          <%- t('last_updated') %>: <%- moment(song.get('updated_at')).fromNow() %>
+        </span>
+      </li>
+    <% }); %>
 
-<ul class="pager">
-  <li>
-    <a href="javascript:void(0);"
-    class="<%- state.model.hasPrevious()? 'previous': 'text-muted' %>">
-      <i class="ion-ios-arrow-left"/><%- t('back') %>
-    </a>
-  </li>
+  </ul>
 
-  <li>
-    <a href="javascript:void(0);"
-    class="<%- state.model.hasNext()? 'next': 'text-muted' %>">
-      <%- t('next') %><i class="ion-ios-arrow-right"/>
-    </a>
-  </li>
+  <ul class="pager">
+    <li>
+      <a href="javascript:void(0);"
+      class="<%- state.model.hasPrevious()? 'previous': 'text-muted' %>">
+        <i class="ion-ios-arrow-left"/><%- t('back') %>
+      </a>
+    </li>
 
-  <li>
-    <span class="text-muted">
-      <%- state.model.currentPage()+1 %>/<%- state.model.maxPage() %>
-    </span>
-  </li>
-</ul>
+    <li>
+      <a href="javascript:void(0);"
+      class="<%- state.model.hasNext()? 'next': 'text-muted' %>">
+        <%- t('next') %><i class="ion-ios-arrow-right"/>
+      </a>
+    </li>
+
+    <li>
+      <span class="text-muted">
+        <%- Math.min( state.model.maxPage(), state.model.currentPage()+1) %>
+        /
+        <%- state.model.maxPage() %>
+      </span>
+    </li>
+  </ul>
+<% } %>

@@ -20,7 +20,8 @@ var terms = {
   'login_success' : 'You have been logged in',
   'last_updated': 'last updated',
   'my_transcriptions': 'my transcriptions',
-  'all_transcriptions': 'all transcriptions'
+  'all_transcriptions': 'all transcriptions',
+  'no_transcriptions': 'no transcriptions, yet.'
 };
 
 module.exports = {

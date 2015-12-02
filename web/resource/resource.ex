@@ -72,7 +72,9 @@ defmodule Usic.Resource do
 
     case run_list(model, params) do
       {:ok, models} ->
-        c = Usic.Repo.one(from m in model, select: count(m.id))
+        count_q = from(m in model)
+        |> apply_filters(params)
+        c = Usic.Repo.one(count_q |> select([m], count(m.id)))
         resp = %{}
         |> Dict.put("items", models)
         |> Dict.put("count", c)

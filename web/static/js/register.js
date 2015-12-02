@@ -31,7 +31,7 @@ module.exports = View.extend({
     this.model.set(this.serializeForm());
     this.sesh.set({
       password: this.model.get('password'),
-      user_id: this.model.get('email')
+      email: this.model.get('email')
     });
     this.model.save();
   },

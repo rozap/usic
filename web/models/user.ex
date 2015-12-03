@@ -30,6 +30,7 @@ defimpl Poison.Encoder, for: Usic.User do
   def encode(song, _options) do
     song
     |> Map.take(@attributes)
+    |> Map.drop([:__meta__])
     |> Poison.encode!
   end
 end

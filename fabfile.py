@@ -19,6 +19,7 @@ releases = "./rel/usic/releases"
 archive_name = "usic.tar.gz"
 
 def check_deploy():
+    local('mix clean')
     local('mix test')
 
 def make_dirs():
@@ -39,14 +40,15 @@ def ensure_packages():
 
 def build_release():
     print(green("Building release"))
+    with shell_env(MIX_ENV='prod'):
+        local('mix compile')
+        local("gulp deploy")
+        local("mix phoenix.digest")
+        local("mix release")
 
-    local("gulp deploy")
-    local("mix phoenix.digest")
-    local("MIX_ENV=prod mix release")
-
-    rels = [ StrictVersion(f) for f in listdir(releases) if isdir(join(releases,f)) ]
-    release_dir = join(releases, str(max(rels)))
-    return archive_name, join(release_dir, archive_name)
+        rels = [ StrictVersion(f) for f in listdir(releases) if isdir(join(releases,f)) ]
+        release_dir = join(releases, str(max(rels)))
+        return archive_name, join(release_dir, archive_name)
 
 
 def ship():

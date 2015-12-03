@@ -35,9 +35,10 @@ end
 defimpl Poison.Encoder, for: Usic.Session do
   @attributes ~w(token user inserted_at updated_at)a
 
-  def encode(song, _options) do
-    song
+  def encode(session, _options) do
+    session
     |> Map.take(@attributes)
+    |> Map.drop([:__meta__])
     |> Poison.encode!
   end
 end

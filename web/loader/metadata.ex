@@ -1,4 +1,5 @@
 defmodule Usic.Loader.Metadata do
+  require HTTPoison.Base
   use HTTPoison.Base
 
   @streams "url_encoded_fmt_stream_map"

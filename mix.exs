@@ -3,7 +3,7 @@ defmodule Usic.Mixfile do
 
   def project do
     [app: :usic,
-     version: "0.0.14",
+     version: "0.0.1",
      elixir: "~> 1.0",
      elixirc_paths: elixirc_paths(Mix.env),
      compilers: [:phoenix] ++ Mix.compilers,
@@ -19,7 +19,7 @@ defmodule Usic.Mixfile do
   def application do
     [mod: {Usic, []},
      applications: [:phoenix, :phoenix_html, :cowboy, :logger,
-                    :phoenix_ecto, :postgrex,
+                    :phoenix_ecto, :postgrex, :httpoison,
                     :logger_file_backend, :uuid, :comeonin]]
   end
 
@@ -39,7 +39,7 @@ defmodule Usic.Mixfile do
       {:phoenix_live_reload, "~> 1.0", only: :dev},
       {:cowboy, "~> 1.0"},
       {:uuid, "~> 1.0.1"},
-      {:exrm, "~> 0.19.9"},
+      {:exrm, github: "bitwalker/exrm"},
       {:logger_file_backend, "0.0.5"},
       {:comeonin, "~> 1.3"},
       {:httpoison, "~> 0.8.0"}

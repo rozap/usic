@@ -14,7 +14,7 @@ var paths = {
         app: {
             src: './web/static/js/app.js',
             dest: './priv/static/js/',
-            watch: ['./web/static/js/*.js', './web/static/js/*/*.js', './web/static/js/*/*.html']
+            watch: ['./web/static/js/*.js', './web/static/js/*/*.js', './web/static/js/**/*.html']
         },
         unmanaged: {
             src: './web/static/js/unmanaged/*',
@@ -40,19 +40,24 @@ var create = function(src, name, dst) {
     bundleStream.bundle()
         .pipe(source(name))
         .pipe(buffer())
-        // .pipe(sourcemaps.init({
-        //     loadMaps: true
-        // }))
-        // .pipe(uglify())
-        // .pipe(sourcemaps.write('maps'))
+        .pipe(sourcemaps.init({
+            loadMaps: true
+        }))
+        .pipe(uglify())
+        .pipe(sourcemaps.write('maps'))
         .pipe(gulp.dest(dst));
 };
 
 
 gulp.task('app', function() {
     create(paths.js.app.src, 'app.js', paths.js.app.dest);
-    console.log(paths.js.unmanaged.src, paths.js.unmanaged.dest)
+    console.log(paths.js.unmanaged.src, paths.js.unmanaged.dest);
     gulp.src(paths.js.unmanaged.src)
+        // .pipe(buffer())
+        // .pipe(sourcemaps.init({
+        //     loadMaps: true
+        // }))
+        // .pipe(uglify())
         .pipe(gulp.dest(paths.js.unmanaged.dest));
 });
 
@@ -62,14 +67,14 @@ gulp.task('less', function() {
         .pipe(less({
             paths: ['style.less']
         }))
-        // .pipe(minifyCSS())
+        .pipe(minifyCSS())
         .pipe(gulp.dest(paths.less.dest));
 });
 
 gulp.task('fonts', function() {
     console.log("Adding fonts...");
     gulp.src(paths.fonts.src)
-        .pipe(gulp.dest(paths.fonts.dest))
+        .pipe(gulp.dest(paths.fonts.dest));
 });
 
 

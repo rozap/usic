@@ -4,9 +4,9 @@ var View = require('./view');
 var WaveTemplate = require('./templates/wave.html');
 
 module.exports = View.extend({
-  template : _.template(WaveTemplate),
-  el : '#view-wave',
-  init:function(opts) {
+  template: _.template(WaveTemplate),
+  el: '#view-wave',
+  init: function(opts) {
     this.render();
     this._initUnderlying(opts);
     this.listenTo(this._parent, 'pan', this.panTo);
@@ -14,7 +14,7 @@ module.exports = View.extend({
 
   },
 
-  _initUnderlying:function(opts) {
+  _initUnderlying: function(opts) {
     var wavesurfer = Object.create(WaveSurfer);
     wavesurfer.init({
       container: '#waveform',
@@ -30,7 +30,7 @@ module.exports = View.extend({
     this._wavesurfer = wavesurfer;
   },
 
-  wv:function() {
+  wv: function() {
     return this._wavesurfer;
   },
 
@@ -38,11 +38,11 @@ module.exports = View.extend({
     return this._wavesurfer.getDuration() * this._wavesurfer.params.minPxPerSec;
   },
 
-  panTo:function(p) {
+  panTo: function(p) {
     this.$el.find('wave').scrollLeft(p);
   },
 
-  zoomTo:function(pps, _duration) {
+  zoomTo: function(pps, _duration) {
     this._wavesurfer.zoom(pps);
   },
 

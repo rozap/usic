@@ -7,7 +7,7 @@ module.exports = {
   },
   'onTogglePlay': {
     name: 'space',
-    character: ' ',
+    character: 'space',
     code: 32,
     type: 'keyup',
     t: 'play_pause'
@@ -19,27 +19,25 @@ module.exports = {
     t: 'create_beat'
   },
   'onSkipForward': {
-    character: 'e',
+    character: 'w',
     type: 'keydown',
-    code: 69,
+    code: 87,
     t: 'skip_forward'
   },
   'onSkipBackward': {
-    character: 'r',
+    character: 's',
     type: 'keydown',
-    code: 82,
+    code: 83,
     t: 'skip_backward'
   },
 
   'onEnableSnapping': {
-    character: 'shift',
     type: 'keyup',
     code: 16,
     t: 'enable_snapping'
   },
 
   'onDisableSnapping': {
-    character: 'shift',
     shift: true,
     type: 'keydown',
     code: 16,
@@ -47,15 +45,15 @@ module.exports = {
   },
 
   'onNudgeLeft': {
-    character: 'n',
+    character: 'a',
     type: 'keyup',
-    code: 78,
+    code: 65,
     t: 'nudge_left'
   },
   'onNudgeRight': {
-    character: 'm',
+    character: 'd',
     type: 'keyup',
-    code: 77,
+    code: 68,
     t: 'nudge_right'
   },
   'onUndo': {

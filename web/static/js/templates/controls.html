@@ -1,5 +1,3 @@
-
-
 <div class="pure-g control-units">
   <div class="pure-u-1-12 control">
     <a class="pure-button button-success control-button skip-backward"
@@ -7,21 +5,18 @@
       <i class="ion-skip-backward"/>
     </a>
   </div>
-  <div class="pure-u-1-8 control">
+  <div class="pure-u-1-12 control">
     <% if(state.status === 'playing') { %>
       <a class="pure-button button-success play-pause control-button"
         href="javascript:void(0)">
-        Pause
         <i class="ion-pause"/>
       </a>
     <% } else if(state.status === 'paused') { %>
       <a class="pure-button button-success play-pause control-button"
         href="javascript:void(0)">
-        Play
         <i class="ion-play"/>
       </a>
     <% } %>
-
   </div>
   <div class="pure-u-1-12 control">
     <a class="pure-button button-success control-button skip-forward"
@@ -36,7 +31,10 @@
       <i class="ion-pinpoint"/>
     </a>
   </div>
-  <div class="pure-u-1-4 control">
+
+
+
+  <div class="pure-u-1-3 control">
     <span>Speed: <%- parseFloat(state.rate).toFixed(2) %></span>
     <input
       id="playback-rate"
@@ -44,4 +42,70 @@
       type="range" min="<%- state.minRate * 100 %>" max="<%- state.maxRate * 100 %>"/>
   </div>
 
+  <div class="pure-u-1-6"></div>
+
+  <div class="pure-u-1-6 control">
+    <a href="javascript:void(0)" class="pure-button show-help">
+      <% if(state.helpShowing) { %>
+        <%- t('hide_help') %>
+      <% } else { %>
+        <%- t('help') %>
+      <% } %>
+    </a>
+  </div>
+
 </div>
+
+<% if(state.helpShowing) { %>
+<div class="pure-g">
+  <div class="pure-u-1-1">
+    <h3 class="text-muted">Help & Shortcuts</h3>
+
+    <ul class="key-codes">
+      <li class="divider">
+        <h4 class="text-muted"><%- t('help') %></h4>
+      </li>
+      <li>
+        <h4><%- t('pan') %></h4>
+        <p><%- t('d_pan') %></p>
+      </li>
+      <li>
+        <h4><%- t('zoom') %></h4>
+        <p><%- t('d_zoom') %></p>
+      </li>
+      <li>
+        <h4><%- t('create_region') %></h4>
+        <p><%= t('d_create_region') %></p>
+      </li>
+      <li>
+        <h4><%- t('clone_region') %></h4>
+        <p><%- t('d_clone_region') %></p>
+      </li>
+      <li>
+        <h4><%- t('loop_region') %></h4>
+        <p><%- t('d_loop_region') %></p>
+      </li>
+      <li>
+        <h4><%- t('follow') %></h4>
+        <p><%- t('d_follow') %></p>
+      </li>
+
+      <li class="divider">
+        <h4 class="text-muted"><%- t('shortcuts') %></h4>
+      </li>
+      <% state.keyCodes.forEach(function(keyCode) { %>
+        <li>
+          <h4>
+            <% if(keyCode.ctrlKey) { %>
+            ctrl +
+            <% } %>
+            <%- keyCode.character %> :
+            <span class="text-muted"><%- t(keyCode.t) %></span>
+          </h4>
+          <p><%- t('d_' + keyCode.t) %></p>
+        </li>
+      <% }) %>
+    </ul>
+  </div>
+</div>
+<% } %>

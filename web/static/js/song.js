@@ -85,6 +85,7 @@ module.exports = View.extend({
   },
 
   onWheelWaveform: function(e) {
+    e.preventDefault();
     var up = e.originalEvent.wheelDelta > 0;
     if (e.shiftKey) {
       var oldPps = this.pxPerSec();

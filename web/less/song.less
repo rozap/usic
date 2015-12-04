@@ -9,24 +9,39 @@
     }
   }
 }
+.show-help {
+  float:right;
+}
+
 
 .control-units {
-  margin-top: @base-pad;
+  margin-top: @base-pad * 2;
   .control {
     a {
       text-align: center;
-    }
-    .pure-button {
-      margin-top: @base-pad;
     }
     .control-button {
       width: 100%;
     }
     padding: @base-pad / 2;
-    border-left: 1px solid @light-gray;
   }
 
   .control:first-of-type {
     border-left: none;
+  }
+}
+
+.key-codes {
+  margin-top: 0px;
+  padding: 0px;
+  li.divider {
+    border-bottom: 1px solid @light-gray;
+  }
+  li {
+    margin-bottom: @base-pad/2;
+    h4, p {
+      margin: 0px;
+      padding: 0px @base-pad/2;
+    }
   }
 }

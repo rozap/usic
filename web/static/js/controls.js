@@ -6,6 +6,8 @@ var View = require('./view');
 var SlicedBufferSource = require('./sliced-buffer');
 var ControlsTemplate = require('./templates/controls.html');
 
+var KeyCodes = require('./keycodes');
+
 var Controls = View.extend({
   el: '#controls',
   template: _.template(ControlsTemplate),
@@ -17,7 +19,8 @@ var Controls = View.extend({
     'change #playback-rate': 'onChangeRate',
     'click .skip-backward': 'onSkipBackward',
     'click .skip-forward': 'onSkipForward',
-    'click .auto-center': 'onAutoCenter'
+    'click .auto-center': 'onAutoCenter',
+    'click .show-help': 'onToggleHelp'
   },
 
   init: function(opts) {
@@ -72,7 +75,8 @@ var Controls = View.extend({
       maxRate: this.maxRate,
       rate: this.model.get('state').rate,
       pxPerSecond: this.model.get('state').pxPerSecond,
-      autoCenter: this.model.get('state').autoCenter
+      autoCenter: this.model.get('state').autoCenter,
+      keyCodes: this._genKeys()
     });
   },
 
@@ -91,10 +95,15 @@ var Controls = View.extend({
     this._changeRate(rate);
   },
 
+  _saveModel: _.debounce(function() {
+    this.model.save()
+  }, 1000),
+
   _changeRate: function(rate) {
     this.model.updateState({
       rate: rate
-    }).save();
+    });
+    this._saveModel();
     if (this.isPlaying()) this.play();
   },
 
@@ -116,6 +125,7 @@ var Controls = View.extend({
 
   onTogglePlay: function(e) {
     if (e.isDefaultPrevented()) return;
+    e.preventDefault();
     if (this.isPlaying()) {
       this.pause();
     } else {
@@ -136,6 +146,7 @@ var Controls = View.extend({
     this.model.updateState({
       autoCenter: !this.model.get('state').autoCenter
     });
+    this._saveModel();
     this._audio.wavesurfer.params.follow = this.model.get('state').autoCenter;
   },
 
@@ -145,6 +156,18 @@ var Controls = View.extend({
 
   onRedo: function() {
     this.model.redo();
+  },
+
+  onToggleHelp: function() {
+    this.updateState({
+      helpShowing: !this._state.helpShowing
+    });
+  },
+
+  _genKeys: function() {
+    return _.filter(KeyCodes, function(key) {
+      return !!key.character;
+    });
   }
 });
 

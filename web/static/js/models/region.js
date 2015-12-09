@@ -13,7 +13,7 @@ module.exports = Model.extend({
     this._isSnapping = true;
     this._song = opts.song;
     this.listenTo(this, 'change', this._updateUnderlying);
-    this.listenTo(this, saveEvents, _.debounce(this._saveChanges, 1000).bind(this));
+    this.listenTo(this, saveEvents, _.debounce(this._saveChanges, 5000).bind(this));
   },
 
   addUnderlying:function(waveRegion) {
@@ -44,8 +44,10 @@ module.exports = Model.extend({
       };
     }
 
+    var s = this._song.get('state')
+    var markers = s.clicks.concat(s.measures);
     var snap = function(position) {
-      return this._song.get('state').clicks.reduce(function(eps, click) {
+      return markers.reduce(function(eps, click) {
         var clickEps = click - position;
         if (Math.abs(clickEps) < Math.abs(eps)) return clickEps;
         return eps;

@@ -9,7 +9,7 @@ module.exports = {
     name: 'space',
     character: 'space',
     code: 32,
-    type: 'keyup',
+    type: 'keydown',
     t: 'play_pause'
   },
   'onBeatCreated': {
@@ -18,15 +18,21 @@ module.exports = {
     type: 'keydown',
     t: 'create_beat'
   },
+  'onMeasureCreated': {
+    character: 'm',
+    code: 77,
+    type: 'keydown',
+    t: 'create_measure'
+  },
   'onSkipForward': {
     character: 'w',
-    type: 'keydown',
+    type: 'keyup',
     code: 87,
     t: 'skip_forward'
   },
   'onSkipBackward': {
     character: 's',
-    type: 'keydown',
+    type: 'keyup',
     code: 83,
     t: 'skip_backward'
   },

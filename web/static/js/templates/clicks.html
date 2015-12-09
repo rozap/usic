@@ -1,11 +1,47 @@
-<svg width="<%- state.width %>">
-  <% _.each(state.model.get('state').clicks, function(click) { %>
-    <line
-      x1="<%- state.scale * click %>"
-      y1="0"
-      x2="<%- state.scale * click %>"
-      y2="16"
-      style="stroke:#105B63;stroke-width:2"
-    />
-  <% }); %>
+<svg width="<%- state.width %>" height="<%- state.height %>">
+
+<!--   <rect
+    x="20"
+    y="0"
+    width="50"
+    height="32"
+    fill="#BD4932"
+    fill-opacity="0.4"/> -->
+
+  <svg width="<%- state.width %>">
+    <% _.each(state.model.get('state').clicks, function(click, i) { %>
+      <svg class="draggable beat-marker"
+        data-kind="clicks"
+        height="<%- state.height / 2 %>"
+        width="20"
+        x="<%- state.scale * click %>"
+        data-position="<%- i %>">
+      <line x1="0" y1="0" x2="0" y2="<%- state.height / 2 %>"
+        style="stroke:#105B63;stroke-width:4"/>
+    </svg>
+    <% }); %>
+  </svg>
+
+
+
+  <svg width="<%- state.width %>"
+    y="<%- state.height / 2 %>"
+    height="<%- state.height / 2 %>">
+    <% _.each(state.model.get('state').measures, function(measure, i) { %>
+    <svg class="draggable measure-marker"
+        data-kind="measures"
+        height="<%- state.height / 2 %>"
+        width="20"
+        x="<%- state.scale * measure %>"
+        data-position="<%- i %>">
+
+      <line x1="0" y1="0" x2="0" y2="<%- state.height / 2 %>"
+        style="stroke:#FFFAD5;stroke-width:12"/>
+
+      <line x1="2" y1="0" x2="2" y2="<%- state.height / 2 %>"
+        style="stroke:#DB9E36;stroke-width:6"/>
+    </svg>
+    <% }); %>
+  </svg>
+
 </svg>

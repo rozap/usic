@@ -17,7 +17,7 @@ defmodule Usic.ApiUserTest do
   test "can create a user" do
     socket = make_socket
     push(socket, "create:user", %{
-      "email": "wow@bar.com", "password": "blahblah"
+      "email" => "wow@bar.com", "password"=> "blahblah"
     })
     receive do
       %{payload: p} ->
@@ -27,10 +27,75 @@ defmodule Usic.ApiUserTest do
     end
   end
 
+  test "can update a user" do
+    socket = make_socket
+    push(socket, "create:user", %{
+      "email" => "wow@bar.com", "password" => "blahblah"
+    })
+    user_id = receive do
+      %{payload: p} -> p.id
+    end
+
+    push(socket, "create:session", %{
+      "email" => "wow@bar.com", "password" => "blahblah"
+    })
+
+    receive do
+      %{payload: s} -> :ok
+    end
+
+    push(socket, "update:user", %{
+      "id" => user_id, "display_name" => "new name"
+    })
+
+    receive do
+      %{payload: p} ->
+        user = Usic.Repo.get!(User, user_id)
+        assert user.email == "wow@bar.com"
+        assert user.display_name == "new name"
+        assert Comeonin.Pbkdf2.checkpw("blahblah", user.password)
+    end
+  end
+
+  test "cannot update a different user" do
+    socket = make_socket
+    push(socket, "create:user", %{
+      "email" => "foo@foo.com", "password" => "foofoofoo"
+    })
+    foo_id = receive do
+      %{payload: p} -> p.id
+    end
+
+    push(socket, "create:user", %{
+      "email" => "bar@bar.com", "password" => "barbarbar"
+    })
+    bar_id = receive do
+      %{payload: p} -> p.id
+    end
+
+
+    push(socket, "create:session", %{
+      "email" => "bar@bar.com", "password" => "barbarbar"
+    })
+
+    receive do
+      %{payload: s} -> :ok
+    end
+
+    ref = push(socket, "update:user", %{
+      "id" => foo_id, "display_name" => "new name"
+    })
+
+    assert_reply ref, :error, %{
+      "id" => "unauthorized"
+    }
+
+  end
+
   test "can't create with a bad password" do
     socket = make_socket
     push(socket, "create:user", %{
-      "email": "www@bar.com", "password": "lol"
+      "email" => "www@bar.com", "password" => "lol"
     })
     receive do
       %{payload: p} ->
@@ -41,14 +106,14 @@ defmodule Usic.ApiUserTest do
   test "can't create user with same email" do
     socket = make_socket
     push(socket, "create:user", %{
-      "email": "foo@bar.com", "password": "blahblah"
+      "email" => "foo@bar.com", "password" => "blahblah"
     })
     receive do
       %{payload: _} -> :ok
     end
 
     push(socket, "create:user", %{
-      "email": "foo@bar.com", "password": "blahblah"
+      "email" => "foo@bar.com", "password" => "blahblah"
     })
     receive do
       %{payload: p} ->

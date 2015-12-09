@@ -39,12 +39,12 @@ var create = function(src, name, dst) {
     bundleStream.transform(stringify(['.html']));
     bundleStream.bundle()
         .pipe(source(name))
-        .pipe(buffer())
-        .pipe(sourcemaps.init({
-            loadMaps: true
-        }))
-        .pipe(uglify())
-        .pipe(sourcemaps.write('maps'))
+        // .pipe(buffer())
+        // .pipe(sourcemaps.init({
+        //     loadMaps: true
+        // }))
+        // .pipe(uglify())
+        // .pipe(sourcemaps.write('maps'))
         .pipe(gulp.dest(dst));
 };
 
@@ -79,7 +79,6 @@ gulp.task('fonts', function() {
 
 
 gulp.task('rebuild', function() {
-
     gulp.watch(paths.js.app.watch, ['app']);
     gulp.watch(paths.less.watch, ['less']);
 });

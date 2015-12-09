@@ -1,6 +1,7 @@
 defmodule Usic.Song.State do
   defstruct [
     clicks:      [],
+    measures:    [],
     load_state:  "loading",
     error:       nil,
     rate:        1,
@@ -80,7 +81,6 @@ defimpl Poison.Encoder, for: Usic.Song do
   def encode(song, _options) do
     song
     |> Map.take(@attributes)
-    |> Map.drop([:__meta__])
     |> Poison.encode!
   end
 end

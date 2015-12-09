@@ -20,7 +20,7 @@ KeyBindings.prototype = {
 
   _onKey: function(e) {
     var dispatchEvent = this._getEvent(e);
-    if (dispatchEvent) {
+    if (dispatchEvent && !e.isDefaultPrevented()) {
       this._dispatcher.trigger('input:' + dispatchEvent, e);
     }
   },

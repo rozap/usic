@@ -7,11 +7,10 @@
     <% state.model.forEach(function(song) { %>
       <li class="transcription">
         <h3>
-          <a href="#song/<%- song.get('id') %>"><%- song.get('name') %></a>
+          <a href="#song/<%- song.get('id') %>"><%- song.get('name') || t('untitled') %></a>
         </h3>
-        <span class="text-muted">
-          <%- t('last_updated') %>: <%- moment(song.get('updated_at')).fromNow() %>
-        </span>
+        <span class="text-muted"><%- t('by') %>: </span><%- t('a_user') %>
+        <span class="text-muted"><%- t('last_updated') %>: </span><%- moment(song.get('updated_at')).fromNow() %>
       </li>
     <% }); %>
 

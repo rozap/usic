@@ -1,21 +1,58 @@
-<h2 class="text-muted"><%- t('me') %></h2>
+<div class="me">
+  <h2 class="text-muted"><%- t('me') %></h2>
 
-<% if(state.model.get('user')) { %>
-  <h4>
-    <span class="text-muted"><%- t('email') %></span>
-    <%- state.model.get('user').email %>
-  </h4>
+  <% if(state.user) { %>
+    <div class="pure-g me-info pure-form">
+      <div class="pure-u-1-4">
+        <% if(state.isEditingDisplayName) { %>
+          <input
+            class="pure-u-1-1"
+            value="<%- state.user.get('display_name') %>"
+            name="display_name"/>
 
-  <h4>
-    <span class="text-muted"><%- t('joined') %></span>
-    <%- moment(state.model.get('user').inserted_at).fromNow() %>
-  </h4>
-  <h4>
-    <span class="text-muted"><%- t('logged_in') %></span>
-    <%- moment(state.model.get('.inserted_at')).fromNow() %>
-  </h4>
-<% } else { %>
-  <%= fragment('spinner') %>
-<% } %>
+        <% } else { %>
+          <h4>
+            <span class="text-muted"><%- t('display_name') %></span>
+            <a href="javascript:void(0)" class="edit-display-name">
+              <%- state.user.get('display_name') || t('none') %>
+              <i class="text-muted ion-edit"></i>
+            </a>
+          </h4>
+        <% } %>
+      </div>
 
-<div id="my-transcriptions"></div>
+      <div class="pure-u-1-4">
+         <% if(state.isEditingEmail) { %>
+          <input
+            class="pure-u-1-1"
+            value="<%- state.user.get('email') %>"
+            name="email"/>
+        <% } else { %>
+          <h4>
+            <span class="text-muted"><%- t('email') %></span>
+            <a href="javascript:void(0)" class="edit-email">
+              <%- state.user.get('email') %>
+              <i class="text-muted ion-edit"></i>
+            </a>
+          </h4>
+        <% } %>
+      </div>
+      <div class="pure-u-1-4">
+        <h4>
+          <span class="text-muted"><%- t('joined') %></span>
+          <%- moment(state.user.get('inserted_at')).fromNow() %>
+        </h4>
+      </div>
+      <div class="pure-u-1-4">
+        <h4>
+          <span class="text-muted"><%- t('logged_in') %></span>
+          <%- moment(state.session.get('.inserted_at')).fromNow() %>
+        </h4>
+      </div>
+    </div>
+  <% } else { %>
+    <%= fragment('spinner') %>
+  <% } %>
+
+  <div id="my-transcriptions"></div>
+</div>

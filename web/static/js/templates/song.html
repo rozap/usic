@@ -1,7 +1,7 @@
 <% if(state.state === 'error') { %>
   <h3>Failed to load that audio buffer! <%- JSON.stringify(state) %></h3>
 <% } else { %>
-  <h3 class="text-muted"><%- state.model.get('name') %></h3>
+  <div id="song-title"></div>
   <div class="interactive">
     <div id="view-wave"></div>
     <div id="view-regions"></div>

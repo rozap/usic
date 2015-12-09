@@ -128,6 +128,7 @@ module.exports = bb.View.extend({
     opts = opts || {};
     this.removeSubview(name);
     opts._parent = this;
+    opts.api = this.api;
     opts.dispatcher = this.dispatcher;
     var view = new cls(opts);
     this._subviews[name] = view;

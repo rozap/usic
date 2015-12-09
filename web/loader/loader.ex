@@ -65,7 +65,7 @@ defmodule Usic.Loader do
   defp get_metadata(id, song) do
     case get_metaserver().get(id) do
       {:ok, metadata} ->
-        name = metadata["title"]
+        name = Dict.get(metadata, "title", "untitled")
         song = %{song | name: name}
         Logger.info("Fetched metadata #{id} name: #{name}")
         Usic.Repo.update(song)

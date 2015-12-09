@@ -27,6 +27,9 @@ var terms = {
   'play_pause' : 'Play or pause audio',
   'd_play_pause' : 'Pauses the current audio track when it is playing. Plays the track when it is paused.',
 
+  'create_measure' : 'Create measure',
+  'd_create_measure': 'Create a beat measure. By default, regions that you create by clicking and dragging on the audio track will snap to these measures.',
+
   'create_beat' : 'Create beat',
   'd_create_beat': 'Create a beat marker. By default, regions that you create by clicking and dragging on the audio track will snap to these beats.',
 

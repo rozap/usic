@@ -31,7 +31,8 @@ defmodule Usic.PersistenceChannel do
 
   @updatable %{
     "song" => {Usic.Song, Usic.Resource},
-    "region" => {Usic.Region, Usic.Resource}
+    "region" => {Usic.Region, Usic.Resource},
+    "user" => {Usic.User, Usic.Resource.User}
   }
 
   @deletable %{

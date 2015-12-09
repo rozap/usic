@@ -15,11 +15,8 @@ module.exports = View.extend({
   },
 
   onAuth:function(session) {
-    console.log("ON AUTH", session)
     this.updateState({
       session: session
-    })
+    });
   }
-
-
 });

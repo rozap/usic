@@ -1,0 +1,16 @@
+<% if(state.isEditing) { %>
+  <form class="pure-form" onsubmit="return false;">
+    <fieldset>
+      <div class="pure-g">
+        <input class="pure-u-1-2" value="<%- state.model.get('name') %>" name="name"/>
+      </div>
+    </fieldset>
+  </form>
+<% } else { %>
+  <h3 class="text-muted">
+    <a href="javascript:void(0)" class="toggle-edit">
+      <%- state.model.get('name') %>
+      <i class="text-muted ion-edit"></i>
+    </a>
+  </h3>
+<% } %>

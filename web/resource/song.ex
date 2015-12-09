@@ -6,22 +6,19 @@ defmodule Usic.Resource.Song do
   @songtopic "create:song:success"
 
 
-  def begin_download({:ok, {song, socket}}) do
+  defp begin_download!({:ok, {song, socket}}) do
     Dispatcher.bind(song, socket)
     Loader.get_song(song)
   end
 
-  def begin_download({:error, _} = r), do: r
+  defp begin_download!({:error, _} = r), do: r
 
 
   def create(model, params, socket) do
     result = model
     |> Usic.Resource.create(params, socket)
 
-    begin_download(result)
-
+    begin_download!(result)
     result
   end
-
-
 end

@@ -72,7 +72,10 @@ module.exports = View.extend({
 
   onChanged: function(waveRegion) {
     var existing = this._findRegionView(waveRegion);
-    if (existing) return;
+    if (existing) {
+      existing.onSelect();
+      return;
+    }
 
     var model = new RegionModel({
       name: this._buildDefaultName(),

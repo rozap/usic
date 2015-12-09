@@ -90,12 +90,12 @@ module.exports = View.extend({
     this.model.set('loop', !this.model.get('loop'));
   },
 
-  onNudgeRight: function() {
+  onNudgeRight: function(e) {
     if (!this.isSelected()) return;
     this.model.shift(this._getNudgeDelta());
   },
 
-  onNudgeLeft: function() {
+  onNudgeLeft: function(e) {
     if (!this.isSelected()) return;
     this.model.shift(-1 * this._getNudgeDelta());
   },

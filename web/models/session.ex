@@ -38,7 +38,6 @@ defimpl Poison.Encoder, for: Usic.Session do
   def encode(session, _options) do
     session
     |> Map.take(@attributes)
-    |> Map.drop([:__meta__])
     |> Poison.encode!
   end
 end

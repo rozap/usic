@@ -7,6 +7,7 @@ var Wave = require('./wave');
 var View = require('./view');
 var Song = require('./models/song');
 var SongTemplate = require('./templates/song.html');
+var SongTitle = require('./song-title');
 var keyCodes = require('./keycodes');
 
 var ControlsView = require('./controls');
@@ -32,11 +33,18 @@ module.exports = View.extend({
   init: function(opts) {
     this.model = new Song({id: opts.id}, this._opts);
     this.listenToOnce(this.model, 'sync', this._loadSong);
+
+
     this.model.fetch();
   },
 
   _loadSong: function() {
     this.render();
+
+    this.addSubview('song-title', SongTitle, {
+      model:this.model
+    });
+
     this.model.resetHistory();
     var loc = this.model.get('location');
     var req = new XMLHttpRequest();

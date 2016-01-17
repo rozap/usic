@@ -35,7 +35,7 @@ module.exports = View.extend({
   },
 
   getWidth: function() {
-    return this._wavesurfer.getDuration() * this._wavesurfer.params.minPxPerSec;
+    return this.wv().getDuration() * this.wv().params.minPxPerSec;
   },
 
   panTo: function(p) {
@@ -43,7 +43,7 @@ module.exports = View.extend({
   },
 
   zoomTo: function(pps, _duration) {
-    this._wavesurfer.zoom(pps);
+    this.wv().zoom(pps);
   },
 
 

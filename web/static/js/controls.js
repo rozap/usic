@@ -95,9 +95,9 @@ var Controls = View.extend({
     this._changeRate(rate);
   },
 
-  _saveModel: _.debounce(function() {
+  _saveModel: _.throttle(function() {
     this.model.save()
-  }, 5000),
+  }, 1000),
 
   _changeRate: function(rate) {
     this.model.updateState({

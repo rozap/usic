@@ -1,4 +1,3 @@
-
 defmodule Extensions.JSON do
   alias Postgrex.TypeInfo
 

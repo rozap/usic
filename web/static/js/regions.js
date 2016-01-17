@@ -19,18 +19,21 @@ module.exports = View.extend({
   init: function(opts) {
     this._wavesurfer = opts.wavesurfer;
     this._bindEvents();
-    this.render();
     this.regions = new Regions([], {
       song: opts.model,
       api: opts.api,
       dispatcher: opts.dispatcher
     });
     this.listenToOnce(this.regions, 'sync', this.onRegionsSynced);
+    this.listenTo(this.regions, 'error', this.onRegionsError);
+    this.listenTo(this.regions, 'add', this.r);
+
     this.regions.fetch();
     this.addSubview('clicks', ClicksView, {
       model: this.model,
       wavesurfer: this._wavesurfer
     });
+    this.render();
   },
 
   _bindEvents: function() {
@@ -56,6 +59,20 @@ module.exports = View.extend({
     this.onChanged(r);
   },
 
+  onRegionsError: function(err) {
+    this.dispatcher.trigger('error:new', err);
+  },
+
+  _regionsSansViews: function() {
+    var truth = {};
+    (this.getSubview('regions') || []).forEach(function(regionView) {
+      truth[regionView.modelId()] = true;
+    });
+    return this.regions.filter(function(region) {
+      return !truth[region.get('id')];
+    });
+  },
+
   onRegionsSynced: function() {
     this.regions.each(function(model) {
       var waveRegion = this._wavesurfer.addRegion({
@@ -65,7 +82,6 @@ module.exports = View.extend({
       });
       model.addUnderlying(waveRegion);
 
-      this._append(model);
     }.bind(this));
     this.render();
   },
@@ -86,24 +102,7 @@ module.exports = View.extend({
       song: this.model
     });
     model.addUnderlying(waveRegion);
-
-    this._append(model).onSelect();
-    this.render();
-  },
-
-  _append:function(model) {
-    var view = this.appendView('regions', RegionView, {
-      model: model,
-      song: this.model,
-      api: this.api,
-      dispatcher: this.dispatcher,
-      pxPerSec: this._getPxPerSec(),
-      duration: this._getDuration(),
-    });
-
-    this.listenTo(view, 'selected', this.onDeselect);
-    this.listenTo(view, 'cloned', this.onCloned);
-    return view;
+    this.regions.add(model);
   },
 
   _buildDefaultName: function() {
@@ -142,6 +141,20 @@ module.exports = View.extend({
   },
 
   onRendered: function() {
+    this._regionsSansViews().map(function(model) {
+      var view = this.appendView('regions', RegionView, {
+        model: model,
+        song: this.model,
+        api: this.api,
+        dispatcher: this.dispatcher,
+        pxPerSec: this._getPxPerSec(),
+        duration: this._getDuration(),
+      });
+
+      this.listenTo(view, 'selected', this.onDeselect);
+      this.listenTo(view, 'cloned', this.onCloned);
+    }.bind(this));
+
     var $list = this._getListEl();
     this._regionViews().forEach(function(view) {
       view.undelegateEvents();

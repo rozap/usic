@@ -2,7 +2,6 @@ defmodule Usic.Model.Dispatcher do
   use GenServer
   require Logger
   import Phoenix.Channel
-  import Phoenix.Socket
 
   def start_link() do
     GenServer.start_link(__MODULE__, [], [name: __MODULE__])
@@ -31,22 +30,40 @@ defmodule Usic.Model.Dispatcher do
     {:reply, :ok, state}
   end
 
-  def handle_cast({:after_insert, cset}, state) do
+  def handle_cast({:after_insert, _cset}, state) do
     {:noreply, state}
   end
 
   def handle_cast({:after_update, cset}, state) do
     mkey = model_key(cset.model)
+
     case get_in(state, [mkey, cset.model.id]) do
       nil -> :ok
       sockets ->
         Enum.each(sockets, fn socket ->
-          push socket, "update:#{mkey}", cset.model
+          Logger.info("Dispatch change for #{inspect cset.model} #{inspect cset.model.id}")
+          dispatch_new!(mkey, socket, cset.model, cset.model.id)
         end)
     end
     {:noreply, state}
   end
 
+  defp dispatch_new!(mkey, socket, model, id) do
+    read = Usic.Resource.Read.read(
+      model,
+      %{"id" => id},
+      socket
+    )
+
+    case read do
+    {:ok, {resource, _}} ->
+      push socket, "update:#{mkey}", resource
+    {:error, {reason, _}} ->
+      Logger.error("Error while reading for dispatch #{inspect reason}")
+  end
+
+
+  end
 
   def after_insert(cset) do
     GenServer.cast(__MODULE__, {:after_insert, cset})

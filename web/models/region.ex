@@ -12,8 +12,23 @@ defmodule Usic.Region do
     timestamps
   end
 
-  def changeset(region, params \\ :empty, opts \\ []) do
+
+  def check_user_perms(song_id, session) do
+    # IO.inspect Usic.Repo.get(region.song)
+    case Usic.Repo.get(Song, song_id) do
+      nil -> []
+      song -> Song.check_user_perms(song, session)
+    end
+  end
+
+  defp validate_user(cset, song_id, session) do
+    check_user_perms(song_id, session)
+    |> Enum.reduce(cset, fn {key, err}, acc -> add_error(cset, key, err) end)
+  end
+
+  def changeset(region, params \\ :empty, session: session) do
     cast(region, params, ~w(song_id name start end loop))
+    |> validate_user(params["song_id"], session)
   end
 end
 

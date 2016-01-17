@@ -4,6 +4,7 @@ defmodule Usic.PersistenceChannel do
   require Logger
   alias Usic.Session
   alias Usic.Repo
+  require Usic.Song
 
   @create "create"
   @update "update"
@@ -12,39 +13,40 @@ defmodule Usic.PersistenceChannel do
   @list   "list"
 
   @creatable %{
-    "user" => {Usic.User, Usic.Resource},
-    "song" => {Usic.Song, Usic.Resource.Song},
-    "session" => {Usic.Session, Usic.Resource.Session},
-    "region" => {Usic.Region, Usic.Resource}
+    "user" => %Usic.User{},
+    "song" => %Usic.Song{},
+    "session" => %Usic.Session{},
+    "region" => %Usic.Region{}
   }
 
   @listable %{
-    "song" => {Usic.Song, Usic.Resource},
-    "region" => {Usic.Region, Usic.Resource}
+    "song" => %Usic.Song{},
+    "region" => %Usic.Region{}
   }
 
   @readable %{
-    "session" => {Usic.Session, Usic.Resource.Session},
-    "song" => {Usic.Song, Usic.Resource},
-    "region" => {Usic.Region, Usic.Resource}
+    "session" => %Usic.Session{},
+    "song" => %Usic.Song{},
+    "region" => %Usic.Region{}
   }
 
   @updatable %{
-    "song" => {Usic.Song, Usic.Resource},
-    "region" => {Usic.Region, Usic.Resource},
-    "user" => {Usic.User, Usic.Resource.User}
+    "song" => %Usic.Song{},
+    "region" => %Usic.Region{},
+    "user" => %Usic.User{}
   }
 
   @deletable %{
-    "region" => {Usic.Region, Usic.Resource}
+    "region" => %Usic.Region{},
+    "session" => %Usic.Session{}
   }
 
   @operations [
-    {@create, quote do: @creatable},
-    {@list, quote do: @listable},
-    {@read, quote do: @readable},
-    {@update, quote do: @updatable},
-    {@delete, quote do: @deletable}
+    {@create, Usic.Resource.Create, quote do: @creatable},
+    {@list, Usic.Resource.List,   quote do: @listable},
+    {@read, Usic.Resource.Read,   quote do: @readable},
+    {@update, Usic.Resource.Update, quote do: @updatable},
+    {@delete, Usic.Resource.Delete, quote do: @deletable}
   ]
 
 
@@ -63,13 +65,10 @@ defmodule Usic.PersistenceChannel do
     end
   end
 
-
-
   def join(invalid, _, _) do
     Logger.warn("Invalid session join #{invalid}")
     {:error, %{error: :invalid_handshake}}
   end
-
 
   defp r({:error, {reason, socket}}) do
     {:reply, {:error, reason}, socket}
@@ -79,14 +78,14 @@ defmodule Usic.PersistenceChannel do
     {:reply, {:ok, resp}, socket}
   end
 
-  Enum.each(@operations, fn {verb, noun} ->
+  Enum.each(@operations, fn {verb, protocol, noun} ->
     def handle_in(unquote(verb) <> ":" <> name, payload, socket) do
       case Dict.get(unquote(noun), name) do
         nil ->
           Logger.error("Invalid resource #{unquote(verb) <> ":" <> name} #{inspect unquote(noun)}")
           r({:error, {%{message: "invalid_resource"}, socket}})
-        {model, res} ->
-          r(apply(res, String.to_atom(unquote(verb)), [model, payload, socket]))
+        model ->
+          r(apply(unquote(protocol), String.to_atom(unquote(verb)), [model, payload, socket]))
       end
     end
   end)

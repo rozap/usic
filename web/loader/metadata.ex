@@ -2,9 +2,6 @@ defmodule Usic.Loader.Metadata do
   require HTTPoison.Base
   use HTTPoison.Base
 
-  @streams "url_encoded_fmt_stream_map"
-  @adaptive "adaptive_fmts"
-
   @meta ~w(thumbnail_url title keywords)
 
   def process_url(id) do
@@ -13,7 +10,7 @@ defmodule Usic.Loader.Metadata do
 
 
   def process_response_body(body) do
-    d = body
+    body
     |> URI.decode_query
     |> Dict.take(@meta)
   end

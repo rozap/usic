@@ -32,6 +32,36 @@ defmodule Usic.ApiSessionTest do
     end
   end
 
+  test "can delete session" do
+    socket = make_socket
+
+    push(socket, "create:user", %{
+      "email" => "sessiontest@bar.com", "password"=> "blahblah"
+    })
+    receive do
+      %{payload: p} -> assert p.email == "sessiontest@bar.com"
+    end
+
+    push(socket, "create:session", %{
+      "email" => "sessiontest@bar.com", "password"=> "blahblah"
+    })
+    session_id = receive do
+      %{payload: p} -> p.id
+    end
+
+    assert Usic.Repo.get(Usic.Session, session_id) != nil
+    push(socket, "delete:session", %{})
+    assert Usic.Repo.get(Usic.Session, session_id) == nil
+  end
+
+  test "cannot delete a session when logged out" do
+    socket = make_socket
+
+    ref = push(socket, "delete:session", %{})
+    assert_reply ref, :error, %{}
+  end
+
+
   test "cannot create session with bad credentials" do
     socket = make_socket
 

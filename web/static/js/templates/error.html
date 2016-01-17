@@ -1,18 +1,26 @@
 <% if(state.hasError) { %>
   <% if(state.dismissed) { %>
-    <h6 title="<%- t(state.message) %>">
+    <h6 title="<%- t(state.error) %>">
       <i class="ion-alert-circled"/>
     </h6>
   <% } else { %>
-    <h4>
+    <h5>
       <i class="ion-alert-circled"/>
-      <%- t(state.message) %>
+
+      <% if(_.isString(state.error)) { %>
+        <%- t(state.error) %>
+      <% } else { %>
+        <% _.each(state.error, function(reason, key) { %>
+          <%- t(key) %>: <span><%- t(reason) %></span>
+        <% }) %>
+      <% } %>
+
 
       <% if(!state.fatal) { %>
-        <a href="javascript:void(0)" class="text-muted minimize-error">
+        <a href="javascript:void(0)" class="text-muted minimize-error border-left">
           <%- t('minimize_error') %>
         </a>
       <% } %>
-    </h4>
+    </h5>
   <% } %>
 <% } %>

@@ -31,18 +31,23 @@ module.exports = View.extend({
   },
 
   init: function(opts) {
-    this.model = new Song({id: opts.id}, this._opts);
+    this.model = new Song({
+      id: opts.id
+    }, this._opts);
     this.listenToOnce(this.model, 'sync', this._loadSong);
-
-
+    this.listenTo(this.model, 'error', this._onError);
     this.model.fetch();
+  },
+
+  _onError: function(err) {
+    this.dispatcher.trigger('error:new', err);
   },
 
   _loadSong: function() {
     this.render();
 
     this.addSubview('song-title', SongTitle, {
-      model:this.model
+      model: this.model
     });
 
     this.model.resetHistory();
@@ -140,15 +145,19 @@ module.exports = View.extend({
   },
 
   zoomOut: function() {
-    var pps = this.pxPerSec() - this._zoomDelta;
-    if (pps < this._minPps) return;
     var duration = this._audio.wavesurfer.getDuration();
+    if (duration <= 0) return;
+
+    var pps = this.pxPerSec() - this._zoomDelta;
+    var minPps = this.$el.width() / duration;
+    if (pps < minPps) pps = minPps;
+
     this.trigger('zoom', pps, duration);
     this._audio.wavesurfer.fireEvent('zoom');
   },
 
   destroy: function() {
-    if(this._audio.wavesurfer) this._audio.wavesurfer.destroy();
+    if (this._audio.wavesurfer) this._audio.wavesurfer.destroy();
     this._destroy();
   }
 });

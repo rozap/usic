@@ -11,9 +11,9 @@ module.exports = View.extend({
   el: '#main',
   template: _.template(MeTemplate),
 
-  renderTo:['session', 'user'],
+  renderTo: ['session', 'user'],
 
-  events : {
+  events: {
     'click .edit-display-name': 'onEditDisplayName',
     'click .edit-email': 'onEditEmail'
   },
@@ -24,12 +24,17 @@ module.exports = View.extend({
 
     this.listenTo(this.session, 'sync change', this.r);
     this.listenTo(this.session, 'sync', this.onSessionSync);
+    this.listenTo(this.session, 'error', this.onSessionErr);
     this.listenTo(this.user, 'sync', this.onUserSync);
     this.listenTo(this.dispatcher, 'input:onConfirm', this.onConfirm);
 
     this.session.fetch();
     this.render();
 
+  },
+
+  onSessionErr: function() {
+    window.location.hash = '#';
   },
 
   onSessionSync: function() {
@@ -48,11 +53,11 @@ module.exports = View.extend({
     this.addSubview('transcriptions', Transcriptions, opts);
   },
 
-  onUserSync:function() {
+  onUserSync: function() {
     this.setState({});
   },
 
-  _edit:function(name) {
+  _edit: function(name) {
     name = 'isEditing' + name;
     var value = !this._state[name];
     var state = {};
@@ -60,22 +65,22 @@ module.exports = View.extend({
     this.updateState(state);
   },
 
-  onEditDisplayName:function() {
+  onEditDisplayName: function() {
     this._edit('DisplayName');
   },
 
-  onEditEmail:function() {
+  onEditEmail: function() {
     this._edit('Email');
   },
 
-  isEditing:function() {
+  isEditing: function() {
     return this._state.isEditingDisplayName ||
       this._state.isEditingEmail;
   },
 
-  onConfirm:function() {
-    if(!this.user.get('id')) return;
-    if(!this.isEditing()) return;
+  onConfirm: function() {
+    if (!this.user.get('id')) return;
+    if (!this.isEditing()) return;
     this.user.set(this.serializeForm('.pure-form')).save();
   }
 

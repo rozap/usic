@@ -30,5 +30,4 @@ module.exports = View.extend({
   onPrevious:function() {
     this.model.previous();
   }
-
 });

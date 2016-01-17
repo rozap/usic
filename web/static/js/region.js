@@ -23,6 +23,7 @@ module.exports = View.extend({
     this._state.duration = opts.duration;
     this._state.editing = false;
 
+    this.listenTo(this.dispatcher, 'input:onConfirm', this.onDoneEditing);
     this.listenTo(this.dispatcher, 'input:onEnableSnapping',
       this.model.enableSnapping.bind(this.model)
     );
@@ -33,6 +34,8 @@ module.exports = View.extend({
     this.listenTo(this.dispatcher, 'input:onNudgeRight', this.onNudgeRight);
 
     this.listenTo(this._parent, 'zoom', this.onZoom);
+
+
     this.listenTo(this.model, 'change', this.r);
     this.listenTo(this.model, 'destroy', this.destroy);
   },
@@ -63,16 +66,19 @@ module.exports = View.extend({
     this.updateState({
       editing: true
     });
+    this.dispatcher.trigger('input:unbind');
   },
 
-  onEditKey: function(e) {
-    if (e.keyCode === 13 && !e.shiftKey) {
-      this.model.set('name', this.el.querySelector('textarea').value);
+  onDoneEditing: function(e) {
+    if (this._state.editing && !e.shiftKey) {
+      this.model
+        .set('name', this.el.querySelector('textarea').value)
+        .save();
       this.updateState({
         editing: false
       });
+      this.dispatcher.trigger('input:bind');
     }
-    e.preventDefault();
   },
 
   onRemove: function() {
@@ -100,7 +106,7 @@ module.exports = View.extend({
     this.model.shift(-1 * this._getNudgeDelta());
   },
 
-  onCloneRight:function() {
+  onCloneRight: function() {
     this.trigger('cloned', this);
   },
 
@@ -126,6 +132,10 @@ module.exports = View.extend({
 
   waveId: function() {
     return this.model.underlyingId();
+  },
+
+  modelId:function() {
+    return this.model.get('id');
   },
 
   getBounds: function() {

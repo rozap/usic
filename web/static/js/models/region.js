@@ -13,11 +13,11 @@ module.exports = Model.extend({
     this._isSnapping = true;
     this._song = opts.song;
     this.listenTo(this, 'change', this._updateUnderlying);
-    this.listenTo(this, saveEvents, _.debounce(this._saveChanges, 5000).bind(this));
+    this.listenTo(this, saveEvents, _.throttle(this._saveChanges, 1000).bind(this));
   },
 
-  addUnderlying:function(waveRegion) {
-    if(this._underlying) throw new Error('only one underlying region');
+  addUnderlying: function(waveRegion) {
+    if (this._underlying) throw new Error('only one underlying region');
 
     this._underlying = waveRegion;
     this._underlying.on('update', this.underlyingChange.bind(this));
@@ -32,7 +32,7 @@ module.exports = Model.extend({
     this._isSnapping = false;
   },
 
-  _saveChanges:function() {
+  _saveChanges: function() {
     this.save();
   },
 

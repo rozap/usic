@@ -2,6 +2,7 @@ defmodule Usic.ApiUserTest do
   use Phoenix.ChannelTest
   use ExUnit.Case
   alias Usic.User
+  import Usic.TestHelpers
   @endpoint Usic.Endpoint
 
   setup do
@@ -41,7 +42,7 @@ defmodule Usic.ApiUserTest do
     })
 
     receive do
-      %{payload: s} -> :ok
+      %{payload: _} -> :ok
     end
 
     push(socket, "update:user", %{
@@ -49,7 +50,7 @@ defmodule Usic.ApiUserTest do
     })
 
     receive do
-      %{payload: p} ->
+      %{payload: _} ->
         user = Usic.Repo.get!(User, user_id)
         assert user.email == "wow@bar.com"
         assert user.display_name == "new name"
@@ -69,8 +70,8 @@ defmodule Usic.ApiUserTest do
     push(socket, "create:user", %{
       "email" => "bar@bar.com", "password" => "barbarbar"
     })
-    bar_id = receive do
-      %{payload: p} -> p.id
+    receive do
+      %{payload: _} -> :ok
     end
 
 
@@ -79,7 +80,7 @@ defmodule Usic.ApiUserTest do
     })
 
     receive do
-      %{payload: s} -> :ok
+      %{payload: _} -> :ok
     end
 
     ref = push(socket, "update:user", %{
@@ -99,7 +100,10 @@ defmodule Usic.ApiUserTest do
     })
     receive do
       %{payload: p} ->
-        assert p == %{password: "should be at least 6 characters"}
+        e = p
+        |> Poison.encode!
+        |> Poison.decode!
+        assert e ==  %{"password" => ["should be at least 6 characters"]}
     end
   end
 
@@ -117,7 +121,7 @@ defmodule Usic.ApiUserTest do
     })
     receive do
       %{payload: p} ->
-        assert p == %{email: "has already been taken"}
+        assert js(p) == %{"email" => ["has already been taken"]}
     end
 
   end

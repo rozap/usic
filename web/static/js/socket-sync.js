@@ -11,17 +11,17 @@ module.exports = {
     this._api.push(name, this.payloadFor(method))
       .receive("ok", function(payload) {
         payload = this.parse(payload);
+        console.log("sync success", payload)
         this.set(payload)
         this.trigger('sync', this);
         this._onSync();
         this._dispatcher.trigger(name + ':success', this);
-        console.log("sync success", payload)
       }.bind(this))
       .receive("error", function(payload) {
+        console.log("sync error", payload)
         this.trigger('error', payload);
         this._onError();
         this._dispatcher.trigger(name + ':error', payload, this);
-        console.log("sync error", payload)
       }.bind(this));
     return this;
   },

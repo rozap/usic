@@ -21,35 +21,36 @@ defmodule Usic.ApiSongTest do
     socket
   end
 
-  defp make_authed_songs() do
+  defp make_authed_songs(n \\ 0) do
     socket = make_socket
     ref = push(socket, "create:user", %{
-      "email" => "sessiontest@bar.com", "password"=> "blahblah"
+      "email" => "sessiontest#{n}@bar.com", "password"=> "blahblah"
     })
     user = receive do
       %Reply{payload: p, ref: ^ref} ->
-        assert p.email == "sessiontest@bar.com"
+        assert p.email == "sessiontest#{n}@bar.com"
         p
     end
 
     ref = push(socket, "create:session", %{
-      "email" => "sessiontest@bar.com", "password"=> "blahblah"
+      "email" => "sessiontest#{n}@bar.com", "password"=> "blahblah"
     })
     receive do
       %Reply{payload: p, ref: ^ref} -> assert p.token != nil
     end
 
-    Enum.each(1..8, fn i ->
+    songs = Enum.map(1..8, fn i ->
       ref = push(socket, "create:song", %{
         "url" => @url, "name" => "something #{i}"
       })
       receive do
         %Reply{payload: p, ref: ^ref} ->
           assert p.url == @url
+          p
       end
     end)
 
-    {socket, user}
+    {socket, user, songs}
   end
 
   test "can create an anonymous song" do
@@ -66,7 +67,7 @@ defmodule Usic.ApiSongTest do
 
   test "can get a list of songs" do
     socket = make_socket
-    Enum.each(1..40, fn i ->
+    Enum.each(1..20, fn _ ->
       ref = push(socket, "create:song", %{
         "url" => @url
       })
@@ -81,19 +82,21 @@ defmodule Usic.ApiSongTest do
     receive do
       %Reply{payload: p, ref: ^ref} ->
         assert length(p["items"]) == 16
-        assert p["count"] == 40
+        assert p["count"] == 20
     end
   end
 
 
   test "can page a list of songs" do
     socket = make_socket
-    Enum.each(1..8, fn i ->
+    Enum.each(1..8, fn _ ->
       p = %{
-        "url" => @url, "name" => "something #{i}"
+        "url" => @url
       }
-      ref = push(socket, "create:song", p)
-      assert_reply ref, :ok, p
+      push(socket, "create:song", p)
+      receive do
+        %Reply{payload: %Song{}} -> :ok
+      end
     end)
 
     ref = push(socket, "list:song", %{
@@ -109,27 +112,29 @@ defmodule Usic.ApiSongTest do
 
 
   test "logged in user should have songs made by them" do
-    {socket, user} = make_authed_songs
+    {socket, user, _} = make_authed_songs
 
     ref = push(socket, "list:song", %{})
 
     receive do
       %Reply{ref: ^ref, payload: %{"items" => [item | _]}} ->
-        assert item.user_id == user.id
+        assert item.user.id == user.id
     end
   end
 
   test "can select by user" do
     anon = make_socket
     Enum.each(1..8, fn _ ->
-      ref = push(anon, "create:song", %{
+      push(anon, "create:song", %{
         "url" => @url
       })
-      assert_reply ref, :ok, %{}
+      receive do
+        _ -> :ok
+      end
     end)
 
 
-    {socket, user} = make_authed_songs
+    {socket, user, _} = make_authed_songs
     ref = push(socket, "list:song", %{
       "where" => %{
         "user_id" => user.id
@@ -189,9 +194,60 @@ defmodule Usic.ApiSongTest do
     })
 
     receive do
-      %Reply{ref: ^ref, payload: p} ->
+      %Reply{ref: ^ref, payload: _} ->
         assert Usic.Repo.get!(Song, song.id).state.rate == 0.8
     end
   end
+
+  test "cant update another user's song" do
+    {_, _, [song0 | _]} = make_authed_songs(0)
+    {socket1, _, _} = make_authed_songs(1)
+
+    state = song0.state
+    |> Poison.encode!
+    |> Poison.decode!
+    |> Dict.put("rate", 0.8)
+
+    ref = push(socket1, "update:song", %{
+      "id" => song0.id,
+      "state" => state
+    })
+
+    receive do
+      %Reply{ref: ^ref, payload: p} ->
+        js = p
+        |> Poison.encode!
+        |> Poison.decode!
+
+        assert js == %{"user_id" => ["song_update_not_allowed"]}
+    end
+  end
+
+  test "cant update users song if anon" do
+    {_, _, [song | _]} = make_authed_songs(0)
+
+    anon_sock = make_socket
+
+    state = song.state
+    |> Poison.encode!
+    |> Poison.decode!
+    |> Dict.put("rate", 0.8)
+
+    ref = push(anon_sock, "update:song", %{
+      "url" => @url,
+      "id" => song.id,
+      "state" => state
+    })
+
+    receive do
+      %Reply{ref: ^ref, payload: p} ->
+        js = p
+        |> Poison.encode!
+        |> Poison.decode!
+
+        assert js == %{"user_id" => ["song_update_not_allowed"]}
+    end
+  end
+
 
 end

@@ -22,6 +22,10 @@ var terms = {
   'my_transcriptions': 'my transcriptions',
   'all_transcriptions': 'all transcriptions',
   'no_transcriptions': 'no transcriptions, yet.',
+  'logged_in': 'logged in',
+  'display_name': 'display name',
+  'user_id': 'User',
+  'song_update_not_allowed': 'You can change this, but since it is not your song, your changes won\'t be saved',
 
 
   'play_pause' : 'Play or pause audio',

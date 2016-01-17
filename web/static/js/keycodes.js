@@ -3,7 +3,8 @@ module.exports = {
     name: 'enter',
     code: 13,
     type: 'keyup',
-    t: 'confirm'
+    t: 'confirm',
+    important: true
   },
   'onTogglePlay': {
     name: 'space',

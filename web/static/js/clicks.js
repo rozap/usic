@@ -12,8 +12,6 @@ module.exports = View.extend({
   renderTo: ['model'],
 
   events: {
-    // 'mousedown': 'onSelectStart',
-    // 'mouseup': 'onSelectEnd',
     'mousedown .draggable': 'onDragStart',
     'mouseup .draggable': 'onDragEnd',
     'mousemove': 'onMouseMove',
@@ -27,7 +25,6 @@ module.exports = View.extend({
     this.render();
     this.listenTo(this.dispatcher, 'input:onBeatCreated', this.onBeatCreated);
     this.listenTo(this.dispatcher, 'input:onMeasureCreated', this.onMeasureCreated);
-
   },
 
   getState: function() {
@@ -37,7 +34,7 @@ module.exports = View.extend({
     };
   },
 
-  save: _.debounce(function() {
+  save: _.throttle(function() {
     if (this._dragging) return;
     this.model.save();
   }, 1000),

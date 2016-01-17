@@ -13,7 +13,7 @@ module.exports = View.extend({
     'keyup': 'onKeyUp'
   },
 
-  init:function(opts){
+  init: function(opts) {
     this.model = new Session({}, opts);
     this.listenTo(this.model, 'sync', this.onSuccess);
     this.listenTo(this.model, 'error', this.onError);
@@ -25,15 +25,15 @@ module.exports = View.extend({
     this.model.set(this.serializeForm()).save();
   },
 
-  onSuccess:function() {
+  onSuccess: function() {
     this.model.persistLocally();
 
     this.setState({
-      success:true
+      success: true
     });
   },
 
-  onError:function(error) {
+  onError: function(error) {
     this.setState({
       error: error
     });

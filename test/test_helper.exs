@@ -13,12 +13,18 @@ defmodule Usic.TestHelpers do
       |> File.rm!
     end)
   end
+
+  def js(phx) do
+    phx
+    |> Poison.encode!
+    |> Poison.decode!
+  end
 end
 
 Code.load_file("dry_executor.exs", "./test/helpers")
 Code.load_file("dry_metaserver.exs", "./test/helpers")
 
-ExUnit.start
+ExUnit.start(timeout: 5000)
 
 Mix.Task.run "ecto.create", ["--quiet"]
 Mix.Task.run "ecto.migrate", ["--quiet"]

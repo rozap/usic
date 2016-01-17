@@ -106,6 +106,7 @@ def deploy(version):
 
     res = migrate(version)
 
+    print "You said", res
     if res == 'yes':
         upgrade(version)
     else:

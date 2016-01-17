@@ -123,6 +123,7 @@ defmodule Usic.Loader do
           get_metadata(id, song)
           |> download_song
         end)
+        {:ok, song}
       err -> put_err(err, song)
     end
   end

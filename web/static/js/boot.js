@@ -50,11 +50,13 @@ socket.onOpen(function() {
   console.log("Joining..");
   var token = getSessionToken();
   var api = socket.channel(token, {});
+
   opts.api = api;
+  router.api = api;
 
   opts.api.onMessage = function(event, payload) {
     dispatcher.trigger(event, payload);
-  }
+  };
 
   new ErrorView(opts);
   new LoaderView(opts);
@@ -65,8 +67,8 @@ socket.onOpen(function() {
       router.start();
 
       if(hasSession(token)) {
-        var session = new Session({}, opts);
-        session.fetch();
+        api.session = new Session({}, opts);
+        api.session.fetch();
       }
 
     })

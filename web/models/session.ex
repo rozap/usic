@@ -9,7 +9,7 @@ defmodule Usic.Session do
   end
 
 
-  def changeset(session, params \\ :empty, opts \\ []) do
+  def changeset(session, params \\ :empty, _opts \\ []) do
     params = Dict.put(params, "token", UUID.uuid4)
     email = Dict.get(params, "email", "")
     cset = cast(session, params, ~w(token))

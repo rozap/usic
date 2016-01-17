@@ -12,18 +12,32 @@ module.exports = View.extend({
   },
 
   init: function(opts) {
+    window.thing = this;
     this.listenTo(opts.dispatcher, 'error:new', this.onError);
     this.listenTo(opts.dispatcher, 'error:dismiss', this.onDismissError);
   },
 
-  onError: function(message, opts) {
+  onError: function(err, opts) {
+    console.warn('got an error', err);
     //only show the first one, preventing cascading weirdness
-    if(this.getState().hasError) return;
+    if(this.getState().hasError) return this.bounce();
     this.setState(_.extend({}, opts, {
       hasError: true,
-      message: message,
+      error: err,
       dismissed: false
     }));
+  },
+
+  bounce:function( ){
+    this.$el.animate({
+      'padding-left': '0em'
+    }, 100, this.onRendered.bind(this));
+  },
+
+  onRendered:function( ){
+    this.$el.animate({
+      'padding-left': '1em'
+    }, 300);
   },
 
   onDismissError:function() {

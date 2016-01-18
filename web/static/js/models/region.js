@@ -13,7 +13,7 @@ module.exports = Model.extend({
     this._isSnapping = true;
     this._song = opts.song;
     this.listenTo(this, 'change', this._updateUnderlying);
-    this.listenTo(this, saveEvents, _.throttle(this._saveChanges, 1000).bind(this));
+    this.listenTo(this, saveEvents, _.debounce(this._saveChanges, 1000).bind(this));
   },
 
   addUnderlying: function(waveRegion) {
@@ -22,6 +22,7 @@ module.exports = Model.extend({
     this._underlying = waveRegion;
     this._underlying.on('update', this.underlyingChange.bind(this));
     this.underlyingChange();
+    return this;
   },
 
   enableSnapping: function() {
@@ -68,6 +69,7 @@ module.exports = Model.extend({
   },
 
   _updateUnderlying: function(bounds) {
+    if(!this._underlying) return;
     this._underlying.update(bounds, true);
     this._underlying.loop = this.get('loop');
   },

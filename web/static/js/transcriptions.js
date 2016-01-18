@@ -17,7 +17,7 @@ module.exports = View.extend({
 
   init: function(opts) {
     this._state.title = opts.title || 'all_transcriptions';
-    this.model = new Songs([], opts);
+    this.model = new Songs([], _.pick(opts, 'api', 'dispatcher'));
     this.listenTo(this.model, 'change sync', this.r);
     this.model.fetch();
     this.render();

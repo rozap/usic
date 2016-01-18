@@ -8,7 +8,6 @@ function KeyBindings(dispatcher) {
 
   dispatcher.on('input:unbind', this._pause.bind(this));
   dispatcher.on('input:bind', this._resume.bind(this));
-
 }
 
 KeyBindings.prototype = {

@@ -33,8 +33,6 @@ var Controls = View.extend({
     this.listenTo(this.dispatcher, 'input:onTogglePlay', this.onTogglePlay);
     this.listenTo(this.dispatcher, 'input:onSkipBackward', this.onSkipBackward);
     this.listenTo(this.dispatcher, 'input:onSkipForward', this.onSkipForward);
-    this.listenTo(this.dispatcher, 'input:onUndo', this.onUndo);
-    this.listenTo(this.dispatcher, 'input:onRedo', this.onRedo);
 
     this.listenTo(this.model, 'change:state', this.r);
 
@@ -95,7 +93,7 @@ var Controls = View.extend({
     this._changeRate(rate);
   },
 
-  _saveModel: _.throttle(function() {
+  _saveModel: _.debounce(function() {
     this.model.save()
   }, 1000),
 
@@ -148,14 +146,6 @@ var Controls = View.extend({
     });
     this._saveModel();
     this._audio.wavesurfer.params.follow = this.model.get('state').autoCenter;
-  },
-
-  onUndo: function() {
-    this.model.undo();
-  },
-
-  onRedo: function() {
-    this.model.redo();
   },
 
   onToggleHelp: function() {

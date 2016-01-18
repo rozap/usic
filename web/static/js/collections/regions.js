@@ -14,6 +14,7 @@ module.exports = Collection.extend({
     this._state.where = {
       song_id : opts.song.get('id')
     };
+    this.listenTo(this._dispatcher, 'history:create:region', this.add);
   },
 
   modelOpts:function(opts) {

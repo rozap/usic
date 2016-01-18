@@ -5,15 +5,23 @@
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1">
 
+    <meta
+      property="og:title"
+      content="μsic.space" />
+    <meta
+      property="og:description"
+      content="μsic is a tool for learning songs in the age of streaming media" />
+    <meta
+      property="og:image"
+      content="<%= static_path(@conn, "/images/icon.png") %>"/>
+
     <title>μsic</title>
     <link rel="stylesheet" href="<%= static_path(@conn, "/css/style.css") %>">
   </head>
 
   <body>
-
     <%= @inner %>
 
-    <!-- because npm is a pile of shit and won't install wavesurfer.js -->
     <script src="<%= static_path(@conn, "/js/soundtouch.js") %>"></script>
     <script src="<%= static_path(@conn, "/js/wavesurfer.js") %>"></script>
     <script src="<%= static_path(@conn, "/js/wavesurfer-regions.js") %>"></script>

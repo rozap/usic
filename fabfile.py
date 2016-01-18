@@ -21,6 +21,7 @@ archive_name = "usic.tar.gz"
 def check_deploy():
     local('mix clean')
     local('mix test')
+    local('mix ship')
 
 def make_dirs():
     sudo("mkdir -p {base_dir}".format(base_dir = base_dir))

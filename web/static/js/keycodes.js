@@ -63,18 +63,18 @@ module.exports = {
     code: 68,
     t: 'nudge_right'
   },
-  'onUndo': {
-    character: 'z',
-    type: 'keyup',
-    code: 90,
-    t: 'undo',
-    ctrlKey: true
-  },
-  'onRedo': {
-    character: 'y',
-    type: 'keyup',
-    code: 89,
-    t: 'redo',
-    ctrlKey: true
-  },
+  // 'onUndo': {
+  //   character: 'z',
+  //   type: 'keyup',
+  //   code: 90,
+  //   t: 'undo',
+  //   ctrlKey: true
+  // },
+  // 'onRedo': {
+  //   character: 'y',
+  //   type: 'keyup',
+  //   code: 89,
+  //   t: 'redo',
+  //   ctrlKey: true
+  // },
 };

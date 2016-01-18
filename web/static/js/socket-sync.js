@@ -6,19 +6,23 @@ module.exports = {
     if(_.isArray(model.models)) {
       method = 'list';
     }
+
     var name = method + ':' + resource;
-    console.log("API", name, this.payloadFor(method));
-    this._api.push(name, this.payloadFor(method))
+    var requestPayload = this.payloadFor(method);
+    this._dispatcher.trigger('history:' + name, this);
+
+    // console.log("API", name, this.payloadFor(method));
+    this._api.push(name, requestPayload)
       .receive("ok", function(payload) {
         payload = this.parse(payload);
-        console.log("sync success", payload)
-        this.set(payload)
+        // console.log("sync success", name, payload)
+        this.set(payload);
         this.trigger('sync', this);
         this._onSync();
         this._dispatcher.trigger(name + ':success', this);
       }.bind(this))
       .receive("error", function(payload) {
-        console.log("sync error", payload)
+        // console.log("sync error", name, payload)
         this.trigger('error', payload);
         this._onError();
         this._dispatcher.trigger(name + ':error', payload, this);
@@ -29,4 +33,4 @@ module.exports = {
   _onSync: function() {},
   _onError: function() {},
 
-}
+};

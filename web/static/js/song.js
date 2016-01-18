@@ -15,6 +15,8 @@ var WaveView = require('./wave');
 var RegionView = require('./regions');
 var ClicksView = require('./clicks');
 
+var History = require('./history');
+
 module.exports = View.extend({
   el: '#main',
   template: _.template(SongTemplate),
@@ -36,6 +38,7 @@ module.exports = View.extend({
     }, this._opts);
     this.listenToOnce(this.model, 'sync', this._loadSong);
     this.listenTo(this.model, 'error', this._onError);
+    this._history = new History(this.dispatcher);
     this.model.fetch();
   },
 
@@ -50,7 +53,6 @@ module.exports = View.extend({
       model: this.model
     });
 
-    this.model.resetHistory();
     var loc = this.model.get('location');
     var req = new XMLHttpRequest();
     req.open('GET', loc);
@@ -158,6 +160,7 @@ module.exports = View.extend({
 
   destroy: function() {
     if (this._audio.wavesurfer) this._audio.wavesurfer.destroy();
+    if(this._history) this._history.destroy();
     this._destroy();
   }
 });

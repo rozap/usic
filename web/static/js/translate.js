@@ -86,6 +86,10 @@ var terms = {
   'follow': 'Follow',
   'd_follow': 'Click the target button to make the waveform scroll along with the audio cursor.',
 
+  'del_beat': 'Delete Beat or Measure',
+  'd_del_beat': 'ctrl+click on a beat or measure to remove it',
+
+
   'shortcuts': 'Shortcuts',
   'help': 'Help',
   'hide_help': 'Close Help'

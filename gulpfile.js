@@ -30,7 +30,12 @@ var paths = {
     fonts: {
         src: './web/static/fonts/*',
         dest: './priv/static/fonts/',
+    },
+    images: {
+        src: './web/static/images/*',
+        dest: './priv/static/images/',
     }
+
 
 };
 
@@ -77,6 +82,11 @@ gulp.task('fonts', function() {
         .pipe(gulp.dest(paths.fonts.dest));
 });
 
+gulp.task('images', function() {
+    gulp.src(paths.images.src)
+        .pipe(gulp.dest(paths.images.dest));
+});
+
 
 gulp.task('rebuild', function() {
     gulp.watch(paths.js.app.watch, ['app']);
@@ -84,5 +94,6 @@ gulp.task('rebuild', function() {
 });
 
 
-gulp.task('watch', ['app', 'less', 'fonts', 'rebuild']);
-gulp.task('deploy', ['app', 'less', 'fonts']);
+
+gulp.task('watch', ['app', 'less', 'fonts', 'images', 'rebuild']);
+gulp.task('deploy', ['app', 'less', 'fonts', 'images']);

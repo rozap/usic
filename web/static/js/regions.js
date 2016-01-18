@@ -29,11 +29,11 @@ module.exports = View.extend({
     this.listenTo(this.regions, 'add', this.r);
 
     this.regions.fetch();
+    this.render();
     this.addSubview('clicks', ClicksView, {
       model: this.model,
       wavesurfer: this._wavesurfer
     });
-    this.render();
   },
 
   _bindEvents: function() {
@@ -101,8 +101,8 @@ module.exports = View.extend({
       dispatcher: this.dispatcher,
       song: this.model
     });
-    model.addUnderlying(waveRegion);
-    this.regions.add(model);
+    model.addUnderlying(waveRegion).save();
+    // this.regions.add(model);
   },
 
   _buildDefaultName: function() {

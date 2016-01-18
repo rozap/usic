@@ -15,7 +15,7 @@ module.exports = View.extend({
     'mousedown .draggable': 'onDragStart',
     'mouseup .draggable': 'onDragEnd',
     'mousemove': 'onMouseMove',
-    'click .draggable': 'onSelectDraggable'
+    'click .draggable': 'onDelete'
   },
 
   init: function(opts) {
@@ -34,7 +34,7 @@ module.exports = View.extend({
     };
   },
 
-  save: _.throttle(function() {
+  save: _.debounce(function() {
     if (this._dragging) return;
     this.model.save();
   }, 1000),
@@ -46,7 +46,6 @@ module.exports = View.extend({
       .set('state', state)
       .trigger('change');
     this.save();
-
   },
 
   onBeatCreated: function() {
@@ -66,6 +65,7 @@ module.exports = View.extend({
   },
 
   onDragStart: function(e) {
+    if(e.ctrlKey) return;
     var $t = $(e.currentTarget);
     this._dragging = {
       el: $t,
@@ -74,7 +74,8 @@ module.exports = View.extend({
     };
   },
 
-  onDragEnd: function() {
+  onDragEnd: function(e) {
+    if(e.ctrlKey) return;
     if(!this._dragging.el) return;
     var state = _.clone(this.model.get('state'));
     var offsetX = parseFloat(this._dragging.el.attr('x'));
@@ -87,29 +88,27 @@ module.exports = View.extend({
   },
 
   onMouseMove: function(e) {
+    if(e.ctrlKey) return;
+
     if (this._dragging) {
       var xPixels = e.offsetX;
       this._dragging.el.attr('x', xPixels);
       return;
     }
-    // var s = this._state.selection;
-    // if (s) {
-    //   this.updateState({
-    //     selection: {
-    //       from: Math.min(s.from, s.to),
-    //       to: Math.max(s.from, s.to)
-    //     }
-    //   });
-    //   return;
-    // }
   },
 
-  onSelectDraggable: function(e) {
+
+  onDelete: function(e) {
     if(!e.ctrlKey) return;
+
     var $t = $(e.currentTarget);
     var kind = $t.data('kind');
     var position = $t.data('position');
+
+    var state = _.clone(this.model.get('state'));
     delete state[kind][position];
+    state[kind] = _.compact(state[kind]);
+
     this.model
       .set('state', state)
       .trigger('change');

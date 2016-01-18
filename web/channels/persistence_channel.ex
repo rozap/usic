@@ -38,7 +38,8 @@ defmodule Usic.PersistenceChannel do
 
   @deletable %{
     "region" => %Usic.Region{},
-    "session" => %Usic.Session{}
+    "session" => %Usic.Session{},
+    "song" => %Usic.Song{}
   }
 
   @operations [

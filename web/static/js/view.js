@@ -45,7 +45,8 @@ module.exports = bb.View.extend({
     var s = {};
     if (this.renderTo) {
       this.renderTo.forEach(function(name) {
-        s[name] = this[name];
+        var thing = this[name];
+        s[name] = _.isFunction(thing) ? thing.bind(this) : thing;
       }.bind(this));
     }
     s.model = this.model;
@@ -136,8 +137,8 @@ module.exports = bb.View.extend({
     return view;
   },
 
-  removeSubview:function(name) {
-    if(_.isArray(this._subviews[name])) {
+  removeSubview: function(name) {
+    if (_.isArray(this._subviews[name])) {
       this._subviews.map(function(sv) {
         return sv.destroy();
       });

@@ -183,7 +183,8 @@ defmodule Usic.Resource.Helpers do
 
   def do_delete(instance, socket) do
     case Usic.Repo.delete(instance) do
-      {:ok, result} -> {:ok, {result, socket}}
+      {:ok, _} ->
+        {:ok, {%{delete: :ok}, socket}}
       {:error, reason} -> {:error, {reason, socket}}
     end
   end

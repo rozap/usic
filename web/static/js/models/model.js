@@ -14,7 +14,6 @@ module.exports = bb.Model.extend(_.extend({
 
   opts: function(opts) {
     if (opts) {
-      console.log("OPTS ARE NOW", opts);
       this._api = opts.api;
       this._dispatcher = opts.dispatcher;
       this._opts = opts;

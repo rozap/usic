@@ -24,6 +24,7 @@ var terms = {
   'no_transcriptions': 'no transcriptions, yet.',
   'logged_in': 'logged in',
   'display_name': 'display name',
+  'unknown_user': 'That user does not exist',
   'user_id': 'User',
   'song_update_not_allowed': 'You can change this, but since it is not your song, your changes won\'t be saved',
 
@@ -92,7 +93,8 @@ var terms = {
 
   'shortcuts': 'Shortcuts',
   'help': 'Help',
-  'hide_help': 'Close Help'
+  'hide_help': 'Close Help',
+
 
 };
 

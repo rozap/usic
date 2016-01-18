@@ -68,6 +68,7 @@ defmodule Usic.Song do
     field :location, :string
     field :state, SongState.Type, default: @wtf
     belongs_to :user, User
+    has_many :regions, Usic.Region, on_delete: :delete_all
     timestamps
   end
 

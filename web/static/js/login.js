@@ -15,6 +15,7 @@ module.exports = View.extend({
 
   init: function(opts) {
     this.model = new Session({}, opts);
+    this.api.session = this.model;
     this.listenTo(this.model, 'sync', this.onSuccess);
     this.listenTo(this.model, 'error', this.onError);
     this.listenTo(this.dispatcher, 'input:onConfirm', this.onLogin);

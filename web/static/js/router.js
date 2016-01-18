@@ -85,7 +85,6 @@ module.exports = bb.Router.extend({
   },
 
   transcriptions: function(page) {
-    console.log("route", "transcriptions");
     this.reset();
     this._main = new Transcriptions(this._opts());
   }

@@ -54,5 +54,19 @@ defmodule Usic.Resource.Song do
     end
   end
 
+  defimpl Usic.Resource.Delete, for: Song do
+    def delete(_, params, socket) do
+      case socket.assigns[:session] do
+        nil -> {:error, {%{"session" => "song_update_not_allowed"}}}
+        session ->
+          song = Usic.Repo.get(Song, params["id"])
+          case Song.check_user_perms(song, session) do
+            [] -> Helpers.do_delete(song, socket)
+            reason -> {:error, {reason, socket}}
+          end
+      end
+    end
+  end
+
 
 end

@@ -249,5 +249,32 @@ defmodule Usic.ApiSongTest do
     end
   end
 
+  test "can delete a song " do
+    {socket, _, [song | _]} = make_authed_songs(0)
+
+    ref = push(socket, "create:region", %{
+      "song_id" => song.id,
+      "name" => "foobar",
+      "start" => 23.4,
+      "end" => 42.4,
+      "loop" => true
+    })
+
+    receive do
+      %Reply{ref: ^ref, payload: p} -> :ok
+    end
+
+    ref = push(socket, "delete:song", %{
+      "id" => song.id
+    })
+
+    receive do
+      %Reply{ref: ^ref, payload: p} -> :ok
+    end
+
+    song = Usic.Repo.get(Song, song.id)
+    IO.inspect song
+
+  end
 
 end

@@ -16,6 +16,16 @@
             <%- t('anonymous') %>
           <% } %>
         <span class="text-muted"><%- t('last_updated') %>: </span><%- moment(song.get('updated_at')).fromNow() %>
+
+        <% if(state.isMine(song)) { %>
+          <span class="border-left">
+            <a href="javascript:void(0)"
+              class="delete-song"
+              data-id="<%- song.get('id') %>">
+              <%- t('delete') %>
+            </a>
+          </span>
+        <% } %>
       </li>
     <% }); %>
 

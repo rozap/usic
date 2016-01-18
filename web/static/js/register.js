@@ -17,6 +17,7 @@ module.exports = View.extend({
   init: function(opts) {
     this.model = new User({}, opts);
     this.sesh = new Session({}, opts);
+    this.api.session = this.sesh;
 
     this.listenTo(this.sesh, 'sync', this.onLoginSuccess);
     this.listenTo(this.model, 'sync', this.onSuccess);

@@ -22,5 +22,9 @@
 
    _onSync: function() {
      this.unset('password');
+   },
+
+   isNew: function() {
+     return !this.get('token');
    }
  });

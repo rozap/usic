@@ -10,7 +10,7 @@
       content="μsic.space" />
     <meta
       property="og:description"
-      content="μsic is a tool for learning songs in the age of streaming media" />
+      content="μsic is a tool for learning and teaching songs in the age of streaming media" />
     <meta
       property="og:image"
       content="<%= static_path(@conn, "/images/icon.png") %>"/>

@@ -13,7 +13,7 @@ defmodule Usic.SongState do
     @behaviour Ecto.Type
     alias Usic.SongState
 
-    def type, do: :json
+    def type, do: :jsonb
 
     def cast(%SongState{} = state) do
       {:ok, state}

@@ -42,6 +42,7 @@ defmodule Usic.ApiSessionTest do
       %{payload: p} -> assert p.email == "sessiontest@bar.com"
     end
 
+
     push(socket, "create:session", %{
       "email" => "sessiontest@bar.com", "password"=> "blahblah"
     })

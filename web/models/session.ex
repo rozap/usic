@@ -12,7 +12,7 @@ defmodule Usic.Session do
   def changeset(session, params \\ :empty, _opts \\ []) do
     params = Dict.put(params, "token", UUID.uuid4)
     email = Dict.get(params, "email", "")
-    cset = cast(session, params, ~w(token))
+    cset = cast(session, params, ~w(token), [])
 
     query = from u in User, where: u.email == ^email
     case {Usic.Repo.one(query), params["password"]} do
@@ -20,7 +20,7 @@ defmodule Usic.Session do
       {_, nil} -> add_error(cset, :password, "empty_password")
       {user, pass} ->
         params = Dict.put(params, "user_id", user.id)
-        cset = cast(cset, params, ~w(token user_id))
+        cset = cast(cset, params, ~w(token user_id), [])
         pw_match = Comeonin.Pbkdf2.checkpw(pass, user.password)
         if pw_match do
           cset

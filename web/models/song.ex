@@ -100,14 +100,16 @@ defmodule Usic.Song do
   end
 
   def changeset(song, params \\ :empty, session: session) do
-    params = case session do
-      nil -> Dict.put(params, "user_id", nil)
-      _ -> Dict.put(params, "user_id", session.user.id)
+
+    user_id = case song.id do
+      nil -> Map.get((session || %{user_id: nil}), :user_id)
+      _ -> song.user_id
     end
 
     cast(song, params, ~w(url), ~w(name user_id location state))
     |> validate_change(:url, &validate_url/2)
     |> validate_user(song, session)
+    |> put_change(:user_id, user_id)
   end
 end
 

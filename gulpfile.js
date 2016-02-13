@@ -44,12 +44,12 @@ var create = function(src, name, dst) {
     bundleStream.transform(stringify(['.html']));
     bundleStream.bundle()
         .pipe(source(name))
-        // .pipe(buffer())
-        // .pipe(sourcemaps.init({
-        //     loadMaps: true
-        // }))
-        // .pipe(uglify())
-        // .pipe(sourcemaps.write('maps'))
+        .pipe(buffer())
+        .pipe(sourcemaps.init({
+            loadMaps: true
+        }))
+        .pipe(uglify())
+        .pipe(sourcemaps.write('.'))
         .pipe(gulp.dest(dst));
 };
 
@@ -58,11 +58,12 @@ gulp.task('app', function() {
     create(paths.js.app.src, 'app.js', paths.js.app.dest);
     console.log(paths.js.unmanaged.src, paths.js.unmanaged.dest);
     gulp.src(paths.js.unmanaged.src)
-        // .pipe(buffer())
-        // .pipe(sourcemaps.init({
-        //     loadMaps: true
-        // }))
-        // .pipe(uglify())
+        .pipe(buffer())
+        .pipe(sourcemaps.init({
+            loadMaps: true
+        }))
+        .pipe(uglify())
+        .pipe(sourcemaps.write('.'))
         .pipe(gulp.dest(paths.js.unmanaged.dest));
 });
 

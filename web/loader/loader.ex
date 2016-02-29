@@ -100,7 +100,7 @@ defmodule Usic.Loader do
 
 
   defp update_location({:ok, location}, song) do
-    state = %{song.state | load_state: "success"}
+    state = %{song.state | "load_state" => "success"}
     song = %{song | location: location, state: state}
     Usic.Repo.update(song)
   end
@@ -109,7 +109,7 @@ defmodule Usic.Loader do
 
 
   defp put_err({:error, reason} = err, song) do
-    state = %{song.state | load_state: "error", error: reason}
+    state = %{song.state | "load_state" => "error", "error" => reason}
     song = %{song | state: state}
     Usic.Repo.update(song)
     err

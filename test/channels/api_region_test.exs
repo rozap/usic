@@ -71,47 +71,47 @@ defmodule Usic.ApiRegionTest do
       name: "foobar #baz buz #biz #butts",
       song_id: _,
       start: 23.4,
-      meta: %Usic.Region.Meta{
-        tags: ["baz", "biz", "butts"]
+      meta: %{
+        "tags" => ["baz", "biz", "butts"]
       }
     }
   end
 
-  test "can add filter by meta tag" do
-    socket = make_socket
-    ref = push(socket, "create:song", %{
-      "url" => @url
-    })
+  # test "can add filter by meta tag" do
+  #   socket = make_socket
+  #   ref = push(socket, "create:song", %{
+  #     "url" => @url
+  #   })
 
-    song_id = receive do
-      %Reply{ref: ^ref, payload: p} -> p.id
-    end
+  #   song_id = receive do
+  #     %Reply{ref: ^ref, payload: p} -> p.id
+  #   end
 
-    push(socket, "create:region", %{
-      "song_id" => song_id,
-      "name" => "#bass #guitar",
-      "start" => 23.4,
-      "end" => 42.4,
-      "loop" => true
-    })
-    push(socket, "create:region", %{
-      "song_id" => song_id,
-      "name" => "#horns #bass",
-      "start" => 23.4,
-      "end" => 42.4,
-      "loop" => true
-    })
-    ref = push(socket, "list:region", %{
-      "where" => %{
-        "meta.tags" => ["horns"]
-      }
-    })
+  #   push(socket, "create:region", %{
+  #     "song_id" => song_id,
+  #     "name" => "#bass #guitar",
+  #     "start" => 23.4,
+  #     "end" => 42.4,
+  #     "loop" => true
+  #   })
+  #   push(socket, "create:region", %{
+  #     "song_id" => song_id,
+  #     "name" => "#horns #bass",
+  #     "start" => 23.4,
+  #     "end" => 42.4,
+  #     "loop" => true
+  #   })
+  #   ref = push(socket, "list:region", %{
+  #     "where" => %{
+  #       "meta.tags" => ["horns"]
+  #     }
+  #   })
 
-    receive do 
-      %Reply{ref: ^ref, payload: p} -> IO.inspect p
-    end
+  #   receive do 
+  #     %Reply{ref: ^ref, payload: p} -> IO.inspect p
+  #   end
     
-  end
+  # end
 
   test "can update a region" do
     socket = make_socket

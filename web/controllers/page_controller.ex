@@ -5,7 +5,6 @@ defmodule Usic.PageController do
 
 
   def set_x_frame_headers(conn, _) do
-    IO.puts "Im a thing"
     merge_resp_headers(conn, [
       {"x-frame-options", "allow-from *"}
     ])

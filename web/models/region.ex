@@ -1,24 +1,19 @@
 defmodule Usic.Region.Meta do
   defstruct [
-    tags:      []
+    tags: []
   ]
 
   defmodule Type do
     @behaviour Ecto.Type
     alias Usic.Region.Meta
+    alias Usic.Util
 
-    def type, do: :jsonb
+    def type, do: :map
 
     def cast(%Meta{} = state), do: {:ok, state}
-    def cast(_other),           do: :error
-
-    def load(value) do
-      Poison.decode(value, as: Usic.Region.Meta)
-    end
-
-    def dump(value) do
-      Poison.encode(value)
-    end
+    def cast(state), do: {:ok, struct(Meta, Util.to_atom_map(state))}
+    def load(value), do: {:ok, value}
+    def dump(value), do: {:ok, value}
   end
 end
 
@@ -33,7 +28,7 @@ defmodule Usic.Region do
     field :start, :float
     field :end,   :float
     field :loop,  :boolean
-    field :meta,  Meta.Type, default: %{}
+    field :meta,  Meta.Type, default: %Meta{}
 
     belongs_to :song, Song
     timestamps
@@ -50,11 +45,12 @@ defmodule Usic.Region do
 
   defp validate_user(cset, song_id, session) do
     check_user_perms(song_id, session)
-    |> Enum.reduce(cset, fn {key, err}, acc -> add_error(cset, key, err) end)
+    |> Enum.reduce(cset, fn {key, err}, acc -> add_error(acc, key, err) end)
   end
 
   def changeset(region, params \\ :empty, session: session) do
     meta = case params["name"] do
+      nil -> region.meta
       name -> 
         tags = name 
         |> String.split(" ") 
@@ -62,7 +58,6 @@ defmodule Usic.Region do
         |> Enum.map(fn "#" <> t -> t end)
 
         %Meta{tags: tags}
-      _ -> region.meta
     end
     params = Dict.put(params, "meta", meta)
     cast(region, params, ~w(song_id name start end loop meta))

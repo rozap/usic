@@ -12,30 +12,19 @@ defmodule Usic.SongState do
   defmodule Type do
     @behaviour Ecto.Type
     alias Usic.SongState
+    alias Usic.Util
 
-    def type, do: :jsonb
+    def type, do: :map
 
     def cast(%SongState{} = state) do
       {:ok, state}
     end
     def cast(%{} = state)      do
-      state = state
-      |> Enum.map(fn
-        {key, val} when is_atom(key) -> {key, val}
-        {key, val} -> {String.to_atom(key), val}
-      end)
-      |> Enum.into(%{})
-      {:ok, struct(SongState, state)}
+      {:ok, struct(SongState, Util.to_atom_map(state))}
     end
-    def cast(_other),           do: :error
-
-    def load(value) do
-      Poison.decode(value, as: SongState)
-    end
-
-    def dump(value) do
-      Poison.encode(value)
-    end
+    def cast(_), do: :error
+    def load(value), do: {:ok, value}
+    def dump(value), do: {:ok, value}
   end
 end
 
@@ -48,16 +37,6 @@ defmodule Usic.Song do
   alias Usic.SongState
   alias Usic.Song
 
-  @wtf %{
-    clicks:      [],
-    measures:    [],
-    load_state:  "loading",
-    error:       nil,
-    rate:        1,
-    pxPerSecond: 40,
-    autoCenter:  false
-  }
-
   after_insert Usic.Model.Dispatcher, :after_insert
   after_update Usic.Model.Dispatcher, :after_update
 
@@ -66,7 +45,7 @@ defmodule Usic.Song do
     field :url, :string
     field :uid, :string
     field :location, :string
-    field :state, SongState.Type, default: @wtf
+    field :state, SongState.Type, default: %SongState{}
     belongs_to :user, User
     has_many :regions, Usic.Region, on_delete: :delete_all
     timestamps
@@ -89,7 +68,7 @@ defmodule Usic.Song do
 
   defp validate_user(cset, song, session) do
     check_user_perms(song, session)
-    |> Enum.reduce(cset, fn {key, err}, acc -> add_error(cset, key, err) end)
+    |> Enum.reduce(cset, fn {key, err}, acc -> add_error(acc, key, err) end)
   end
 
   defp validate_url(:url, url) do
@@ -105,6 +84,7 @@ defmodule Usic.Song do
       nil -> Map.get((session || %{user_id: nil}), :user_id)
       _ -> song.user_id
     end
+
 
     cast(song, params, ~w(url), ~w(name user_id location state))
     |> validate_change(:url, &validate_url/2)

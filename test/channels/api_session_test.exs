@@ -51,7 +51,8 @@ defmodule Usic.ApiSessionTest do
     end
 
     assert Usic.Repo.get(Usic.Session, session_id) != nil
-    push(socket, "delete:session", %{})
+    ref = push(socket, "delete:session", %{})
+    assert_reply ref, _, _
     assert Usic.Repo.get(Usic.Session, session_id) == nil
   end
 

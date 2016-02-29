@@ -2,6 +2,7 @@ defmodule Usic.Model.Dispatcher do
   use GenServer
   require Logger
   import Phoenix.Channel
+  alias Usic.Resource.State
 
   def start_link() do
     GenServer.start_link(__MODULE__, [], [name: __MODULE__])
@@ -49,18 +50,17 @@ defmodule Usic.Model.Dispatcher do
   end
 
   defp dispatch_new!(mkey, socket, model, id) do
-    read = Usic.Resource.Read.read(
+    read = Usic.Resource.Read.handle(
       model,
-      %{"id" => id},
-      socket
+      %State{params: %{"id" => id}, socket: socket}
     )
 
     case read do
-    {:ok, {resource, _}} ->
-      push socket, "update:#{mkey}", resource
-    {:error, {reason, _}} ->
-      Logger.error("Error while reading for dispatch #{inspect reason}")
-  end
+      %State{resp: resource} ->
+        push socket, "update:#{mkey}", resource
+      %State{error: reason} ->
+        Logger.error("Error while reading for dispatch #{inspect reason}")
+    end
 
 
   end

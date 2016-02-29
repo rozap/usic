@@ -81,6 +81,9 @@ defmodule Usic.ApiSongTest do
 
     receive do
       %Reply{payload: p, ref: ^ref} ->
+        Enum.each(p["items"], fn song -> 
+          assert song.user == nil
+        end)
         assert length(p["items"]) == 16
         assert p["count"] == 20
     end
@@ -195,7 +198,7 @@ defmodule Usic.ApiSongTest do
 
     receive do
       %Reply{ref: ^ref, payload: _} ->
-        assert Usic.Repo.get!(Song, song.id).state.rate == 0.8
+        assert Usic.Repo.get!(Song, song.id).state["rate"] == 0.8
     end
   end
 
@@ -261,7 +264,7 @@ defmodule Usic.ApiSongTest do
     })
 
     receive do
-      %Reply{ref: ^ref, payload: p} -> :ok
+      %Reply{ref: ^ref} -> :ok
     end
 
     ref = push(socket, "delete:song", %{
@@ -269,12 +272,10 @@ defmodule Usic.ApiSongTest do
     })
 
     receive do
-      %Reply{ref: ^ref, payload: p} -> :ok
+      %Reply{ref: ^ref} -> :ok
     end
 
-    song = Usic.Repo.get(Song, song.id)
-    IO.inspect song
-
+    Usic.Repo.get(Song, song.id)
   end
 
 end

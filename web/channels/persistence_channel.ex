@@ -5,6 +5,7 @@ defmodule Usic.PersistenceChannel do
   alias Usic.Session
   alias Usic.Repo
   require Usic.Song
+  alias Usic.Resource.State
 
   @create "create"
   @update "update"
@@ -71,28 +72,36 @@ defmodule Usic.PersistenceChannel do
     {:error, %{error: :invalid_handshake}}
   end
 
-  defp r({:error, {reason, socket}}) do
+
+  defp r(%State{resp: nil, socket: socket, error: nil}) do
+    {:reply, {:ok, %{}}, socket}
+  end
+  defp r(%State{resp: resp, socket: socket, error: nil}) do
+    {:reply, {:ok, resp}, socket}
+  end
+  defp r(%State{socket: socket, error: reason}) do
     {:reply, {:error, reason}, socket}
   end
 
-  defp r({:ok, {resp, socket}}) do
-    {:reply, {:ok, resp}, socket}
-  end
 
   Enum.each(@operations, fn {verb, protocol, noun} ->
-    def handle_in(unquote(verb) <> ":" <> name, payload, socket) do
+    def handle_in(unquote(verb) <> ":" <> name, params, socket) do
       case Dict.get(unquote(noun), name) do
         nil ->
           Logger.error("Invalid resource #{unquote(verb) <> ":" <> name} #{inspect unquote(noun)}")
           r({:error, {%{message: "invalid_resource"}, socket}})
         model ->
-          r(apply(unquote(protocol), String.to_atom(unquote(verb)), [model, payload, socket]))
+          state = %State{params: params, socket: socket}
+          Logger.debug("Dispatch #{unquote(protocol)} #{inspect model.__struct__} #{inspect state}")
+          res = unquote(protocol).handle(model, state)
+          Logger.debug("#{inspect res}")
+          r(res)
       end
     end
   end)
 
 
-  def handle_info(info, socket) do
+  def handle_info(_, socket) do
     {:noreply, socket}
   end
 

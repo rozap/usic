@@ -45,8 +45,8 @@ defmodule Usic.PersistenceChannel do
 
   @operations [
     {@create, Usic.Resource.Create, quote do: @creatable},
-    {@list, Usic.Resource.List,   quote do: @listable},
-    {@read, Usic.Resource.Read,   quote do: @readable},
+    {@list, Usic.Resource.List,     quote do: @listable},
+    {@read, Usic.Resource.Read,     quote do: @readable},
     {@update, Usic.Resource.Update, quote do: @updatable},
     {@delete, Usic.Resource.Delete, quote do: @deletable}
   ]
@@ -58,13 +58,7 @@ defmodule Usic.PersistenceChannel do
   end
 
   def join("session:" <> session_token, _message, socket) do
-    case Repo.one(from s in Session,
-      where: s.token == ^session_token, select: s, preload: [:user]) do
-      nil -> {:error, %{error: :invalid_token}}
-      session ->
-        Logger.info("#{session.user.email} has started an existing session")
-        {:ok, assign(socket, :session, session)}
-    end
+    {:ok, Usic.Resource.Session.get_socket_session(session_token, socket)}
   end
 
   def join(invalid, _, _) do
@@ -89,7 +83,8 @@ defmodule Usic.PersistenceChannel do
       case Dict.get(unquote(noun), name) do
         nil ->
           Logger.error("Invalid resource #{unquote(verb) <> ":" <> name} #{inspect unquote(noun)}")
-          r({:error, {%{message: "invalid_resource"}, socket}})
+          %State{error: %{message: "invalid_resource"}, socket: socket}
+          |> r
         model ->
           state = %State{params: params, socket: socket}
           Logger.debug("Dispatch #{unquote(protocol)} #{inspect model.__struct__} #{inspect state}")

@@ -77,14 +77,10 @@ defmodule Usic.Resource.Helpers do
 
   def filter(query, {name, value}) do
     case String.split(name, ".") do
-      [_] ->
+      [name] -> 
         fname = String.to_atom(name)
         query |> where([m], field(m, ^fname) == ^value)
-      [h | t] -> 
-        outer = String.to_atom(h)
-        inner = Enum.join(t, ".")
-        query 
-        |> where([m], fragment("'?'->'?' @> ?", ^outer, field(m, ^outer), ^value))
+      _ -> query
     end
   end
 

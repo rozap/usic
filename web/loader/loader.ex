@@ -1,6 +1,7 @@
 defmodule Usic.Loader do
   require Logger
-
+  alias Usic.Repo
+  alias Usic.Song 
   defp media_dir, do: Application.get_env(:usic, :media_dir)
 
   ##
@@ -66,9 +67,10 @@ defmodule Usic.Loader do
     case get_metaserver().get(id) do
       {:ok, metadata} ->
         name = Dict.get(metadata, "title", "untitled")
-        song = %{song | name: name}
         Logger.info("Fetched metadata #{id} name: #{name}")
-        Usic.Repo.update(song)
+        song
+        |> Song.changeset(%{"name" => name})
+        |> Repo.push_update
       err -> err
     end
   end
@@ -100,18 +102,20 @@ defmodule Usic.Loader do
 
 
   defp update_location({:ok, location}, song) do
-    state = %{song.state | "load_state" => "success"}
-    song = %{song | location: location, state: state}
-    Usic.Repo.update(song)
+    Logger.info("Successfully loaded #{song.id}")
+    state = %{song.state | load_state: "success"}
+    song
+    |> Song.changeset(%{location: location, state: state})
+    |> Repo.push_update
   end
 
   defp update_location(err, song), do: put_err(err, song)
 
 
   defp put_err({:error, reason} = err, song) do
-    state = %{song.state | "load_state" => "error", "error" => reason}
+    state = %{song.state | load_state: "error", error: reason}
     song = %{song | state: state}
-    Usic.Repo.update(song)
+    Repo.push_update(song)
     err
   end
 

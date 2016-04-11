@@ -103,7 +103,7 @@ defmodule Usic.ApiUserTest do
         e = p
         |> Poison.encode!
         |> Poison.decode!
-        assert e ==  %{"password" => ["should be at least 6 characters"]}
+        assert e ==  %{"password" => "should be at least 6 characters"}
     end
   end
 
@@ -121,7 +121,7 @@ defmodule Usic.ApiUserTest do
     })
     receive do
       %{payload: p} ->
-        assert js(p) == %{"email" => ["has already been taken"]}
+        assert js(p) == %{"email" => "has already been taken"}
     end
 
   end

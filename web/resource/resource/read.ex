@@ -1,8 +1,8 @@
-defimpl Usic.Resource.Read, for: Any do
+defmodule Usic.Resource.ReadAny do
   import Ecto.Query
   alias Usic.Resource.State
 
-  def handle(model, %State{params: params, socket: socket} = state) do
+  def read(model, %State{params: params, socket: socket} = state) do
     query = from(m in model.__struct__)
     [id_name] = model.__struct__.__schema__(:primary_key)
     case Map.get(params, Atom.to_string(id_name)) do
@@ -19,5 +19,10 @@ defimpl Usic.Resource.Read, for: Any do
           m   -> struct(state, resp: m)
         end
     end
-  end
+  end  
+end
+
+defimpl Usic.Resource.Read, for: Any do
+  use Usic.Resource
+  stage :read, mod: Usic.Resource.ReadAny
 end

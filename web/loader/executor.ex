@@ -13,7 +13,7 @@ defmodule Usic.Executor do
   def handle_call({:get, url, output_loc}, _from, state) do
     args = [
       "--extract-audio",
-      "--audio-format", "best",
+      "--audio-format", "mp3",
       "--audio-quality", "0",
       url,
       "-o",

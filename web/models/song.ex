@@ -37,9 +37,6 @@ defmodule Usic.Song do
   alias Usic.SongState
   alias Usic.Song
 
-  after_insert Usic.Model.Dispatcher, :after_insert
-  after_update Usic.Model.Dispatcher, :after_update
-
   schema "song" do
     field :name, :string, default: "untitled"
     field :url, :string
@@ -52,25 +49,6 @@ defmodule Usic.Song do
   end
 
 
-  def check_user_perms(song, session) do
-    current_uid = case session do
-      nil -> nil
-      _ -> session.user_id
-    end
-
-    case song do
-      %Song{id: nil} -> [] #nascent song can be updated always
-      %Song{user_id: nil} -> [] #anyone can update an anon song
-      %Song{user_id: ^current_uid} -> [] #same user can update own
-      _ -> [user_id: "song_update_not_allowed"]
-    end
-  end
-
-  defp validate_user(cset, song, session) do
-    check_user_perms(song, session)
-    |> Enum.reduce(cset, fn {key, err}, acc -> add_error(acc, key, err) end)
-  end
-
   defp validate_url(:url, url) do
     case Usic.Loader.get_song_id(url) do
       {:error, reason} -> [url: reason]
@@ -78,18 +56,9 @@ defmodule Usic.Song do
     end
   end
 
-  def changeset(song, params \\ :empty, session: session) do
-
-    user_id = case song.id do
-      nil -> Map.get((session || %{user_id: nil}), :user_id)
-      _ -> song.user_id
-    end
-
-
+  def changeset(song, params \\ :empty) do
     cast(song, params, ~w(url), ~w(name user_id location state))
     |> validate_change(:url, &validate_url/2)
-    |> validate_user(song, session)
-    |> put_change(:user_id, user_id)
   end
 end
 

@@ -113,7 +113,6 @@ defmodule Usic.ApiSongTest do
     end
   end
 
-
   test "logged in user should have songs made by them" do
     {socket, user, _} = make_authed_songs
 
@@ -160,8 +159,7 @@ defmodule Usic.ApiSongTest do
     end
 
     meta_update = receive do
-      %Message{event: "update:song", payload: p} ->
-        p
+      %Message{event: "update:song", payload: p} -> p
     after
       40 -> raise "nope!"
     end
@@ -222,7 +220,7 @@ defmodule Usic.ApiSongTest do
         |> Poison.encode!
         |> Poison.decode!
 
-        assert js == %{"user_id" => ["song_update_not_allowed"]}
+        assert js == %{"user_id" => "song_update_not_allowed"}
     end
   end
 
@@ -248,7 +246,7 @@ defmodule Usic.ApiSongTest do
         |> Poison.encode!
         |> Poison.decode!
 
-        assert js == %{"user_id" => ["song_update_not_allowed"]}
+        assert js == %{"user_id" => "song_update_not_allowed"}
     end
   end
 
@@ -276,6 +274,30 @@ defmodule Usic.ApiSongTest do
     end
 
     Usic.Repo.get(Song, song.id)
+  end
+
+  
+  test "cant delete another user's song" do
+    {_, _, [song0 | _]} = make_authed_songs(0)
+    {socket1, _, _} = make_authed_songs(1)
+
+    state = song0.state
+    |> Poison.encode!
+    |> Poison.decode!
+    |> Dict.put("rate", 0.8)
+
+    ref = push(socket1, "delete:song", %{
+      "id" => song0.id
+    })
+
+    receive do
+      %Reply{ref: ^ref, payload: p} ->
+        js = p
+        |> Poison.encode!
+        |> Poison.decode!
+
+        assert js == %{"user_id" => "song_update_not_allowed"}
+    end
   end
 
 end

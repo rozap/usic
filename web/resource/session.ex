@@ -4,28 +4,39 @@ defmodule Usic.Resource.Session do
   import Ecto.Query
   alias Usic.Session
   alias Usic.Repo
+  alias Ecto.Changeset
   import Usic.Resource.Helpers
   alias Usic.Resource.State
 
+  def get_socket_session(token, socket) do
+    result = Repo.one(
+      from s in Session,
+      where: s.token == ^token, 
+      select: s, 
+      preload: [:user]
+    )
+    case result do
+      nil -> 
+        Logger.warn("invalid session token #{token}")
+        socket
+      session ->
+        Logger.info("#{session.user.email} has signed in")
+        assign(socket, :session, session)
+    end
+  end
+
 
   defimpl Usic.Resource.Create, for: Session do
-    def handle(model, %State{params: params, socket: socket} = state) do
-      cset = Session.changeset(model, params)
-      if cset.valid? do
-        case Repo.insert(cset) do
-          {:error, reason} -> struct(state, error: reason)
-          {:ok, session} ->
-            session = Repo.one(from s in Session,
-              where: s.id == ^session.id,
-              preload: [:user])
-            Logger.info("#{session.user.email} has signed in")
+    use Usic.Resource
 
-            socket = assign(socket, :session, session)
-            struct(state, resp: session, socket: socket)
-        end
-      else
-        struct(state, error: format_cset_errors(cset.errors))
-      end
+    stage :create, mod: Usic.Resource.CreateAny
+    stage :put_session_in_socket
+
+
+    def put_session_in_socket(_, %State{resp: inserted, socket: socket} = state) do
+      token = inserted.token
+      socket = Usic.Resource.Session.get_socket_session(token, socket)
+      struct(state, socket: socket)
     end
   end
 
@@ -38,19 +49,19 @@ defmodule Usic.Resource.Session do
   end
 
 
-  defimpl Usic.Resource.Delete, for: Session do
-    def handle(_, %State{socket: socket} = state) do
-      with_session state do
-        case Repo.delete(socket.assigns.session) do
-          {:ok, _} -> 
-            socket = assign(socket, :session, nil)
-            struct(state, socket: socket)
-          {:error, cset} ->
-            struct(state, error: format_cset_errors(cset))
-        end
-      end
-    end
-  end
+  # defimpl Usic.Resource.Delete, for: Session do
+  #   def handle(_, %State{socket: socket} = state) do
+  #     with_session state do
+  #       case Repo.delete(socket.assigns.session) do
+  #         {:ok, _} -> 
+  #           socket = assign(socket, :session, nil)
+  #           struct(state, socket: socket)
+  #         {:error, cset} ->
+  #           struct(state, error: format_cset_errors(cset))
+  #       end
+  #     end
+  #   end
+  # end
 
 
 end

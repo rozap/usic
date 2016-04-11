@@ -42,7 +42,7 @@ defmodule Usic.Model.Dispatcher do
       nil -> :ok
       sockets ->
         Enum.each(sockets, fn socket ->
-          Logger.info("Dispatch change for #{inspect cset.model} #{inspect cset.model.id}")
+          Logger.debug("Dispatch change for #{inspect cset.model} #{inspect cset.model.id}")
           dispatch_new!(mkey, socket, cset.model, cset.model.id)
         end)
     end
@@ -54,15 +54,12 @@ defmodule Usic.Model.Dispatcher do
       model,
       %State{params: %{"id" => id}, socket: socket}
     )
-
     case read do
-      %State{resp: resource} ->
+      %State{resp: resource} when resource != nil ->
         push socket, "update:#{mkey}", resource
       %State{error: reason} ->
-        Logger.error("Error while reading for dispatch #{inspect reason}")
+        Logger.error("Error while reading for dispatch #{mkey} #{id} #{inspect reason}")
     end
-
-
   end
 
   def after_insert(cset) do

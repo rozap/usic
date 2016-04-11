@@ -3,13 +3,20 @@ defmodule Usic.Resource.User do
   alias Usic.User
   alias Usic.Resource.State
 
+
   defimpl Usic.Resource.Update, for: User do
-    def handle(_, %State{params: params, socket: socket} = state) do
+    use Usic.Resource
+
+    stage :validate
+    stage :update, mod: Usic.Resource.UpdateAny
+    stage :read, mod: Usic.Resource.ReadAny
+
+    def validate(_, %State{params: params, socket: socket} = state) do
       want_to_update = params["id"]
       case socket.assigns.session do
         %{user: %{id: ^want_to_update}} ->
           Logger.info("Update user")
-          Usic.Resource.UpdateAny.handle(%User{}, state)
+          state
         _ ->
           Logger.info("Update user error")
           if socket.assigns.session do

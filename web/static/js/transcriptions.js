@@ -6,6 +6,38 @@ var $ = require('jquery');
 var Songs = require('./collections/songs');
 
 var TranscriptionsTemplate = require('./templates/transcriptions.html');
+var FilterViewTemplate = require('./templates/filter.html');
+var TranscriptionListViewTemplate = require('./templates/transcription-list.html');
+
+
+var FilterView = View.extend({
+  el: '#filter',
+  template: _.template(FilterViewTemplate),
+
+  init: function() {
+
+  }
+})
+
+var TranscriptionListView = View.extend({
+  el: '#transcription-list',
+  template: _.template(TranscriptionListViewTemplate),
+  renderTo: ['isMine'],
+
+  init: function() {
+    this.listenTo(this.model, 'change sync remove', this.r);
+  },
+
+  isMine: function(song) {
+    if (!this.api) return;
+    return this.api.session &&
+      this.api.session.get('user') &&
+      song.get('user') &&
+      this.api.session.get('user').id === song.get('user').id;
+  },
+
+})
+
 
 module.exports = View.extend({
   el: '#main',
@@ -14,31 +46,30 @@ module.exports = View.extend({
   events: {
     'click .next': 'onNext',
     'click .previous': 'onPrevious',
-    'click .delete-song': 'onDelete'
+    'click .delete-song': 'onDelete',
+    'keyup .filter': 'onFilter'
   },
 
-  renderTo: ['isMine'],
 
   init: function(opts) {
     this._state.title = opts.title || 'all_transcriptions';
     this.model = new Songs([], _.pick(opts, 'api', 'collectionState', 'dispatcher'));
-    this.listenTo(this.model, 'change sync remove', this.r);
     this.listenTo(this.model, 'destroy', this.fetch);
+    this.listenTo(this.model, 'sync', this.r);
+
+    this.render();
+    this.addSubview('list', TranscriptionListView, {
+      model: this.model
+    });
+    this.addSubview('filter', FilterView, {
+      model: this.model
+    });
 
     this.fetch();
-    this.render();
   },
 
   fetch: function() {
     this.model.fetch();
-  },
-
-  isMine: function(song) {
-    if(!this.api) return;
-    return this.api.session &&
-      this.api.session.get('user') &&
-      song.get('user') &&
-      this.api.session.get('user').id === song.get('user').id;
   },
 
   onNext: function() {

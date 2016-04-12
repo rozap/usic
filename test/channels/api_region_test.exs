@@ -44,6 +44,17 @@ defmodule Usic.ApiRegionTest do
       song_id: _,
       start: 23.4
     }
+
+    ref = push(socket, "list:song", %{
+        "where" => %{
+          "id" => song_id
+        }
+    })
+
+    receive do 
+      %Reply{ref: ^ref, payload: %{"items" => [song]}} ->
+        assert length(song.regions) == 1
+    end
   end
 
 

@@ -2,10 +2,35 @@ ul.transcriptions {
   li.transcription {
     h3 {
       margin-top: 0px;
+      margin-bottom: 0px;
       padding-top: 0px;
+      padding-bottom: 0px;
     }
     border-left: 2px solid @dark-gray;
     padding: @base-pad/2 @base-pad;
     margin: @base-pad/2 0px;
   }
+
+  ul.meta-tags {
+    padding: @base-pad 0px;
+    li {
+      display: inline-block;
+      a {      
+        padding: 4px;
+        background: @blue;
+        color: @white;
+
+        &:hover {
+          background: lighten(@blue, 10%);
+          color: @light-gray;
+
+        };
+      }
+    }
+  }
 }
+
+.filter {
+  width: 100%;
+}
+

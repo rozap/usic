@@ -31,6 +31,7 @@ defmodule Usic.Resource.Session do
 
     stage :create, mod: Usic.Resource.CreateAny
     stage :put_session_in_socket
+    stage :handle, mod: Usic.Resource.Read
 
 
     def put_session_in_socket(_, %State{resp: inserted, socket: socket} = state) do
@@ -41,6 +42,8 @@ defmodule Usic.Resource.Session do
   end
 
   defimpl Usic.Resource.Read, for: Session do
+    use Usic.Resource
+
     def handle(_, %State{socket: socket} = state) do
       with_session state do
         struct(state, resp: socket.assigns.session)

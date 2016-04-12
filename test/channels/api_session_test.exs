@@ -29,6 +29,7 @@ defmodule Usic.ApiSessionTest do
     receive do
       %{payload: p} ->
         assert p.token != nil
+        assert p.user.email == "sessiontest@bar.com"
     end
   end
 

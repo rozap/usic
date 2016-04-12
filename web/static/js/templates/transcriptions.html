@@ -1,36 +1,11 @@
 <h2 class="text-muted"><%- t(state.title) %></h2>
 
-<% if(state.model.length === 0) { %>
-  <h4><%- t('no_transcriptions') %></h4>
-<% } else { %>
-  <ul class="transcriptions">
-    <% state.model.forEach(function(song) { %>
-      <li class="transcription">
-        <h3>
-          <a href="#song/<%- song.get('id') %>"><%- song.get('name') || t('untitled') %></a>
-        </h3>
-        <span class="text-muted"><%- t('by') %>: </span>
-          <% if(song.get('user')) { %>
-            <%- song.get('user').display_name || t('someone') %>
-          <% } else { %>
-            <%- t('anonymous') %>
-          <% } %>
-        <span class="text-muted"><%- t('last_updated') %>: </span><%- moment(song.get('updated_at')).fromNow() %>
+<div id="filter"></div>
 
-        <% if(state.isMine(song)) { %>
-          <span class="border-left">
-            <a href="javascript:void(0)"
-              class="delete-song"
-              data-id="<%- song.get('id') %>">
-              <%- t('delete') %>
-            </a>
-          </span>
-        <% } %>
-      </li>
-    <% }); %>
 
-  </ul>
+<ul class="transcriptions" id="transcription-list"></ul>
 
+<% if(state.model.length > 0) { %>
   <ul class="pager">
     <li>
       <a href="javascript:void(0);"

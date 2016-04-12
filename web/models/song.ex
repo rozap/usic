@@ -63,7 +63,7 @@ defmodule Usic.Song do
 end
 
 defimpl Poison.Encoder, for: Usic.Song do
-  @attributes ~w(id name url inserted_at updated_at user state location)a
+  @attributes ~w(id name url inserted_at updated_at user state location regions)a
 
   def encode(song, _options) do
     song

@@ -11,7 +11,8 @@ defmodule Usic.Resource.Song do
   def join_user do
     from(m in Song,
       left_join: u in assoc(m, :user),
-      preload: [user: u])
+      left_join: r in assoc(m, :regions),
+      preload: [user: u, regions: r])
   end
 
   def check_user_perms(song, session) do
@@ -60,7 +61,7 @@ defmodule Usic.Resource.Song do
     stage :put_user
     stage :create, mod: Usic.Resource.CreateAny
     stage :begin_download
-    # stage :handle, mod: Usic.Resource.Read
+    stage :handle, mod: Usic.Resource.Read
 
     def put_user(_, %State{params: params, socket: %{assigns: %{session: session}}} = state) do
       params = Dict.put(params, "user_id", session.user.id)
@@ -80,6 +81,7 @@ defmodule Usic.Resource.Song do
     stage :handle,   mod: Usic.Resource.Read
     stage :validate, mod: Usic.Resource.Song
     stage :update,   mod: Usic.Resource.UpdateAny
+    stage :handle,   mod: Usic.Resource.Read
   end
 
   defimpl Usic.Resource.Delete, for: Song do

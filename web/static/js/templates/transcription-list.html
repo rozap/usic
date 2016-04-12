@@ -1,0 +1,46 @@
+<% if(state.model.length === 0) { %>
+  <h4><%- t('no_transcriptions') %></h4>
+<% } else { %>
+  <% state.model.forEach(function(song) { %>
+    <li class="transcription">
+      <h3>
+        <a href="#song/<%- song.get('id') %>"><%- song.get('name') || t('untitled') %></a>
+      </h3>
+      
+      <ul class="meta-tags">
+        <% song.get('regions').forEach(function(region) { %>
+          <% if(region.meta && region.meta.tags) { %>
+            <% region.meta.tags.forEach(function(tag) { %>
+              <li class="tag">
+                <a href="#transcriptions/<%- tag %>" 
+                  title="Look for songs tagged '<%- tag %>'">
+                  <%- tag %>
+                </a>
+              </li>
+            <% }) %>
+          <% } %>
+        <% }) %>
+      </ul>
+
+
+      <span class="text-muted"><%- t('by') %>: </span>
+        <% if(song.get('user')) { %>
+          <%- song.get('user').display_name || t('someone') %>
+        <% } else { %>
+          <%- t('anonymous') %>
+        <% } %>
+      <span class="text-muted"><%- t('last_updated') %>: </span><%- moment(song.get('updated_at')).fromNow() %>
+
+      <% if(state.isMine(song)) { %>
+        <span class="border-left">
+          <a href="javascript:void(0)"
+            class="delete-song"
+            data-id="<%- song.get('id') %>">
+            <%- t('delete') %>
+          </a>
+        </span>
+      <% } %>
+    </li>
+  <% }); %>
+<% } %>
+

@@ -32,7 +32,6 @@ module.exports = bb.Collection.extend(_.extend({
   },
 
   payloadFor: function(method) {
-    console.log("fetch collection", this._state);
     return this._state;
   },
 

@@ -34,8 +34,9 @@ module.exports = View.extend({
 
   init: function(opts) {
     this.model = new Song({
-      id: opts.id
+      id: opts.songId
     }, this._opts);
+    this._centerOnRegionId = opts.regionId;
     this.listenToOnce(this.model, 'sync', this._loadSong);
     this.listenTo(this.model, 'error', this._onError);
     this._history = new History(this.dispatcher);
@@ -81,7 +82,8 @@ module.exports = View.extend({
       wavesurfer: wavesurfer,
       model: this.model,
       dispatcher: this.dispatcher,
-      api: this.api
+      api: this.api,
+      centerOn: this._centerOnRegionId
     });
     this.listenTo(regionsView, 'scroll', this.panTo);
 
@@ -98,6 +100,7 @@ module.exports = View.extend({
       error: err
     });
   },
+
 
   onWheelWaveform: function(e) {
     e.preventDefault();
@@ -142,8 +145,13 @@ module.exports = View.extend({
     var pps = this.pxPerSec() + this._zoomDelta;
     if (pps > this._maxPps) return;
     var duration = this._audio.wavesurfer.getDuration();
-    this.trigger('zoom', pps, duration);
+    this.zoomTo(pps);
+  },
+
+  zoomTo: function(pps) {
+    this.trigger('zoom', pps, this._audio.wavesurfer.getDuration());
     this._audio.wavesurfer.fireEvent('zoom');
+    return this;
   },
 
   zoomOut: function() {
@@ -153,14 +161,16 @@ module.exports = View.extend({
     var pps = this.pxPerSec() - this._zoomDelta;
     var minPps = this.$el.width() / duration;
     if (pps < minPps) pps = minPps;
+    this.zoomTo(pps);
+  },
 
-    this.trigger('zoom', pps, duration);
-    this._audio.wavesurfer.fireEvent('zoom');
+  viewportWidth: function() {
+    return this.el.clientWidth;
   },
 
   destroy: function() {
     if (this._audio.wavesurfer) this._audio.wavesurfer.destroy();
-    if(this._history) this._history.destroy();
+    if (this._history) this._history.destroy();
     this._destroy();
   }
 });

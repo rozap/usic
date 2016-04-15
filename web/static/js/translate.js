@@ -21,7 +21,7 @@ var terms = {
   'last_updated': 'last updated',
   'my_transcriptions': 'my transcriptions',
   'all_transcriptions': 'all transcriptions',
-  'no_transcriptions': 'no transcriptions, yet.',
+  'no_transcriptions': 'no transcriptions',
   'logged_in': 'logged in',
   'display_name': 'display name',
   'unknown_user': 'That user does not exist',

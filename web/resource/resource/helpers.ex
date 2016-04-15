@@ -47,7 +47,6 @@ defmodule Usic.Resource.Helpers do
     |> limit([m], ^limit)
     |> offset([m], ^offset)
     |> order_by([m], [desc: m.updated_at])
-    |> apply_filters(params)
   end
 
 
@@ -62,7 +61,7 @@ defmodule Usic.Resource.Helpers do
     case query_result do
       {:ok, models} ->
         count_q = from(m in model.__struct__)
-        |> apply_filters(params)
+        # |> apply_filters(params)
         c = Usic.Repo.one(count_q |> select([m], count(m.id)))
 
         resp = %{}

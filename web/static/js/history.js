@@ -1,9 +1,6 @@
 function History(dispatcher) {
   this.resetHistory();
   this.dispatcher = dispatcher;
-  this.dispatcher.on('all', function(a, b, c){
-    console.log(a, b, c);
-  });
 
   this.dispatcher.on('history:create:region', this._onRegionCreate.bind(this));
     // this.listenTo(this.dispatcher, 'request:update:song', this._onSongUpdate);

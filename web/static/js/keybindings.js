@@ -41,7 +41,6 @@ KeyBindings.prototype = {
 
   _getEvent: function(e) {
     return _.reduce(keyCodes, function(acc, spec, eventName) {
-      // console.log(e.type, e.keyCode, '-->', spec.type, spec.code)
       if (
         e.shiftKey === (!!spec.shift) &&
         e.ctrlKey === (!!spec.ctrlKey) &&

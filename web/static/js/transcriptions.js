@@ -13,9 +13,37 @@ var TranscriptionListViewTemplate = require('./templates/transcription-list.html
 var FilterView = View.extend({
   el: '#filter',
   template: _.template(FilterViewTemplate),
-
+  events : {
+    'keyup .filter': 'onFilter'
+  },
   init: function() {
+    this.render();
+  },
 
+  _buildWhere: function(filter) {
+    var toks = filter.split(' ')
+
+    var things = _.partition(toks, function(tok) {
+      return tok.startsWith("#")
+    });
+    var regions = things[0].map(function(tag) {
+      return tag.slice(1);
+    });
+    var name = things[1].join(' ').trim();
+
+    if(regions.length || name.length) {
+      var q = {};
+      if(regions.length) q.regions = regions;
+      if(name.length) q.name = name;
+      return q;
+    }
+    return {};
+  },
+
+  onFilter:function(e) {
+    var filter = $(e.currentTarget).val()
+    var q = this._buildWhere(filter);
+    this.model.updateState("where", q);
   }
 })
 
@@ -46,8 +74,7 @@ module.exports = View.extend({
   events: {
     'click .next': 'onNext',
     'click .previous': 'onPrevious',
-    'click .delete-song': 'onDelete',
-    'keyup .filter': 'onFilter'
+    'click .delete-song': 'onDelete'
   },
 
 
@@ -55,7 +82,6 @@ module.exports = View.extend({
     this._state.title = opts.title || 'all_transcriptions';
     this.model = new Songs([], _.pick(opts, 'api', 'collectionState', 'dispatcher'));
     this.listenTo(this.model, 'destroy', this.fetch);
-    this.listenTo(this.model, 'sync', this.r);
 
     this.render();
     this.addSubview('list', TranscriptionListView, {

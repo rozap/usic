@@ -89,6 +89,137 @@ defmodule Usic.ApiSongTest do
     end
   end
 
+  test "can get a list of songs by name" do
+    socket = make_socket
+
+    names = [
+      "foo",
+      "foo bar",
+      "bar",
+      "baz"
+    ]
+
+    Enum.each(names, fn name ->
+      ref = push(socket, "create:song", %{
+        "url" => @url,
+        "name" => name
+      })
+      receive do
+        %Reply{payload: p, ref: ^ref} ->
+          assert p.url == @url
+          assert p.name == name
+      end
+    end)
+
+    ref = push(socket, "list:song", %{
+      "where" => %{
+        "name" => "foo"
+      }
+    })
+
+    receive do
+      %Reply{payload: p, ref: ^ref} ->
+        assert length(p["items"]) == 2
+        assert Enum.sort(Enum.map(p["items"], fn i -> i.name end)) == ["foo", "foo bar"]
+    end
+  end
+
+
+  test "can get a list of songs by region meta tag" do
+    socket = make_socket
+
+    names = [
+      "foo",
+      "foo bar",
+      "bar",
+      "baz"
+    ]
+
+    song_ids = Enum.map(names, fn name ->
+      ref = push(socket, "create:song", %{
+        "url" => @url,
+        "name" => name
+      })
+      receive do
+        %Reply{payload: p, ref: ^ref} -> 
+          song_id = p.id
+          ref = push(socket, "create:region", %{
+            "song_id" => song_id,
+            "name" => "##{name}",
+            "loop" => true,
+            "start" => 0,
+            "end" => 0
+          })
+
+          assert_reply ref, :ok, %Usic.Region{}
+      end
+    end)
+
+    ref = push(socket, "list:song", %{
+      "where" => %{
+        "regions" => ["foo"]
+      }
+    })
+
+    receive do
+      %Reply{payload: p, ref: ^ref} ->
+        songs = p["items"]
+        assert length(songs) == 2
+
+        Enum.each(songs, fn %Usic.Song{regions: [region]} ->
+          assert "foo" in region.meta["tags"]
+        end)
+    end
+  end
+
+
+  test "tags are applied with OR" do
+    socket = make_socket
+
+    names = [
+      "foo",
+      "foo bar",
+      "bar",
+      "baz"
+    ]
+
+    song_ids = Enum.map(names, fn name ->
+      ref = push(socket, "create:song", %{
+        "url" => @url,
+        "name" => name
+      })
+      receive do
+        %Reply{payload: p, ref: ^ref} -> 
+          song_id = p.id
+          ref = push(socket, "create:region", %{
+            "song_id" => song_id,
+            "name" => "##{name}",
+            "loop" => true,
+            "start" => 0,
+            "end" => 0
+          })
+
+          assert_reply ref, :ok, %Usic.Region{}
+      end
+    end)
+
+    ref = push(socket, "list:song", %{
+      "where" => %{
+        "regions" => ["foo", "baz"]
+      }
+    })
+
+    receive do
+      %Reply{payload: p, ref: ^ref} ->
+        songs = p["items"]
+        assert length(songs) == 3
+
+        Enum.each(songs, fn %Usic.Song{regions: [region]} ->
+          assert (("foo" in region.meta["tags"]) or ("baz" in region.meta["tags"]))
+        end)
+    end
+  end
+
 
   test "can page a list of songs" do
     socket = make_socket
@@ -155,7 +286,7 @@ defmodule Usic.ApiSongTest do
       "url" => @url
     })
     receive do
-      %Reply{ref: ^ref, payload: p} -> assert p.location == nil
+      %Reply{ref: ^ref, payload: p} -> :ok
     end
 
     meta_update = receive do

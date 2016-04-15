@@ -42,7 +42,7 @@ defmodule Usic.Region do
         tags = name 
         |> String.split(" ") 
         |> Enum.filter(fn "#" <> _ -> true; _ -> false end)
-        |> Enum.map(fn "#" <> t -> t end)
+        |> Enum.map(fn "#" <> t -> String.strip(t) end)
 
         %Meta{tags: tags}
     end

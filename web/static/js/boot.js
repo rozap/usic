@@ -47,7 +47,6 @@ new KeyBindings(dispatcher);
 socket.onOpen(function() {
   dispatcher.trigger('error:dismiss');
 
-  console.log("Joining..");
   var token = getSessionToken();
   var api = socket.channel(token, {});
 

@@ -14,18 +14,16 @@ module.exports = {
     if(method==='destroy') {
       debugger;
     }
-    console.log("API", name, this.payloadFor(method));
     this._api.push(name, requestPayload)
       .receive("ok", function(payload) {
         payload = this.parse(payload);
-        console.log("sync success", name, payload)
         this.set(payload);
         this.trigger('sync', this);
         this._onSync();
         this._dispatcher.trigger(name + ':success', this);
       }.bind(this))
       .receive("error", function(payload) {
-        console.log("sync error", name, payload)
+        console.warn("sync error", name, payload)
         this.trigger('error', payload);
         this._onError();
         this._dispatcher.trigger(name + ':error', payload, this);

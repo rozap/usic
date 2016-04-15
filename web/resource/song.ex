@@ -9,9 +9,9 @@ defmodule Usic.Resource.Song do
 
 
   def join_user do
-    from(m in Song,
-      left_join: u in assoc(m, :user),
-      left_join: r in assoc(m, :regions),
+    from(s in Song,
+      left_join: u in assoc(s, :user),
+      left_join: r in assoc(s, :regions),
       preload: [user: u, regions: r])
   end
 
@@ -47,8 +47,29 @@ defmodule Usic.Resource.Song do
   end
 
   defimpl Usic.Resource.List, for: Song do
+
+    def pop_where(%{"where" => where} = params, name) do
+      put_in(params, ["where"], Map.delete(where, name))
+    end
+
+    def query(q, %{"where" => %{"name" => term}} = params) do
+      q 
+      |> where([s], ilike(s.name, "%#{term}%"))
+      |> query(pop_where(params, "name"))
+    end
+
+    def query(q, %{"where" => %{"regions" => tags}} = params) do
+
+      q 
+      |> where([s, u, r], fragment("?->'tags' \\?| ?", r.meta, ^tags))
+      |> query(pop_where(params, "regions"))
+    end
+
+    def query(q, params), do: apply_filters(q, params)
+
     def handle(_, %State{params: params} = state) do
       Usic.Resource.Song.join_user
+      |> query(params)
       |> slice(params)
       |> select([m], m)
       |> as_list_result_for(%Song{}, state)

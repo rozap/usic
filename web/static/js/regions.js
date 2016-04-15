@@ -24,6 +24,8 @@ module.exports = View.extend({
       api: opts.api,
       dispatcher: opts.dispatcher
     });
+    this.centerOn = opts.centerOn;
+
     this.listenToOnce(this.regions, 'sync', this.onRegionsSynced);
     this.listenTo(this.regions, 'error', this.onRegionsError);
     this.listenTo(this.regions, 'add', this.r);
@@ -82,6 +84,10 @@ module.exports = View.extend({
       });
       model.addUnderlying(waveRegion);
 
+      if(this.centerOn && (parseInt(this.centerOn) === model.get('id'))) {
+        this._centerOnRegion(model);
+        this.centerOn = false;
+      }
     }.bind(this));
     this.render();
   },
@@ -112,6 +118,15 @@ module.exports = View.extend({
     return String.fromCharCode(65 + (count % 26) + index);
   },
 
+  _centerOnRegion:function(region) {
+    var regionDuration = region.get('end') - region.get('start');
+    var pad = 80;
+    var pps = (this._parent.viewportWidth() - pad) / regionDuration;
+    this._parent
+      .zoomTo(pps)
+      .panTo((region.get('start') * this._parent.pxPerSec()) - (pad / 2))
+  },
+
   //TODO: urgh
   _getPxPerSec: function() {
     return this._wavesurfer.params.minPxPerSec;
@@ -135,8 +150,8 @@ module.exports = View.extend({
     this.$el.scrollLeft(p);
   },
 
-  zoomTo: function(pps, duration) {
-    this.trigger('zoom', pps, duration);
+  zoomTo: function(pps) {
+    this.trigger('zoom', pps, this._getDuration());
     this.render();
   },
 

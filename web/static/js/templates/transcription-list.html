@@ -4,7 +4,9 @@
   <% state.model.forEach(function(song) { %>
     <li class="transcription">
       <h3>
-        <a href="#song/<%- song.get('id') %>"><%- song.get('name') || t('untitled') %></a>
+        <a href="#song/<%- song.get('id') %>">
+          <%- song.get('name') || t('untitled') %>
+        </a>
       </h3>
       
       <ul class="meta-tags">
@@ -12,8 +14,8 @@
           <% if(region.meta && region.meta.tags) { %>
             <% region.meta.tags.forEach(function(tag) { %>
               <li class="tag">
-                <a href="#transcriptions/<%- tag %>" 
-                  title="Look for songs tagged '<%- tag %>'">
+                <a href="#song/<%- song.get('id') %>/region/<%- region.id %>" 
+                  title="Go to this section">
                   <%- tag %>
                 </a>
               </li>

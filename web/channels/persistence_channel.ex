@@ -1,9 +1,6 @@
 defmodule Usic.PersistenceChannel do
   use Phoenix.Channel
-  import Ecto.Query
   require Logger
-  alias Usic.Session
-  alias Usic.Repo
   require Usic.Song
   alias Usic.Resource.State
 

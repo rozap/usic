@@ -15,9 +15,11 @@ module.exports = bb.Router.extend({
     'logout': 'logout',
     'register': 'register',
     'song/:uid': 'song',
+    'song/:uid/region/:id': 'song',
     'me': 'me',
     'about': 'about',
     'transcriptions/:page': 'transcriptions'
+
   },
 
   initialize: function(opts) {
@@ -36,7 +38,6 @@ module.exports = bb.Router.extend({
   },
 
   index: function() {
-    console.log("route", "index");
     this.reset();
   },
 
@@ -66,10 +67,11 @@ module.exports = bb.Router.extend({
     this._main = new Register(this._opts());
   },
 
-  song: function(id) {
+  song: function(songId, regionId) {
     this.reset();
     this._main = new Song(this._opts({
-      id: id
+      songId: songId,
+      regionId: regionId
     }));
     document.querySelector('#search-input').blur();
   },

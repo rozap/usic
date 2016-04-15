@@ -9,7 +9,7 @@ defmodule Usic.DryMetaserver do
 
   def handle_call({:get, _id}, _from, state) do
     metadata = %{
-      "title"=> "foobar"
+      "title" => "foobar"
     }
     {:reply, {:ok, metadata}, state}
   end

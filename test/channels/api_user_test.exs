@@ -103,7 +103,7 @@ defmodule Usic.ApiUserTest do
         e = p
         |> Poison.encode!
         |> Poison.decode!
-        assert e ==  %{"password" => "should be at least 6 characters"}
+        assert e ==  %{"password" => "should be at least 6 character(s)"}
     end
   end
 

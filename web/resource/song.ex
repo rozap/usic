@@ -53,8 +53,9 @@ defmodule Usic.Resource.Song do
     end
 
     def query(q, %{"where" => %{"name" => term}} = params) do
+      query_term = "%#{term}%"
       q 
-      |> where([s], ilike(s.name, "%#{term}%"))
+      |> where([s], ilike(s.name, ^query_term))
       |> query(pop_where(params, "name"))
     end
 

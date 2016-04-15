@@ -1,5 +1,3 @@
-there is nothing to see here
+A tool for helping you learn songs locked inside the world wide web, by ear.
 
-todo:
-  errors are wrapped in the action that they were...
-    kind of annoying
+[μsic](https://usic.space)

@@ -13,4 +13,12 @@
       <i class="text-muted ion-edit"></i>
     </a>
   </h3>
+
+  <h6 class="text-muted">
+    created by <% if(state.model.get('user')) { %>
+      <%- state.model.get('user').display_name %>
+    <% } else { %>
+      <%- t('anonymous') %>
+    <% } %>
+  </h6>
 <% } %>

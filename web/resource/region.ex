@@ -9,9 +9,9 @@ defmodule Usic.Resource.Region do
 
   defp check_user_perms(song_id, session) do
     case Usic.Repo.get(Usic.Song, song_id) do
-      nil -> 
+      nil ->
         []
-      song -> 
+      song ->
         Usic.Resource.Song.check_user_perms(song, session)
     end
   end
@@ -25,6 +25,13 @@ defmodule Usic.Resource.Region do
     end
   end
 
+  defimpl Usic.Resource.Update, for: Region do
+    use Usic.Resource
+    stage :handle, mod: Usic.Resource.Read
+    stage :validate_user, mod: Usic.Resource.Region
+    stage :update, mod: Usic.Resource.UpdateAny
+    stage :handle, mod: Usic.Resource.Read
+  end
 
   defimpl Usic.Resource.List, for: Region do
     use Usic.Resource
@@ -42,13 +49,11 @@ defmodule Usic.Resource.Region do
     def query(model, state) do
       Usic.Resource.ListAny.query(model, state)
     end
-
   end
 
 
   defimpl Usic.Resource.Delete, for: Region do
     use Usic.Resource
-
     stage :handle, mod: Usic.Resource.Read
     stage :validate_user, mod: Usic.Resource.Region
     stage :delete, mod: Usic.Resource.DeleteAny

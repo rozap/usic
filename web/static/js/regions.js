@@ -19,19 +19,19 @@ module.exports = View.extend({
   init: function(opts) {
     this._wavesurfer = opts.wavesurfer;
     this._bindEvents();
-    this.regions = new Regions([], {
+    this.regions = new Regions(opts.model.get('regions'), {
       song: opts.model,
       api: opts.api,
       dispatcher: opts.dispatcher
     });
-    this.centerOn = opts.centerOn;
 
     this.listenToOnce(this.regions, 'sync', this.onRegionsSynced);
     this.listenTo(this.regions, 'error', this.onRegionsError);
     this.listenTo(this.regions, 'add', this.r);
 
-    this.regions.fetch();
     this.render();
+    this.onRegionsSynced();
+    this._centerOnRegion(opts.centerOn);
     this.addSubview('clicks', ClicksView, {
       model: this.model,
       wavesurfer: this._wavesurfer
@@ -84,10 +84,6 @@ module.exports = View.extend({
       });
       model.addUnderlying(waveRegion);
 
-      if(this.centerOn && (parseInt(this.centerOn) === model.get('id'))) {
-        this._centerOnRegion(model);
-        this.centerOn = false;
-      }
     }.bind(this));
     this.render();
   },
@@ -118,13 +114,21 @@ module.exports = View.extend({
     return String.fromCharCode(65 + (count % 26) + index);
   },
 
-  _centerOnRegion:function(region) {
-    var regionDuration = region.get('end') - region.get('start');
-    var pad = 80;
-    var pps = (this._parent.viewportWidth() - pad) / regionDuration;
-    this._parent
-      .zoomTo(pps)
-      .panTo((region.get('start') * this._parent.pxPerSec()) - (pad / 2))
+  _centerOnRegion: function(centerOn) {
+    if (centerOn) {
+      var centerId = parseInt(centerOn);
+      var region = this.regions.get(centerId);
+      if (!region) return;
+
+      var regionDuration = region.get('end') - region.get('start');
+      var pad = 80;
+      var pps = (this._parent.viewportWidth() - pad) / regionDuration;
+      this._parent
+        .zoomTo(pps)
+        .panTo((region.get('start') * this._parent.pxPerSec()) - (pad / 2));
+
+      this.centerOn = false;
+    }
   },
 
   //TODO: urgh

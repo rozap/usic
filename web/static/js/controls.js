@@ -145,7 +145,7 @@ var Controls = View.extend({
       autoCenter: !this.model.get('state').autoCenter
     });
     this._saveModel();
-    this._audio.wavesurfer.params.follow = this.model.get('state').autoCenter;
+    this._audio.wavesurfer.params.autoCenter = this.model.get('state').autoCenter;
   },
 
   onToggleHelp: function() {

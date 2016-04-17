@@ -23,7 +23,7 @@ module.exports = View.extend({
   _audio: {},
   _zoomDelta: 2,
   _panDelta: 30,
-  _maxPps: 106, //TODO: why does it go to shit at 106
+  _maxPps: 66, //TODO: why does it go to shit at 106
   _minPps: 2,
   _pan: 0,
 
@@ -77,6 +77,7 @@ module.exports = View.extend({
       buf: buf
     });
     var wavesurfer = waveView.wv();
+    this._audio.wavesurfer = wavesurfer;
 
     var regionsView = this.addSubview('regions', RegionView, {
       wavesurfer: wavesurfer,
@@ -87,7 +88,6 @@ module.exports = View.extend({
     });
     this.listenTo(regionsView, 'scroll', this.panTo);
 
-    this._audio.wavesurfer = wavesurfer;
     this.addSubview('controls', ControlsView, {
       audio: this._audio,
       model: this.model
@@ -144,11 +144,13 @@ module.exports = View.extend({
   zoomIn: function() {
     var pps = this.pxPerSec() + this._zoomDelta;
     if (pps > this._maxPps) return;
-    var duration = this._audio.wavesurfer.getDuration();
     this.zoomTo(pps);
   },
 
   zoomTo: function(pps) {
+    pps = Math.max(pps, this._minPps);
+    pps = Math.min(pps, this._maxPps);
+    console.log('pps', pps)
     this.trigger('zoom', pps, this._audio.wavesurfer.getDuration());
     this._audio.wavesurfer.fireEvent('zoom');
     return this;

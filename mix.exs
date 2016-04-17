@@ -3,7 +3,7 @@ defmodule Usic.Mixfile do
 
   def project do
     [app: :usic,
-     version: "0.1.5",
+     version: "0.1.6",
      elixir: "~> 1.0",
      elixirc_paths: elixirc_paths(Mix.env),
      compilers: [:phoenix] ++ Mix.compilers,

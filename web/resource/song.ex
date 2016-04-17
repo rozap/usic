@@ -5,14 +5,15 @@ defmodule Usic.Resource.Song do
   alias Usic.Loader
   alias Usic.Song
   alias Usic.Model.Dispatcher
+  alias Usic.Repo
   alias Usic.Resource.State
 
 
   def join_user do
     from(s in Song,
       left_join: u in assoc(s, :user),
-      left_join: r in assoc(s, :regions),
-      preload: [user: u, regions: r])
+      left_join: r in assoc(s, :regions)
+    )
   end
 
   def check_user_perms(song, session) do
@@ -40,9 +41,24 @@ defmodule Usic.Resource.Song do
   end
 
   defimpl Usic.Resource.Read, for: Song do
-    def handle(_, %State{params: params} = state) do
-      Usic.Resource.Song.join_user
-      |> as_single_result_for(%Song{}, params, state)
+    def handle(_, %State{params: %{"id" => id}} = state) do
+      model = Usic.Resource.Song.join_user
+      |> where([s], s.id == ^id)
+      |> group_by([s], s.id)
+      |> select([s], s)
+      |> Repo.one
+
+      case model do
+        nil ->
+          struct(state, error: %{id: :not_found})
+        _ ->
+          result = model
+          |> Repo.preload(:user)
+          |> Repo.preload(:regions)
+
+          struct(state, resp: result)
+      end
+
     end
   end
 
@@ -60,7 +76,6 @@ defmodule Usic.Resource.Song do
     end
 
     def query(q, %{"where" => %{"regions" => tags}} = params) do
-
       q
       |> where([s, u, r], fragment("?->'tags' \\?| ?", r.meta, ^tags))
       |> query(pop_where(params, "regions"))
@@ -72,11 +87,19 @@ defmodule Usic.Resource.Song do
       q = Usic.Resource.Song.join_user
       |> query(params)
 
-      songs = q
+      result = q
+      |> group_by([s], s.id)
       |> slice(params)
-      |> select([m], m)
+      |> select([s], s)
+      |> eval_q
 
-      as_list_result_for(songs, %Song{}, state, q)
+      songs = with {:ok, songs} <- result do
+        {:ok, songs
+        |> Repo.preload(:user)
+        |> Repo.preload(:regions)}
+      end
+
+      enum_meta(q, songs, state)
     end
   end
 

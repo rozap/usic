@@ -46,32 +46,34 @@ defmodule Usic.Resource.Helpers do
     query
     |> limit([m], ^limit)
     |> offset([m], ^offset)
-    |> order_by([m], [desc: m.updated_at])
+    |> order_by([s], [desc: s.updated_at])
   end
 
-
-  def as_list_result_for(query, model, %State{params: params} = state, counter) do
-    query_result = try do
+  def eval_q(query) do
+    try do
       {:ok, Repo.all(query)}
     rescue
       e in [Ecto.QueryError] ->
         {:error, %{query: e.message}}
     end
+  end
 
-    case query_result do
-      {:ok, models} ->
-        c = counter
-        |> exclude(:preload)
-        |> select([s], count(s.id))
-        |> Usic.Repo.one
 
-        resp = %{}
-        |> Dict.put("items", models)
-        |> Dict.put("count", c)
+  def enum_meta(_, {:error, reason}, state) do
+    struct(state, error: reason)
+  end
 
-        struct(state, resp: resp)
-      {:error, reason} -> struct(state, error: reason)
-    end
+  def enum_meta(query, {:ok, items}, state) do
+    count = query
+    |> exclude(:preload)
+    |> select([s], count(s.id, :distinct))
+    |> Usic.Repo.one
+
+    resp = %{}
+    |> Dict.put("items", items)
+    |> Dict.put("count", count)
+
+    struct(state, resp: resp)
   end
 
 
@@ -91,51 +93,5 @@ defmodule Usic.Resource.Helpers do
   end
 
   def apply_filters(query, _), do: query
-
-
-
-
-  ##
-  # Read and List should be able to send a where query
-  # Read will just ensure this returns one thing
-  #
-
-  def as_single_result_for(query, model, params, state) do
-    [id_name] = model.__struct__.__schema__(:primary_key)
-    case Map.get(params, Atom.to_string(id_name)) do
-      nil ->
-        struct(state, error: %{id: :not_found})
-      id ->
-        results = query
-        |> where([m], m.id == ^id)
-        |> select([m], m)
-        |> Usic.Repo.one
-
-        case results do
-          nil -> struct(state, error: %{id: :not_found})
-          instance -> struct(state, resp: instance)
-        end
-    end
-  end
-
-  def create(model, params, socket) do
-    session = Map.get(socket.assigns, :session, nil)
-    cset = model.__struct__.changeset(model, params, session: session)
-    Logger.info("Create #{inspect model} :: #{inspect params}")
-
-    case Usic.Repo.insert(cset) do
-      {:error, reason} ->
-        {:error, {reason, socket}}
-      {:ok, inserted} ->
-        Read.read(model, %{"id" => inserted.id}, socket)
-    end
-  end
-
-
-  def read(model, params, socket) do
-    from(m in model.__struct__)
-    |> as_single_result_for(model, params, socket)
-  end
-
 
 end

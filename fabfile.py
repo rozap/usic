@@ -19,14 +19,18 @@ releases = "./rel/usic/releases"
 archive_name = "usic.tar.gz"
 
 def check_deploy():
-    local('mix clean')
-    local('mix test')
+    # local('mix clean')
+    # local('mix test')
     local('mix ship')
 
-def make_dirs():
+def make_dirs(version):
     sudo("mkdir -p {base_dir}".format(base_dir = base_dir))
     sudo("mkdir -p {log_dir}".format(log_dir = log_dir))
     sudo("mkdir -p {media_dir}".format(media_dir = media_dir))
+    sudo("mkdir -p {base_dir}/releases/{version}".format(
+        base_dir = base_dir,
+        version = version
+    ))
 
     sudo("chown -R usic:usic {base_dir}".format(base_dir = base_dir))
     sudo("chown -R usic:usic {log_dir}".format(log_dir = log_dir))
@@ -52,16 +56,20 @@ def build_release():
         return archive_name, join(release_dir, archive_name)
 
 
-def ship():
+def ship(version):
     archive_name, archive = build_release()
-    put(archive, "/tmp")
 
-    make_dirs()
+    make_dirs(version)
+    put(archive, "{base_dir}/releases/{version}".format(
+        base_dir = base_dir,
+        version = version
+    ))
 
     with cd(base_dir):
-        sudo("tar xfz /tmp/{archive_name}".format(
+        sudo("tar xfz {base_dir}/releases/{version}/{archive_name}".format(
             archive_name = archive_name,
-            base_dir = base_dir
+            base_dir = base_dir,
+            version = version
         ))
     put("deploy/upstart.conf", "/etc/init/usic.conf", use_sudo = True)
 
@@ -83,8 +91,6 @@ def migrate(version):
     return prompt('Are your migrations in order?', default = 'no')
 
 def upgrade(version):
-    # ~~ we are living in the future ~~
-    # ~~ the future is 1980 ~~
     print(yellow("Upgrading to {version}".format(version = version)))
     with cd(base_dir):
         sudo("bin/usic upgrade {version}".format(version = version))
@@ -103,7 +109,7 @@ def deploy(version):
     check_deploy()
     print(green("starting deploy"))
     ensure_packages()
-    ship()
+    ship(version)
 
     res = migrate(version)
 

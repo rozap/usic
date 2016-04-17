@@ -65,6 +65,27 @@ defmodule Usic.ApiSongTest do
     end
   end
 
+  test "can create an anonymous song and read it" do
+    socket = make_socket
+    ref = push(socket, "create:song", %{
+      "url" => @url
+    })
+    song_id = receive do
+      %Reply{payload: p, ref: ^ref} -> p.id
+    end
+
+    ref = push(socket, "read:song", %{
+      "id" => song_id
+    })
+
+    receive do
+      %Reply{payload: p, ref: ^ref} ->
+        %{"url" => "https://www.youtube.com/watch?v=lVKBRF4gu54"} = p
+        |> Poison.encode!
+        |> Poison.decode!
+    end
+  end
+
   test "can get a list of songs" do
     socket = make_socket
     Enum.each(1..20, fn _ ->
@@ -81,7 +102,7 @@ defmodule Usic.ApiSongTest do
 
     receive do
       %Reply{payload: p, ref: ^ref} ->
-        Enum.each(p["items"], fn song -> 
+        Enum.each(p["items"], fn song ->
           assert song.user == nil
         end)
         assert length(p["items"]) == 16
@@ -141,7 +162,7 @@ defmodule Usic.ApiSongTest do
         "name" => name
       })
       receive do
-        %Reply{payload: p, ref: ^ref} -> 
+        %Reply{payload: p, ref: ^ref} ->
           song_id = p.id
           ref = push(socket, "create:region", %{
             "song_id" => song_id,
@@ -189,7 +210,7 @@ defmodule Usic.ApiSongTest do
         "name" => name
       })
       receive do
-        %Reply{payload: p, ref: ^ref} -> 
+        %Reply{payload: p, ref: ^ref} ->
           song_id = p.id
           ref = push(socket, "create:region", %{
             "song_id" => song_id,
@@ -407,7 +428,7 @@ defmodule Usic.ApiSongTest do
     Usic.Repo.get(Song, song.id)
   end
 
-  
+
   test "cant delete another user's song" do
     {_, _, [song0 | _]} = make_authed_songs(0)
     {socket1, _, _} = make_authed_songs(1)

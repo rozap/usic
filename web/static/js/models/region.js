@@ -45,7 +45,8 @@ module.exports = Model.extend({
       };
     }
 
-    var s = this._song.get('state')
+    var s = this._song.get('state');
+    if(!s.clicks || !s.measures) return;
     var markers = s.clicks.concat(s.measures);
     var snap = function(position) {
       return markers.reduce(function(eps, click) {

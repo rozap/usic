@@ -13,7 +13,7 @@ var PagerTemplate = require('./templates/pager.html');
 var FilterView = View.extend({
   el: '#filter',
   template: _.template(FilterViewTemplate),
-  events : {
+  events: {
     'keyup .filter': 'onFilter'
   },
   init: function() {
@@ -33,15 +33,15 @@ var FilterView = View.extend({
     });
     var name = tagsAndFreeText[1].join(' ').trim();
 
-    if(regions.length || name.length) {
-      if(regions.length) q.regions = regions;
-      if(name.length) q.name = name;
+    if (regions.length || name.length) {
+      if (regions.length) q.regions = regions;
+      if (name.length) q.name = name;
       return q;
     }
     return q;
   },
 
-  onFilter:function(e) {
+  onFilter: function(e) {
     var filter = $(e.currentTarget).val();
 
     var state = this.model.getState();

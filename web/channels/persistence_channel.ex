@@ -84,9 +84,7 @@ defmodule Usic.PersistenceChannel do
           |> r
         model ->
           state = %State{params: params, socket: socket}
-          Logger.debug("Dispatch #{unquote(protocol)} #{inspect model.__struct__} #{inspect state}")
           res = unquote(protocol).handle(model, state)
-          Logger.debug("#{inspect res}")
           r(res)
       end
     end

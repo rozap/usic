@@ -1,5 +1,6 @@
 
 var terms = {
+  'load_state_undefined': 'Loading...',
   'load_state_invalid_link': 'Invalid youtube URL',
   'load_state_loading': 'Loading the video',
   'load_state_error': 'Error loading the video',

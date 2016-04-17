@@ -23,6 +23,7 @@ module.exports = View.extend({
       hideScrollbar: false,
       scrollParent: true,
       minPxPerSec: 10,
+      autoCenter: false
     });
     wavesurfer.enableDragSelection({});
 

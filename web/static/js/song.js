@@ -33,14 +33,26 @@ module.exports = View.extend({
   },
 
   init: function(opts) {
-    this.model = new Song({
-      id: opts.songId
-    }, this._opts);
-    this._centerOnRegionId = opts.regionId;
-    this.listenToOnce(this.model, 'sync', this._loadSong);
-    this.listenTo(this.model, 'error', this._onError);
-    this._history = new History(this.dispatcher);
-    this.model.fetch();
+    this.listenTo(this, 'state.update.songId', this._onSongChanged);
+    this.listenTo(this, 'state.update.regionId', this._onRegionChanged);
+    window.song = this;
+  },
+
+  _onSongChanged: function(oldId, newId) {
+    if (!oldId || (oldId !== newId)) {
+      this.model = new Song({
+        id: newId
+      }, this._opts);
+      this.listenToOnce(this.model, 'sync', this._loadSong);
+      this.listenTo(this.model, 'error', this._onError);
+      this._history = new History(this.dispatcher);
+      this.model.fetch();
+    }
+  },
+
+  _onRegionChanged:function(_oldRegion, newRegion) {
+    console.log(_oldRegion, "-->", newRegion)
+    this._state.centerOnRegionId = newRegion;
   },
 
   _onError: function(err) {
@@ -84,10 +96,9 @@ module.exports = View.extend({
       model: this.model,
       dispatcher: this.dispatcher,
       api: this.api,
-      centerOn: this._centerOnRegionId
+      centerOn: this._state.centerOnRegionId
     });
     this.listenTo(regionsView, 'scroll', this.panTo);
-
     this.addSubview('controls', ControlsView, {
       audio: this._audio,
       model: this.model
@@ -150,7 +161,6 @@ module.exports = View.extend({
   zoomTo: function(pps) {
     pps = Math.max(pps, this._minPps);
     pps = Math.min(pps, this._maxPps);
-    console.log('pps', pps)
     this.trigger('zoom', pps, this._audio.wavesurfer.getDuration());
     this._audio.wavesurfer.fireEvent('zoom');
     return this;

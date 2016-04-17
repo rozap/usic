@@ -16,9 +16,10 @@ module.exports = View.extend({
     'keyup textarea': 'onEditKey'
   },
 
-  renderTo: ['model'],
+  renderTo: ['model', 'song'],
 
   init: function(opts) {
+    this.song = opts.song;
     this._state.pxPerSec = opts.pxPerSec;
     this._state.duration = opts.duration;
     this._state.editing = false;
@@ -45,7 +46,7 @@ module.exports = View.extend({
     this.trigger('selected', this);
     this.updateState({
       isSelected: true
-    });
+    }).render();
     return this;
   },
 
@@ -54,7 +55,7 @@ module.exports = View.extend({
     this.trigger('deselected', this);
     this.updateState({
       isSelected: false
-    });
+    }).render();
     return this;
   },
 
@@ -65,7 +66,7 @@ module.exports = View.extend({
   onEdit: function() {
     this.updateState({
       editing: true
-    });
+    }).render();
     this.dispatcher.trigger('input:unbind');
   },
 
@@ -76,7 +77,7 @@ module.exports = View.extend({
         .save();
       this.updateState({
         editing: false
-      });
+      }).render();
       this.dispatcher.trigger('input:bind');
     }
   },

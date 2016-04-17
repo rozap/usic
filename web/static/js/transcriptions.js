@@ -54,7 +54,7 @@ var FilterView = View.extend({
 var TranscriptionListView = View.extend({
   el: '#transcription-list',
   template: _.template(TranscriptionListViewTemplate),
-  renderTo: ['isMine'],
+  renderTo: ['isMine', 'getSortedRegions'],
 
   init: function() {
     this.listenTo(this.model, 'change sync remove', this.r);
@@ -67,6 +67,14 @@ var TranscriptionListView = View.extend({
       song.get('user') &&
       this.api.session.get('user').id === song.get('user').id;
   },
+
+  getSortedRegions: function(song) {
+    var regions = _.clone(song.get('regions'));
+    regions.sort(function(r0, r1) {
+      return r0.start > r1.start ? 1 : -1;
+    });
+    return regions;
+  }
 
 });
 

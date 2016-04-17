@@ -8,6 +8,14 @@ var fragments = {
   'spinner': _.template(require('./templates/spinner.html'))
 };
 
+/**
+ * Need a state change loop here, state would need to be the router
+ * need a way to dispatch to change
+ *
+ * this.stateChange('song', )
+ */
+
+
 module.exports = bb.View.extend({
   initialize: function(opts) {
     this.api = opts.api;
@@ -21,24 +29,18 @@ module.exports = bb.View.extend({
     this.init(opts);
   },
 
-  stateChange: function(listenable, event, cb) {
-    this.listenTo(listenable, event, function() {
-      var state = cb.apply(this, Array.prototype.slice.call(arguments));
-      if (state) {
-        this._state = state;
-        this.render();
-      }
-    }.bind(this));
-  },
-
   setState: function(state) {
     this._state = state;
     this.render();
   },
 
-  updateState: function(state) {
-    this._state = _.extend({}, this._state, state);
-    this.render();
+  updateState: function(newState) {
+    var oldState = this._state
+    this._state = _.extend({}, oldState, newState);
+    _.each(newState, function(newValue, key) {
+      this.trigger('state.update.' + key, oldState[key], newValue);
+    }.bind(this))
+    return this;
   },
 
   _getState: function() {

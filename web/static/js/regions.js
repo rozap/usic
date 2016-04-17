@@ -16,6 +16,8 @@ module.exports = View.extend({
     'scroll': 'onScroll'
   },
 
+  _minRegionSize: 0.25,
+
   init: function(opts) {
     this._wavesurfer = opts.wavesurfer;
     this._bindEvents();
@@ -25,13 +27,14 @@ module.exports = View.extend({
       dispatcher: opts.dispatcher
     });
 
-    this.listenToOnce(this.regions, 'sync', this.onRegionsSynced);
     this.listenTo(this.regions, 'error', this.onRegionsError);
     this.listenTo(this.regions, 'add', this.r);
 
     this.render();
-    this.onRegionsSynced();
-    this._centerOnRegion(opts.centerOn);
+
+    this._addWavesurferRegions();
+    this._onCenterRegionChanged(null, opts.centerOn);
+
     this.addSubview('clicks', ClicksView, {
       model: this.model,
       wavesurfer: this._wavesurfer
@@ -39,16 +42,41 @@ module.exports = View.extend({
   },
 
   _bindEvents: function() {
-    this._wavesurfer.on('region-update-end', this.onChanged.bind(this));
+    this._wavesurfer.on('region-update-end', this.onWaveRegionUpdated.bind(this));
     this._wavesurfer.on('scroll', this.onScroll.bind(this));
     this.listenTo(this._parent, 'pan', this.panTo);
     this.listenTo(this._parent, 'zoom', this.zoomTo);
+    this.listenTo(this._parent, 'state.update.regionId', this._onCenterRegionChanged);
+    this.listenTo(this.dispatcher, 'input:onEnableZoomTool', this.onEnableZoomTool);
+    this.listenTo(this.dispatcher, 'input:onDisableZoomTool', this.onDisableZoomTool);
+
   },
 
   onDeselect: function(view) {
     (this.getSubview('regions') || []).forEach(function(region) {
       if (region.cid !== view.cid) region.onDeselect();
     });
+  },
+
+  onEnableZoomTool: function() {
+    $('body').css({
+      cursor: 'zoom-in'
+    });
+    this._state.zoomSelection = true;
+    this.regions.each(function(region) {
+      region.disableInteraction();
+    });
+  },
+
+  onDisableZoomTool: function() {
+    $('body').css({
+      cursor: 'pointer'
+    });
+    this._state.zoomSelection = false;
+    this.regions.each(function(region) {
+      region.enableInteraction();
+    });
+
   },
 
   onCloned: function(region) {
@@ -58,7 +86,7 @@ module.exports = View.extend({
       end: bounds.end + (bounds.end - bounds.start)
     });
     //hack because update-end event isn't fired
-    this.onChanged(r);
+    this.onWaveRegionUpdated(r);
   },
 
   onRegionsError: function(err) {
@@ -75,7 +103,7 @@ module.exports = View.extend({
     });
   },
 
-  onRegionsSynced: function() {
+  _addWavesurferRegions: function() {
     this.regions.each(function(model) {
       var waveRegion = this._wavesurfer.addRegion({
         start: model.get('start'),
@@ -88,22 +116,32 @@ module.exports = View.extend({
     this.render();
   },
 
-  onChanged: function(waveRegion) {
-    var existing = this._findRegionView(waveRegion);
-    if (existing) {
-      existing.onSelect();
-      return;
-    }
+  onWaveRegionUpdated: function(waveRegion) {
+    if (this._state.zoomSelection) {
+      this.onDisableZoomTool();
+      this._zoomSelection(waveRegion.start, waveRegion.end);
+      waveRegion.remove();
+    } else {
+      var existing = this._findRegionView(waveRegion);
+      if (existing) {
+        existing.onSelect();
+        return;
+      }
 
-    var model = new RegionModel({
-      name: this._buildDefaultName(),
-      song_id: this.model.get('id')
-    }, {
-      api: this.api,
-      dispatcher: this.dispatcher,
-      song: this.model
-    });
-    model.addUnderlying(waveRegion).save();
+      if(waveRegion.end - waveRegion.start < this._minRegionSize) {
+        return waveRegion.remove();
+      }
+
+      var model = new RegionModel({
+        name: this._buildDefaultName(),
+        song_id: this.model.get('id')
+      }, {
+        api: this.api,
+        dispatcher: this.dispatcher,
+        song: this.model
+      });
+      model.addUnderlying(waveRegion).save();
+    }
     // this.regions.add(model);
   },
 
@@ -114,21 +152,24 @@ module.exports = View.extend({
     return String.fromCharCode(65 + (count % 26) + index);
   },
 
-  _centerOnRegion: function(centerOn) {
+  _onCenterRegionChanged: function(_oldRegion, centerOn) {
     if (centerOn) {
       var centerId = parseInt(centerOn);
       var region = this.regions.get(centerId);
       if (!region) return;
 
-      var regionDuration = region.get('end') - region.get('start');
-      var pad = 80;
-      var pps = (this._parent.viewportWidth() - pad) / regionDuration;
-      this._parent
-        .zoomTo(pps)
-        .panTo((region.get('start') * this._parent.pxPerSec()) - (pad / 2));
-
-      this.centerOn = false;
+      this._zoomSelection(region.get('start'), region.get('end'));
     }
+  },
+
+  _zoomSelection: function(start, end) {
+    var pad = 80;
+    var duration = end - start;
+    var pps = (this._parent.viewportWidth() - pad) / duration;
+
+    this._parent
+      .zoomTo(pps)
+      .panTo((start * this._parent.pxPerSec()) - (pad / 2));
   },
 
   //TODO: urgh
@@ -167,7 +208,7 @@ module.exports = View.extend({
         api: this.api,
         dispatcher: this.dispatcher,
         pxPerSec: this._getPxPerSec(),
-        duration: this._getDuration(),
+        duration: this._getDuration()
       });
 
       this.listenTo(view, 'selected', this.onDeselect);

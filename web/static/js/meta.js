@@ -16,13 +16,13 @@ module.exports = View.extend({
   },
 
   onAuth: function(session) {
-    this.updateState({
+    this.setState({
       session: session
     });
   },
 
   onLogout: function() {
-    this.updateState({
+    this.setState({
       session: false
     });
   }

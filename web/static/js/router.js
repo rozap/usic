@@ -46,9 +46,17 @@ module.exports = bb.Router.extend({
     if (this._main) this._main.destroy();
   },
 
+  set: function(name, Cls, opts) {
+    if (this._viewName !== name) {
+      this.reset();
+      this._main = new Cls(opts || this._opts());
+    }
+    this._viewName = name;
+    return this._main;
+  },
+
   login: function() {
-    this.reset();
-    this._main = new Login(this._opts());
+    this.set('login', Login);
   },
 
   logout: function() {
@@ -63,31 +71,29 @@ module.exports = bb.Router.extend({
   },
 
   register: function() {
-    this.reset();
-    this._main = new Register(this._opts());
+    this.set('register', Register);
   },
 
   song: function(songId, regionId) {
-    this.reset();
-    this._main = new Song(this._opts({
-      songId: songId,
-      regionId: regionId
-    }));
+    this.set('song', Song)
+      .updateState({
+        songId: songId
+      })
+      .updateState({
+        regionId: regionId
+      });
     document.querySelector('#search-input').blur();
   },
 
   me: function() {
-    this.reset();
-    this._main = new Me(this._opts());
+    this.set('me', Me);
   },
 
   about: function() {
-    this.reset();
-    this._main = new About(this._opts());
+    this.set('about', About);
   },
 
   transcriptions: function(page) {
-    this.reset();
-    this._main = new Transcriptions(this._opts());
+    this.set('transcriptions', Transcriptions);
   }
 });

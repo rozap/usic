@@ -80,7 +80,7 @@ var terms = {
 
 
   'zoom': 'Zoom',
-  'd_zoom': 'Zoom in by holding shift and scrolling on the waveform.',
+  'd_zoom': 'Zoom in by holding shift and scrolling on the waveform. You can also hold the ctrl key and make a selection to zoom to it.',
 
   'pan': 'Pan',
   'd_pan': 'Pan left and right by scrolling on the waveform.',
@@ -96,6 +96,12 @@ var terms = {
   'help': 'Help',
   'hide_help': 'Close Help',
 
+  'ctrl_keyup' : 'release ctrl key',
+  'ctrl_keydown' : 'press+hold ctrl key',
+  'enable_zoom_selection': 'Select to zoom',
+  'disable_zoom_selection': 'Select to make a region',
+  'd_enable_zoom_selection': 'Changes the region creation tool to the zoom selection tool',
+  'd_disable_zoom_selection': 'Changes the zoom selection tool back to the region creation tool'
 
 };
 

@@ -100,7 +100,7 @@ var Controls = View.extend({
   _changeRate: function(rate) {
     this.model.updateState({
       rate: rate
-    });
+    }).render();
     this._saveModel();
     if (this.isPlaying()) this.play();
   },
@@ -143,7 +143,7 @@ var Controls = View.extend({
   onAutoCenter: function() {
     this.model.updateState({
       autoCenter: !this.model.get('state').autoCenter
-    });
+    }).render();
     this._saveModel();
     this._audio.wavesurfer.params.autoCenter = this.model.get('state').autoCenter;
   },
@@ -151,7 +151,7 @@ var Controls = View.extend({
   onToggleHelp: function() {
     this.updateState({
       helpShowing: !this._state.helpShowing
-    });
+    }).render();
   },
 
   _genKeys: function() {

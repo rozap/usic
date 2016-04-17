@@ -26,14 +26,14 @@ module.exports = View.extend({
   },
 
   onSave: function() {
-    this.updateState({
+    this.setState({
       isEditing: false
     });
     this._updateKeybindings();
   },
 
   onToggle: function() {
-    this.updateState({
+    this.setState({
       isEditing: !this._state.isEditing
     });
     this._updateKeybindings();

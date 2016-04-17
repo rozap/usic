@@ -99,10 +99,14 @@
       <% state.keyCodes.forEach(function(keyCode) { %>
         <li>
           <h4>
-            <% if(keyCode.ctrlKey) { %>
-            ctrl +
+            <% if(keyCode.describe) { %>
+              <%- t(keyCode.describe) %>:
+            <% } else { %>
+              <% if(keyCode.ctrlKey) { %>
+              ctrl +
+              <% } %>
+              <%- keyCode.character %>:
             <% } %>
-            <%- keyCode.character %> :
             <span class="text-muted"><%- t(keyCode.t) %></span>
           </h4>
           <p><%- t('d_' + keyCode.t) %></p>

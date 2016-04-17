@@ -63,6 +63,22 @@ module.exports = {
     code: 68,
     t: 'nudge_right'
   },
+  'onEnableZoomTool': {
+    character: 'ctrl',
+    type: 'keydown',
+    code: 17,
+    ctrlKey: true,
+    describe: 'ctrl_keydown',
+    t: 'enable_zoom_selection'
+  },
+  'onDisableZoomTool': {
+    character: 'ctrl',
+    type: 'keyup',
+    code: 17,
+    describe: 'ctrl_keyup',
+    t: 'disable_zoom_selection'
+  }
+
   // 'onUndo': {
   //   character: 'z',
   //   type: 'keyup',

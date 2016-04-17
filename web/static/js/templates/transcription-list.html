@@ -8,13 +8,14 @@
           <%- song.get('name') || t('untitled') %>
         </a>
       </h3>
-      
+
       <ul class="meta-tags">
-        <% song.get('regions').forEach(function(region) { %>
+        <!-- TODO: sort these regions by start time -->
+        <% state.getSortedRegions(song).forEach(function(region) { %>
           <% if(region.meta && region.meta.tags) { %>
             <% region.meta.tags.forEach(function(tag) { %>
               <li class="tag">
-                <a href="#song/<%- song.get('id') %>/region/<%- region.id %>" 
+                <a href="#song/<%- song.get('id') %>/region/<%- region.id %>"
                   title="Go to this section">
                   <%- tag %>
                 </a>

@@ -23,8 +23,16 @@ module.exports = Model.extend({
 
     this._underlying = waveRegion;
     this._underlying.on('update', this.onUnderlyingUpdate.bind(this));
-    // this.onUnderlyingUpdate();
+    this.onUnderlyingUpdate();
     return this;
+  },
+
+  disableInteraction:function() {
+    this._underlying.freeze();
+  },
+
+  enableInteraction:function( ){
+    this._underlying.unfreeze();
   },
 
   enableSnapping: function() {

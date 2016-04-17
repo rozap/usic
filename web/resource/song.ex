@@ -54,14 +54,14 @@ defmodule Usic.Resource.Song do
 
     def query(q, %{"where" => %{"name" => term}} = params) do
       query_term = "%#{term}%"
-      q 
+      q
       |> where([s], ilike(s.name, ^query_term))
       |> query(pop_where(params, "name"))
     end
 
     def query(q, %{"where" => %{"regions" => tags}} = params) do
 
-      q 
+      q
       |> where([s, u, r], fragment("?->'tags' \\?| ?", r.meta, ^tags))
       |> query(pop_where(params, "regions"))
     end
@@ -69,11 +69,14 @@ defmodule Usic.Resource.Song do
     def query(q, params), do: apply_filters(q, params)
 
     def handle(_, %State{params: params} = state) do
-      Usic.Resource.Song.join_user
+      q = Usic.Resource.Song.join_user
       |> query(params)
+
+      songs = q
       |> slice(params)
       |> select([m], m)
-      |> as_list_result_for(%Song{}, state)
+
+      as_list_result_for(songs, %Song{}, state, q)
     end
   end
 

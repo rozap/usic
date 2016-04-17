@@ -38,16 +38,16 @@ defmodule Usic.Region do
   def changeset(region, params \\ :empty) do
     meta = case params["name"] do
       nil -> region.meta
-      name -> 
-        tags = name 
-        |> String.split(" ") 
+      name ->
+        tags = name
+        |> String.split(" ")
         |> Enum.filter(fn "#" <> _ -> true; _ -> false end)
         |> Enum.map(fn "#" <> t -> String.strip(t) end)
 
         %Meta{tags: tags}
     end
     params = Dict.put(params, "meta", meta)
-    cast(region, params, ~w(song_id name start end loop meta))
+    cast(region, params, ~w(song_id name start end loop meta), [])
   end
 end
 

@@ -11,9 +11,8 @@ module.exports = {
     var requestPayload = this.payloadFor(method);
     this._dispatcher.trigger('history:' + name, this);
 
-    if(method==='destroy') {
-      debugger;
-    }
+    console.log("state", this._state)
+
     this._api.push(name, requestPayload)
       .receive("ok", function(payload) {
         payload = this.parse(payload);

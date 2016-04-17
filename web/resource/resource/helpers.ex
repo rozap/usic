@@ -9,7 +9,7 @@ defmodule Usic.Resource.Helpers do
     case state.socket.assigns[:session] do
       nil ->
         {:error, struct(state, error: %{"session" => "not_logged_in"})}
-      _ -> 
+      _ ->
         {:ok, state}
     end
   end
@@ -50,7 +50,7 @@ defmodule Usic.Resource.Helpers do
   end
 
 
-  def as_list_result_for(query, model, %State{params: params} = state) do
+  def as_list_result_for(query, model, %State{params: params} = state, counter) do
     query_result = try do
       {:ok, Repo.all(query)}
     rescue
@@ -60,9 +60,10 @@ defmodule Usic.Resource.Helpers do
 
     case query_result do
       {:ok, models} ->
-        count_q = from(m in model.__struct__)
-        # |> apply_filters(params)
-        c = Usic.Repo.one(count_q |> select([m], count(m.id)))
+        c = counter
+        |> exclude(:preload)
+        |> select([s], count(s.id))
+        |> Usic.Repo.one
 
         resp = %{}
         |> Dict.put("items", models)
@@ -76,7 +77,7 @@ defmodule Usic.Resource.Helpers do
 
   def filter(query, {name, value}) do
     case String.split(name, ".") do
-      [name] -> 
+      [name] ->
         fname = String.to_atom(name)
         query |> where([m], field(m, ^fname) == ^value)
       _ -> query
@@ -92,7 +93,7 @@ defmodule Usic.Resource.Helpers do
   def apply_filters(query, _), do: query
 
 
-  
+
 
   ##
   # Read and List should be able to send a where query

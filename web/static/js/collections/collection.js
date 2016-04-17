@@ -27,6 +27,10 @@ module.exports = bb.Collection.extend(_.extend({
     this.trigger('state', this._state);
   },
 
+  getState: function() {
+    return this._state;
+  },
+
   _onStateChange: function() {
     this.fetch();
   },
@@ -40,7 +44,7 @@ module.exports = bb.Collection.extend(_.extend({
     return payload.items;
   },
 
-  modelOpts:function(opts) {
+  modelOpts: function(opts) {
     return opts;
   },
 
@@ -59,30 +63,30 @@ module.exports = bb.Collection.extend(_.extend({
     return false;
   },
 
-  hasNext:function() {
+  hasNext: function() {
     var page = this.currentPage() + 1;
     return page < this.maxPage();
   },
 
-  hasPrevious:function() {
+  hasPrevious: function() {
     return this._state.offset > 0;
   },
 
   next: function() {
-    if(!this.hasNext()) return this;
+    if (!this.hasNext()) return this;
     this.updateState('offset', this._state.offset + this._pageSize);
   },
 
   previous: function() {
-    if(!this.hasPrevious()) return this;
+    if (!this.hasPrevious()) return this;
     this.updateState('offset', this._state.offset - this._pageSize);
   },
 
-  currentPage:function() {
+  currentPage: function() {
     return Math.floor(this._state.offset / this._pageSize);
   },
 
-  maxPage:function() {
+  maxPage: function() {
     return Math.ceil(this._meta.count / this._pageSize);
   }
 

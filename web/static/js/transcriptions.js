@@ -8,7 +8,7 @@ var Songs = require('./collections/songs');
 var TranscriptionsTemplate = require('./templates/transcriptions.html');
 var FilterViewTemplate = require('./templates/filter.html');
 var TranscriptionListViewTemplate = require('./templates/transcription-list.html');
-
+var PagerTemplate = require('./templates/pager.html');
 
 var FilterView = View.extend({
   el: '#filter',
@@ -20,32 +20,36 @@ var FilterView = View.extend({
     this.render();
   },
 
-  _buildWhere: function(filter) {
-    var toks = filter.split(' ')
+  _buildWhere: function(q, filter) {
+    delete q.name;
+    delete q.regions;
 
-    var things = _.partition(toks, function(tok) {
-      return tok.startsWith("#")
+    var toks = filter.split(' ');
+    var tagsAndFreeText = _.partition(toks, function(tok) {
+      return tok.startsWith("#");
     });
-    var regions = things[0].map(function(tag) {
+    var regions = tagsAndFreeText[0].map(function(tag) {
       return tag.slice(1);
     });
-    var name = things[1].join(' ').trim();
+    var name = tagsAndFreeText[1].join(' ').trim();
 
     if(regions.length || name.length) {
-      var q = {};
       if(regions.length) q.regions = regions;
       if(name.length) q.name = name;
       return q;
     }
-    return {};
+    return q;
   },
 
   onFilter:function(e) {
-    var filter = $(e.currentTarget).val()
-    var q = this._buildWhere(filter);
-    this.model.updateState("where", q);
+    var filter = $(e.currentTarget).val();
+
+    var state = this.model.getState();
+    state.offset = 0;
+    var where = this._buildWhere(state.where || {}, filter);
+    this.model.updateState("where", where);
   }
-})
+});
 
 var TranscriptionListView = View.extend({
   el: '#transcription-list',
@@ -64,7 +68,30 @@ var TranscriptionListView = View.extend({
       this.api.session.get('user').id === song.get('user').id;
   },
 
-})
+});
+
+var PagerView = View.extend({
+  el: '#pager',
+  template: _.template(PagerTemplate),
+
+  events: {
+    'click .next': 'onNext',
+    'click .previous': 'onPrevious'
+  },
+
+  init: function() {
+    this.listenTo(this.model, 'sync', this.r);
+  },
+
+  onNext: function() {
+    this.model.next();
+  },
+
+  onPrevious: function() {
+    this.model.previous();
+  },
+
+});
 
 
 module.exports = View.extend({
@@ -72,8 +99,6 @@ module.exports = View.extend({
   template: _.template(TranscriptionsTemplate),
 
   events: {
-    'click .next': 'onNext',
-    'click .previous': 'onPrevious',
     'click .delete-song': 'onDelete'
   },
 
@@ -90,20 +115,15 @@ module.exports = View.extend({
     this.addSubview('filter', FilterView, {
       model: this.model
     });
+    this.addSubview('pager', PagerView, {
+      model: this.model
+    });
 
     this.fetch();
   },
 
   fetch: function() {
     this.model.fetch();
-  },
-
-  onNext: function() {
-    this.model.next();
-  },
-
-  onPrevious: function() {
-    this.model.previous();
   },
 
   onDelete: function(e) {

@@ -1,0 +1,23 @@
+<ul class="pager">
+  <li>
+    <a href="javascript:void(0);"
+    class="<%- state.model.hasPrevious()? 'previous': 'text-muted' %>">
+      <i class="ion-ios-arrow-left"/><%- t('back') %>
+    </a>
+  </li>
+
+  <li>
+    <a href="javascript:void(0);"
+    class="<%- state.model.hasNext()? 'next': 'text-muted' %>">
+      <%- t('next') %><i class="ion-ios-arrow-right"/>
+    </a>
+  </li>
+
+  <li>
+    <span class="text-muted">
+      <%- Math.min( state.model.maxPage(), state.model.currentPage()+1) %>
+      /
+      <%- state.model.maxPage() %>
+    </span>
+  </li>
+</ul>

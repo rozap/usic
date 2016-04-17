@@ -3,7 +3,7 @@ defmodule Usic.Mixfile do
 
   def project do
     [app: :usic,
-     version: "0.0.18",
+     version: "0.1.2",
      elixir: "~> 1.0",
      elixirc_paths: elixirc_paths(Mix.env),
      compilers: [:phoenix] ++ Mix.compilers,
@@ -41,7 +41,7 @@ defmodule Usic.Mixfile do
       {:uuid, "~> 1.0.1"},
       {:exrm, github: "bitwalker/exrm"},
       {:logger_file_backend, "0.0.5"},
-      {:comeonin, "~> 1.3"},
+      {:comeonin, "~> 1.3.0"},
       {:httpoison, "~> 0.8.0"}
    ]
   end

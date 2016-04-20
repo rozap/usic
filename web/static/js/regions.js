@@ -20,12 +20,12 @@ module.exports = View.extend({
 
   init: function(opts) {
     this._wavesurfer = opts.wavesurfer;
-    this._bindEvents();
     this.regions = new Regions(opts.model.get('regions'), {
       song: opts.model,
       api: opts.api,
       dispatcher: opts.dispatcher
     });
+    this._bindEvents();
 
     this.listenTo(this.regions, 'error', this.onRegionsError);
     this.listenTo(this.regions, 'add', this.r);
@@ -50,6 +50,9 @@ module.exports = View.extend({
     this.listenTo(this.dispatcher, 'input:onEnableZoomTool', this.onEnableZoomTool);
     this.listenTo(this.dispatcher, 'input:onDisableZoomTool', this.onDisableZoomTool);
 
+    this.listenTo(this.regions, 'change', function( ){
+      this.model.set('regions', this.regions.toJSON())
+    });
   },
 
   onDeselect: function(view) {

@@ -1,0 +1,19 @@
+<h4 class="text-muted control-label">Shortcuts</h4>
+<ul class="meta-tags">
+  <% if(state.model.getSortedRegions().length) { %>
+    <% state.model.getSortedRegions().forEach(function(region) { %>
+      <% if(region.meta && region.meta.tags) { %>
+        <% region.meta.tags.forEach(function(tag) { %>
+          <li class="tag">
+            <a href="#song/<%- state.model.get('id') %>/region/<%- region.id %>"
+              title="Go to this section">
+              <%- tag %>
+            </a>
+          </li>
+        <% }) %>
+      <% } %>
+    <% }) %>
+  <% } else { %>
+    <h5>No regions yet. Click and drag on the wave form to make one. Add a #hashtag in the region description to make a shortcut.</h5>
+  <% } %>
+</ul>

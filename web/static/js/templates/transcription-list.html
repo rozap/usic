@@ -11,7 +11,7 @@
 
       <ul class="meta-tags">
         <!-- TODO: sort these regions by start time -->
-        <% state.getSortedRegions(song).forEach(function(region) { %>
+        <% song.getSortedRegions().forEach(function(region) { %>
           <% if(region.meta && region.meta.tags) { %>
             <% region.meta.tags.forEach(function(tag) { %>
               <li class="tag">

@@ -20,7 +20,7 @@ archive_name = "usic.tar.gz"
 
 def check_deploy():
     # local('mix clean')
-    # local('mix test')
+    local('mix test')
     local('mix ship')
 
 def make_dirs(version):

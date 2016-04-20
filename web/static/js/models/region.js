@@ -6,7 +6,7 @@ var saveEvents = 'change:name change:loop change:start change:end';
 module.exports = Model.extend({
   name: 'region',
   defaults: {
-    loop: true,
+    loop: false,
   },
   initialize: function(attrs, opts) {
     Model.prototype.initialize.call(this, attrs, opts);

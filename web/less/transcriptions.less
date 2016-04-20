@@ -11,26 +11,27 @@ ul.transcriptions {
     margin: @base-pad/2 0px;
   }
 
-  ul.meta-tags {
-    padding: @base-pad 0px;
-    li {
-      display: inline-block;
-      a {      
-        padding: 4px;
-        background: @blue;
-        color: @white;
 
-        &:hover {
-          background: lighten(@blue, 10%);
-          color: @light-gray;
-
-        };
-      }
-    }
-  }
 }
 
 .filter {
   width: 100%;
 }
 
+ul.meta-tags {
+  padding: @base-pad 0px;
+  li {
+    display: inline-block;
+    a {
+      padding: 4px;
+      background: @blue;
+      color: @white;
+
+      &:hover {
+        background: lighten(@blue, 10%);
+        color: @light-gray;
+
+      };
+    }
+  }
+}

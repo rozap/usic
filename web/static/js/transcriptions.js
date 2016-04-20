@@ -66,16 +66,7 @@ var TranscriptionListView = View.extend({
       this.api.session.get('user') &&
       song.get('user') &&
       this.api.session.get('user').id === song.get('user').id;
-  },
-
-  getSortedRegions: function(song) {
-    var regions = _.clone(song.get('regions'));
-    regions.sort(function(r0, r1) {
-      return r0.start > r1.start ? 1 : -1;
-    });
-    return regions;
   }
-
 });
 
 var PagerView = View.extend({

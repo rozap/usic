@@ -14,6 +14,7 @@ var ControlsView = require('./controls');
 var WaveView = require('./wave');
 var RegionView = require('./regions');
 var ClicksView = require('./clicks');
+var TagMapView = require('./tag-map');
 
 var History = require('./history');
 
@@ -35,7 +36,6 @@ module.exports = View.extend({
   init: function(opts) {
     this.listenTo(this, 'state.update.songId', this._onSongChanged);
     this.listenTo(this, 'state.update.regionId', this._onRegionChanged);
-    window.song = this;
   },
 
   _onSongChanged: function(oldId, newId) {
@@ -51,7 +51,6 @@ module.exports = View.extend({
   },
 
   _onRegionChanged:function(_oldRegion, newRegion) {
-    console.log(_oldRegion, "-->", newRegion)
     this._state.centerOnRegionId = newRegion;
   },
 
@@ -63,6 +62,10 @@ module.exports = View.extend({
     this.render();
 
     this.addSubview('song-title', SongTitle, {
+      model: this.model
+    });
+    this.addSubview('tag-map', TagMapView, {
+      el: '#tag-map',
       model: this.model
     });
 
